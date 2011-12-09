@@ -18,7 +18,7 @@ Jeweler::Tasks.new do |gem|
   gem.homepage = "http://github.com/projectdx/kookaburra"
   gem.license = "MIT"
   gem.summary = %Q{WindowDriver testing pattern for Ruby apps}
-  gem.description = %Q{TODO: longer description of your gem}
+  gem.description = %Q{Cucumber + Capybara = Kookaburra? It made sense at the time.}
   gem.email = "johnwilger@gmail.com"
   gem.authors = ["John Wilger", "Sam Livingston-Gray"]
   # dependencies defined in Gemfile
