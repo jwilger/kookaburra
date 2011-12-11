@@ -30,6 +30,17 @@ module Kookaburra
       end
 
       module InstanceMethods
+        def build_input_xpath(attribute)
+          "(" +
+            "(.//textarea)|" +
+            "(.//select)|" +
+            "(.//input[(not(@type='button')) and (not(@type='reset')) and (not(@type='submit'))])" +
+          ")[contains(@id,'_#{attribute}')]"
+          # TODO: Avoid false positives by matching to the end of the id
+          #       string for everything but radio buttons and checkboxes
+          #       ... or something better than that.
+        end
+
         def build_textual_input_xpath(attribute, value=nil)
           # Since the type attribute might not be present or might contain
           # just about any value, check for and exclude nodes with type
@@ -73,10 +84,6 @@ module Kookaburra
           browser.find(:xpath, xpath, :message => msg)
         end
 
-        def has_validation_errors?
-          in_component { browser.has_css?('.inline-errors') }
-        end
-
         def submit_button_locator
           raise "Subclass responsibility!"
         end
@@ -102,31 +109,6 @@ module Kookaburra
         def values_in_fields_match_hash?(hash = {}, opts = {})
           @body = nil
           hash.all? { |field, value| form_element_has_value?(field, value, opts) }
-        end
-
-        def read_only_values_match_hash?(hash = {}, opts = {})
-          hash.all? do |field, expected_value|
-            is_money = opts[:money] && opts[:money].include?(field)
-            read_only_value_matches?(expected_value, field, :is_money => is_money)
-          end
-        end
-
-        def read_only_value_matches?(expected_value, field, opts = {})
-          actual_value = read_only_value(field, opts)
-          (actual_value == expected_value).tap do |same|
-            puts <<-EOF unless same
-Read-only value mismatch in #{field}:
-  Expected: #{expected_value}
-  Actual:   #{actual_value}
-            EOF
-          end
-        end
-
-        def read_only_value(field, opts = {})
-          browser.find(:css, ".#{field}").text.tap do |value|
-            value.gsub!(/^.*:\s/, '')
-            value.gsub!(/[\$,]/, '') if opts[:is_money]
-          end
         end
 
         def tag_visible?(css)
@@ -161,7 +143,6 @@ Read-only value mismatch in #{field}:
             input.value == value
           end
         end
-
       end
 
       def self.included(receiver)

@@ -16,6 +16,7 @@ module Kookaburra
   end
 end
 
+
 # Require all Ruby files under ./kookaburra/
 base_path = File.expand_path(File.join(File.dirname(__FILE__), 'kookaburra'))
 Dir.glob(File.join(base_path, '**', '*.rb')).each { |file| require file }
