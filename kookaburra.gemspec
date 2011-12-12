@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{kookaburra}
-  s.version = "0.0.0"
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Renewable Funding, LLC"]
-  s.date = %q{2011-12-09}
+  s.date = %q{2011-12-11}
   s.description = %q{Cucumber + Capybara = Kookaburra? It made sense at the time.}
   s.email = %q{devteam@renewfund.com}
   s.extra_rdoc_files = [
@@ -25,11 +25,11 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "kookaburra.gemspec",
     "lib/kookaburra.rb",
     "lib/kookaburra/api_driver.rb",
-    "lib/kookaburra/api_driver/json_tools.rb",
-    "lib/kookaburra/api_driver/plumbing.rb",
     "lib/kookaburra/given_driver.rb",
+    "lib/kookaburra/plumbing.rb",
     "lib/kookaburra/test_data.rb",
     "lib/kookaburra/test_data/factory.rb",
     "lib/kookaburra/ui_driver.rb",
@@ -53,6 +53,8 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<activesupport>, [">= 2.3"])
+      s.add_runtime_dependency(%q<json>, ["~> 1.6.3"])
       s.add_development_dependency(%q<minitest>, [">= 0"])
       s.add_development_dependency(%q<yard>, ["~> 0.6.0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
@@ -60,6 +62,8 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<rcov>, [">= 0"])
       s.add_development_dependency(%q<reek>, ["~> 1.2.8"])
     else
+      s.add_dependency(%q<activesupport>, [">= 2.3"])
+      s.add_dependency(%q<json>, ["~> 1.6.3"])
       s.add_dependency(%q<minitest>, [">= 0"])
       s.add_dependency(%q<yard>, ["~> 0.6.0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
@@ -68,6 +72,8 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<reek>, ["~> 1.2.8"])
     end
   else
+    s.add_dependency(%q<activesupport>, [">= 2.3"])
+    s.add_dependency(%q<json>, ["~> 1.6.3"])
     s.add_dependency(%q<minitest>, [">= 0"])
     s.add_dependency(%q<yard>, ["~> 0.6.0"])
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
