@@ -2,10 +2,10 @@ module Kookaburra
   class UIDriver
     module HasStrategies
       class Strategy
-        class_inheritable_accessor :tag
+        __cattr_accessor_for_kookaburra(:tag)
         attr_reader :ui_component
         def initialize(ui_component)
-          @ui_component, @tag = ui_component
+          @ui_component = ui_component
         end
       end
 
@@ -38,8 +38,7 @@ module Kookaburra
       end
 
       def self.included(receiver)
-        receiver.class_inheritable_accessor :strategy_classes
-        receiver.strategy_classes = []
+        receiver.__cattr_accessor_for_kookaburra :strategy_classes, []
 
         receiver.extend Forwardable
         receiver.extend         ClassMethods

@@ -35,8 +35,7 @@ module Kookaburra
       end
 
       def self.included(receiver)
-        receiver.class_inheritable_accessor :ui_component_names
-        receiver.ui_component_names = []
+        receiver.__cattr_accessor_for_kookaburra :ui_component_names, []
 
         receiver.extend         ClassMethods
         receiver.send :include, InstanceMethods
