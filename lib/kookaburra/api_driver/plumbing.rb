@@ -10,9 +10,9 @@ module Kookaburra
           @test_data = opts.fetch(:test_data)
         end
 
-        def raise_unless_created(short_description)
-          message = "%s creation failed (#{last_response.status})\n#{last_response.body}" % short_description
-          raise message unless last_response.status == 201
+        def raise_unless_status(expected_status, short_description)
+          message = "%s failed (#{last_response.status})\n#{last_response.body}" % short_description
+          raise message unless last_response.status == expected_status
         end
       end
       

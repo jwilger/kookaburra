@@ -30,6 +30,17 @@ module Kookaburra
       end
 
       module InstanceMethods
+        def build_input_xpath(attribute)
+          "(" +
+            "(.//textarea)|" +
+            "(.//select)|" +
+            "(.//input[(not(@type='button')) and (not(@type='reset')) and (not(@type='submit'))])" +
+          ")[contains(@id,'_#{attribute}')]"
+          # TODO: Avoid false positives by matching to the end of the id
+          #       string for everything but radio buttons and checkboxes
+          #       ... or something better than that.
+        end
+
         def build_textual_input_xpath(attribute, value=nil)
           # Since the type attribute might not be present or might contain
           # just about any value, check for and exclude nodes with type
@@ -55,7 +66,7 @@ module Kookaburra
         end
 
         def build_select_input_xpath(attribute, value=nil)
-          xpath = ".//select[contains(@id, #{attribute})]/option[@value='#{value}']"
+          xpath = ".//select[contains(@id, #{attribute})]/option[text()='#{value}']"
         end
 
         # Find the specified input by its field name.  The value argument is
@@ -73,10 +84,6 @@ module Kookaburra
           browser.find(:xpath, xpath, :message => msg)
         end
 
-        def has_validation_errors?
-          in_component { browser.has_css?('.inline-errors') }
-        end
-
         def submit_button_locator
           raise "Subclass responsibility!"
         end
@@ -86,7 +93,7 @@ module Kookaburra
           no_500_error!
         end
 
-        def fill_in_fields(hash, idx = 0, opts = {})
+        def fill_in_fields(hash, idx = 0)
           @body = nil
 
           # If not explicitly ordered, then we must think the fill-in order doesn't
@@ -95,73 +102,71 @@ module Kookaburra
           hash = hash.map.shuffle if Hash === hash && ! ActiveSupport::OrderedHash === hash
 
           hash.each do |field, value|
-            fill_in_form_element(field, value, idx, opts)
+            fill_in_form_element(field, value, idx)
           end
         end
 
-        def values_in_fields_match_hash?(hash = {}, opts = {})
-          @body = nil
-          hash.all? { |field, value| form_element_has_value?(field, value, opts) }
-        end
-
-        def read_only_values_match_hash?(hash = {}, opts = {})
-          hash.all? do |field, expected_value|
-            is_money = opts[:money] && opts[:money].include?(field)
-            read_only_value_matches?(expected_value, field, :is_money => is_money)
+      private
+          def fill_in_form_element(attribute, value, idx = 0, opts = {})
+            msg = "cannot find the field for '#{attribute}' with value '#{value}' to fill it in."
+            input = find_input(attribute, value, idx+1, msg)
+            set_value(input, value, attribute)
           end
-        end
-
-        def read_only_value_matches?(expected_value, field, opts = {})
-          actual_value = read_only_value(field, opts)
-          (actual_value == expected_value).tap do |same|
-            puts <<-EOF unless same
-Read-only value mismatch in #{field}:
-  Expected: #{expected_value}
-  Actual:   #{actual_value}
-            EOF
-          end
-        end
-
-        def read_only_value(field, opts = {})
-          browser.find(:css, ".#{field}").text.tap do |value|
-            value.gsub!(/^.*:\s/, '')
-            value.gsub!(/[\$,]/, '') if opts[:is_money]
-          end
-        end
+            def set_value(input, value, attribute)
+              if self.class.is_select?(attribute)
+                input.select_option
+              else
+                input.set value
+              end
+            end
+      public
 
         def tag_visible?(css)
-          browser.find(:css, css).visible?
-        rescue
-          false
+          browser.has_css?(css, :visible => true)
+        end
+
+        def no_tag_visible?(css)
+          # use of wait_until is supposed to be redundant with #has_no_css?, but
+          # getting intermittent Selenium::WebDriver::Error::StaleElementReferenceError.
+          # Just wrapping in an explicit wait_until did not capture the exception,
+          # so apparently that one is explicitly passed through rather than being
+          # retried.
+          browser.wait_until do
+            begin
+              browser.has_no_css?(css, :visible => true)
+            rescue Selenium::WebDriver::Error::StaleElementReferenceError
+              next false  # Keep trying if not yet timed out.
+            end
+          end
         end
 
         private
 
-        def fill_in_form_element(attribute, value, idx = 0, opts = {})
-          msg = "cannot find the field for '#{attribute}' to fill it in."
-          input = find_input(attribute, value, idx+1, msg)
-          set_value(input, value, attribute)
-        end
 
-        def set_value(input, value, attribute)
-          if self.class.is_select?(attribute)
-            input.select_option
-          else
-            input.set value
+        def find_disableable_inputs(attribute)
+          inputs = []
+          browser.wait_until do
+            inputs = browser.all(:xpath, build_input_xpath(attribute))
+            inputs.present?
           end
+          inputs
         end
 
-        def form_element_has_value?(attribute, value, idx = 0, opts = {})
-          msg = "can't find a field for '#{attribute}' to check its value."
-          input = find_input(attribute, value, idx+1, msg)
-          # <select> elements are not currently handled.
-          if input[:type] == 'radio'
-            input.checked?
-          else
-            input.value == value
+        def form_element_disabled?(attribute, *_)
+          # TODO (SLG): this will only check the currently-selected radio button, not all of them
+          find_disableable_inputs(attribute).all? { |input| !!input[:disabled] }
+        rescue Capybara::TimeoutError
+          puts "Timed out trying to find disableable inputs for #{attribute}"
+        end
+
+        def all_form_elements_disabled?(desc, attr_names, &b)
+          errs = attr_names.inject([]) do |mem, attr_name|
+            (mem << "#{desc} #{attr_name} is not read-only") unless form_element_disabled?(attr_name)
+            mem
           end
+          raise errs.join("\n") if errs.present?
+          true
         end
-
       end
 
       def self.included(receiver)
