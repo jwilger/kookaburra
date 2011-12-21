@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{kookaburra}
-  s.version = "0.0.0"
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Renewable Funding, LLC"]
-  s.date = %q{2011-12-09}
+  s.date = %q{2011-12-21}
   s.description = %q{Cucumber + Capybara = Kookaburra? It made sense at the time.}
   s.email = %q{devteam@renewfund.com}
   s.extra_rdoc_files = [
@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
+    "kookaburra.gemspec",
     "lib/kookaburra.rb",
     "lib/kookaburra/api_driver.rb",
     "lib/kookaburra/api_driver/json_tools.rb",
