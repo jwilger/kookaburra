@@ -20,7 +20,12 @@ module Kookaburra
       end
 
       def self.component_path(path)
-        define_method(:component_path) { path }
+        case path
+        when Symbol
+          alias_method :component_path, path
+        else
+          define_method(:component_path) { path }
+        end
       end
 
       def self.path_id_regex(regex)
@@ -49,6 +54,10 @@ module Kookaburra
         visit component_path
       end
 
+      def refresh
+        visit component_path
+      end
+
       def show!
         show
         visible!
@@ -59,7 +68,12 @@ module Kookaburra
       end
 
       def component_visible?
-        at_path? && browser.has_css?(component_locator)
+        begin
+          browser.find(component_locator)
+        rescue Capybara::ElementNotFound
+          return false
+        end
+        at_path?
       end
 
       def alternate_paths
@@ -77,7 +91,7 @@ module Kookaburra
       end
 
       def click_on(locator)
-        in_component { browser.click_on(locator) }
+        in_component { browser.find(locator).click }
       end
 
       def choose(locator)
