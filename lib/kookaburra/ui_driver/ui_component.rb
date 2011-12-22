@@ -4,8 +4,6 @@ module Kookaburra
       include HasBrowser
       include HasFields
       include HasStrategies
-
-
       extend HasSubcomponents
 
       attr_reader :test_data
