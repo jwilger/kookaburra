@@ -1,5 +1,3 @@
-require File.expand_path(File.join(File.dirname(__FILE__), *%w[test_data factory]))
-
 # This is the mechanism for sharing state between Cucumber steps.
 # If you're using instance variables, YOU'RE DOING IT WRONG.
 module Kookaburra
