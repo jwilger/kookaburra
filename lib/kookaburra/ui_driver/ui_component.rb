@@ -4,6 +4,8 @@ module Kookaburra
       include HasBrowser
       include HasFields
       include HasStrategies
+
+
       extend HasSubcomponents
 
       attr_reader :test_data
@@ -48,18 +50,20 @@ module Kookaburra
       end
       private :_visible?
 
-      def show
+      def show(opts = {})
         return if visible?
         raise "Subclass responsibility!" unless self.respond_to?(:component_path)
-        visit component_path
+        path = component_path
+        path << ( '?' + opts[:query_params].map{|kv| "%s=%s" % kv}.join('&') ) if opts[:query_params]
+        visit path
       end
 
       def refresh
         visit component_path
       end
 
-      def show!
-        show
+      def show!(opts = {})
+        show opts
         visible!
       end
 
@@ -68,12 +72,7 @@ module Kookaburra
       end
 
       def component_visible?
-        begin
-          browser.find(component_locator)
-        rescue Capybara::ElementNotFound
-          return false
-        end
-        at_path?
+        at_path? && browser.has_css?(component_locator)
       end
 
       def alternate_paths
