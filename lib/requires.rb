@@ -11,6 +11,7 @@ end
 
 # Require specific paths from the bottom up.  Hooray for dependency graphs!
 base = File.dirname(__FILE__)
+kookaburra_require_all_relative_to base, %w[kookaburra ui_driver mixins]
 kookaburra_require_all_relative_to base, %w[kookaburra ui_driver]
 kookaburra_require_all_relative_to base, %w[kookaburra test_data]
 kookaburra_require_all_relative_to base, %w[kookaburra]
