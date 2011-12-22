@@ -28,8 +28,6 @@ Gem::Specification.new do |s|
     "kookaburra.gemspec",
     "lib/kookaburra.rb",
     "lib/kookaburra/api_driver.rb",
-    "lib/kookaburra/api_driver/json_tools.rb",
-    "lib/kookaburra/api_driver/plumbing.rb",
     "lib/kookaburra/given_driver.rb",
     "lib/kookaburra/test_data.rb",
     "lib/kookaburra/test_data/factory.rb",
