@@ -23,15 +23,6 @@ module Kookaburra
         def ui_components
           ui_component_names.map { |name| self.send(name) }
         end
-      
-        def current_component
-          # TODO: This will fail if we ever add a component for something that's visible on every page
-          # It might make sense to add some sort of priority to components,
-          # or maybe some additional selector so we can say current_submittable_component... just an idea.
-          ui_components.detect(&:visible?).tap do |component|
-            raise "There are no visible components!" if component.nil?
-          end
-        end
       end
 
       def self.included(receiver)
