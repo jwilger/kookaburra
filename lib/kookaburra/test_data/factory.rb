@@ -9,7 +9,7 @@ module Kookaburra
 
       protected
       def hash_for_merging(overrides = {})
-        overrides.dup.tap do |hash_to_merge|
+        HashWithIndifferentAccess.new( overrides.with_indifferent_access ).tap do |hash_to_merge|
           yield hash_to_merge if block_given?
         end
       end
