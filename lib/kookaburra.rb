@@ -1,8 +1,4 @@
-base_path = File.expand_path(File.join(File.dirname(__FILE__), *%w[kookaburra]))
-%w[api_driver given_driver test_data ui_driver world_setup].each do |file|
-  require File.join(base_path, file)
-end
-
+require File.join(File.dirname(__FILE__), *%w[requires])
 
 module Kookaburra
   def self.drivers
