@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{kookaburra}
-  s.version = "0.0.1"
+  s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Renewable Funding, LLC"]
-  s.date = %q{2011-12-21}
+  s.date = %q{2012-01-13}
   s.description = %q{Cucumber + Capybara = Kookaburra? It made sense at the time.}
   s.email = %q{devteam@renewfund.com}
   s.extra_rdoc_files = [
@@ -32,13 +32,14 @@ Gem::Specification.new do |s|
     "lib/kookaburra/test_data.rb",
     "lib/kookaburra/test_data/factory.rb",
     "lib/kookaburra/ui_driver.rb",
-    "lib/kookaburra/ui_driver/has_browser.rb",
-    "lib/kookaburra/ui_driver/has_fields.rb",
-    "lib/kookaburra/ui_driver/has_strategies.rb",
-    "lib/kookaburra/ui_driver/has_subcomponents.rb",
-    "lib/kookaburra/ui_driver/has_ui_component.rb",
+    "lib/kookaburra/ui_driver/mixins/has_browser.rb",
+    "lib/kookaburra/ui_driver/mixins/has_fields.rb",
+    "lib/kookaburra/ui_driver/mixins/has_strategies.rb",
+    "lib/kookaburra/ui_driver/mixins/has_subcomponents.rb",
+    "lib/kookaburra/ui_driver/mixins/has_ui_component.rb",
     "lib/kookaburra/ui_driver/ui_component.rb",
     "lib/kookaburra/world_setup.rb",
+    "lib/requires.rb",
     "test/helper.rb"
   ]
   s.homepage = %q{http://github.com/projectdx/kookaburra}
