@@ -4,14 +4,14 @@
 # -*- encoding: utf-8 -*-
 
 Gem::Specification.new do |s|
-  s.name = %q{kookaburra}
+  s.name = "kookaburra"
   s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Renewable Funding, LLC"]
-  s.date = %q{2012-01-13}
-  s.description = %q{Cucumber + Capybara = Kookaburra? It made sense at the time.}
-  s.email = %q{devteam@renewfund.com}
+  s.date = "2012-01-15"
+  s.description = "Cucumber + Capybara = Kookaburra? It made sense at the time."
+  s.email = "devteam@renewfund.com"
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -42,14 +42,13 @@ Gem::Specification.new do |s|
     "lib/requires.rb",
     "test/helper.rb"
   ]
-  s.homepage = %q{http://github.com/projectdx/kookaburra}
+  s.homepage = "http://github.com/projectdx/kookaburra"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = %q{1.3.7}
-  s.summary = %q{WindowDriver testing pattern for Ruby apps}
+  s.rubygems_version = "1.8.15"
+  s.summary = "WindowDriver testing pattern for Ruby apps"
 
   if s.respond_to? :specification_version then
-    current_version = Gem::Specification::CURRENT_SPECIFICATION_VERSION
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
