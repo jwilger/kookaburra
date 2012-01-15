@@ -1,3 +1,5 @@
+require 'active_support/core_ext/class/attribute'
+
 module Kookaburra
   class UIDriver
     module HasStrategies

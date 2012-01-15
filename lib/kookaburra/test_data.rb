@@ -1,3 +1,5 @@
+require 'active_support/hash_with_indifferent_access'
+
 # This is the mechanism for sharing state between Cucumber steps.
 # If you're using instance variables, YOU'RE DOING IT WRONG.
 module Kookaburra

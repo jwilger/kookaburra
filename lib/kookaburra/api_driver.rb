@@ -1,3 +1,5 @@
+require 'rack/test'
+
 module Kookaburra
   # Pattern:
   # - Get some data from test_data.factory
