@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.0.2"
+  s.version = "0.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Renewable Funding, LLC"]
@@ -54,6 +54,7 @@ Gem::Specification.new do |s|
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
       s.add_runtime_dependency(%q<activesupport>, [">= 3.0"])
       s.add_runtime_dependency(%q<rack>, [">= 0"])
+      s.add_runtime_dependency(%q<capybara>, [">= 0"])
       s.add_development_dependency(%q<minitest>, [">= 0"])
       s.add_development_dependency(%q<yard>, ["~> 0.6.0"])
       s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
@@ -63,6 +64,7 @@ Gem::Specification.new do |s|
     else
       s.add_dependency(%q<activesupport>, [">= 3.0"])
       s.add_dependency(%q<rack>, [">= 0"])
+      s.add_dependency(%q<capybara>, [">= 0"])
       s.add_dependency(%q<minitest>, [">= 0"])
       s.add_dependency(%q<yard>, ["~> 0.6.0"])
       s.add_dependency(%q<bundler>, ["~> 1.0.0"])
@@ -73,6 +75,7 @@ Gem::Specification.new do |s|
   else
     s.add_dependency(%q<activesupport>, [">= 3.0"])
     s.add_dependency(%q<rack>, [">= 0"])
+    s.add_dependency(%q<capybara>, [">= 0"])
     s.add_dependency(%q<minitest>, [">= 0"])
     s.add_dependency(%q<yard>, ["~> 0.6.0"])
     s.add_dependency(%q<bundler>, ["~> 1.0.0"])
