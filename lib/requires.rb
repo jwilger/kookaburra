@@ -1,5 +1,3 @@
-require 'active_support/hash_with_indifferent_access'
-
 def kookaburra_require_glob(path_glob)
   Dir.glob(path_glob).each do |file|
     require file
