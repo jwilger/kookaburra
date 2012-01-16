@@ -84,5 +84,28 @@ describe Kookaburra do
         refute_same mixer.ui, mixer2.ui
       end
     end
+
+    describe '#kookaburra_reset!' do
+      it 'resets the api driver' do
+        api = mixer.api
+        mixer.kookaburra_reset!
+        api2 = mixer.api
+        refute_same api, api2
+      end
+
+      it 'resets the given driver' do
+        given = mixer.given
+        mixer.kookaburra_reset!
+        given2 = mixer.given
+        refute_same given, given2
+      end
+
+      it 'resets the ui driver' do
+        ui = mixer.ui
+        mixer.kookaburra_reset!
+        ui2 = mixer.ui
+        refute_same ui, ui2
+      end
+    end
   end
 end
