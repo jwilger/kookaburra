@@ -1,8 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'activesupport', '>= 3.0'
-gem 'rack'
-gem 'capybara'
+gem 'rack-test'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
