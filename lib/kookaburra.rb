@@ -28,9 +28,20 @@ require File.join(File.dirname(__FILE__), *%w[requires])
 #     end
 #   end
 #
+# For Cucumber, add the following to `features/support/kookaburra_setup.rb`:
+#
+#   Kookaburra.adapter = Capybara
+#   World(Kookaburra)
+#
+#   Before do
+#     kookaburra_reset!
+#   end
+#
+# After doing to, the #api, #given and #ui methods will be available in your
+# Cucumber step definitions.
+#
 # (Obviously, the specific methods on #given and #ui are something that will be
 # unique to your application's domain.)
-#
 module Kookaburra
   class << self
     # Provides the default adapter for the Kookaburra library. In most cases,
@@ -40,30 +51,7 @@ module Kookaburra
     #
     # We allow this to be passed in, so that we can avoid a hard-coded
     # dependency on Capybara in this gem.
-    #
-    # (Note: the #drivers method still has a hard-coded dependency on Capybara,
-    # but it is deprecated and will be removed shortly.)
     attr_accessor :adapter
-
-    # This method is used by some Cucumber clients, but should be considered
-    # deprecated.
-    # TODO: find a better way to make sure the #given, #api and #ui methods are
-    # available to Cucumber step definitions
-    def drivers
-      test_data = Kookaburra::TestData.new
-      api_driver = Kookaburra::APIDriver.new({
-        :app       => Capybara.app,
-        :test_data => test_data,
-      })
-      given_driver = Kookaburra::GivenDriver.new({
-        :api_driver => api_driver,
-      })
-      ui_driver = Kookaburra::UIDriver.new({
-        :browser   => Capybara.current_session,
-        :test_data => test_data,
-      })
-      { :api_driver => api_driver, :given_driver => given_driver, :ui_driver => ui_driver }
-    end
   end
 
   # Whatever was set in `Kookaburra.adapter can be overriden in the mixin
@@ -84,20 +72,35 @@ module Kookaburra
 
   # Returns a configured instance of the `Kookaburra::APIDriver`
   def api
-    @kookaburra_api ||= Kookaburra::APIDriver.new(:app => kookaburra_adapter.app,
-                                                  :test_data => kookaburra_test_data)
+    kookaburra_drivers[:api] ||= Kookaburra::APIDriver.new(
+      :app => kookaburra_adapter.app,
+      :test_data => kookaburra_test_data)
   end
 
   # Returns a configured instance of the `Kookaburra::GivenDriver`
   def given
-    @kookaburra_given ||= Kookaburra::GivenDriver.new(:api_driver => api)
+    kookaburra_drivers[:given] ||= Kookaburra::GivenDriver.new(:api_driver => api)
   end
 
   # Returns a configured instance of the `Kookaburra::UIDriver`
   def ui
-    @kookaburra_ui ||= Kookaburra::UIDriver.new(
+    kookaburra_drivers[:ui] ||= Kookaburra::UIDriver.new(
       :browser => kookaburra_adapter.current_session,
       :test_data => kookaburra_test_data)
+  end
+
+  # This method causes new instances of all the Kookaburra drivers to be created
+  # the next time they are used, and, in particular, resets the state of any
+  # test data that is shared between the various drivers. This is necessary when
+  # Kookaburra is mixed in to Cucumber's World, because World does not get a new
+  # instance for each scenario. Instead, just be sure to call this method from a
+  # `Before` block in your cucumber setup, i.e.:
+  #
+  #   Before do
+  #     kookaburra_reset!
+  #   end
+  def kookaburra_reset!
+    @kookaburra_drivers = {}
   end
 
   private
@@ -105,6 +108,13 @@ module Kookaburra
   # The Kookaburra::TestData instance should not be used directly, but all of
   # the drivers should reference the same instance.
   def kookaburra_test_data
-    @kookaburra_test_data ||= Kookaburra::TestData.new
+    kookaburra_drivers[:test_data] ||= Kookaburra::TestData.new
+  end
+
+  # Holds references to all drivers in a single hash, so that
+  # Kookaburra#kookaburra_reset! can easily clear all Kookaburra state on the
+  # instance of the including class.
+  def kookaburra_drivers
+    @kookaburra_drivers ||= {}
   end
 end
