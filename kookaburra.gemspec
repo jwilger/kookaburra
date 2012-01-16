@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.0.4"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Renewable Funding, LLC"]
-  s.date = "2012-01-15"
+  s.date = "2012-01-16"
   s.description = "Cucumber + Capybara = Kookaburra? It made sense at the time."
   s.email = "devteam@renewfund.com"
   s.extra_rdoc_files = [
@@ -38,9 +38,9 @@ Gem::Specification.new do |s|
     "lib/kookaburra/ui_driver/mixins/has_subcomponents.rb",
     "lib/kookaburra/ui_driver/mixins/has_ui_component.rb",
     "lib/kookaburra/ui_driver/ui_component.rb",
-    "lib/kookaburra/world_setup.rb",
     "lib/requires.rb",
-    "test/helper.rb"
+    "test/helper.rb",
+    "test/kookaburra_test.rb"
   ]
   s.homepage = "http://github.com/projectdx/kookaburra"
   s.licenses = ["MIT"]
