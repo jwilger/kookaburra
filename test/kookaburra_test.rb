@@ -36,16 +36,27 @@ describe Kookaburra do
 
     describe '#kookaburra_adapter' do
       it 'is a read/write attribute' do
-        mixer = mixer_class.new
-        assert_nil mixer.kookaburra_adapter
         mixer.kookaburra_adapter = :probably_Capybara
         assert_equal :probably_Capybara, mixer.kookaburra_adapter
+      end
+
+      it 'defaults to the value of Kookaburra.adapter' do
+        begin
+          old_adapter = Kookaburra.adapter
+          Kookaburra.adapter = :global_adapter
+          mixer = mixer_class.new
+          assert_equal :global_adapter, mixer.kookaburra_adapter
+        ensure
+          Kookaburra.adapter = old_adapter
+        end
       end
     end
 
     describe '#api' do
-      it 'is an instance of Kookaburra::APIDriver' do
-        assert_kind_of(Kookaburra::APIDriver, mixer.api)
+      it 'is an instance of Kookaburra.api_driver' do
+        klass = Class.new(Kookaburra::APIDriver)
+        Kookaburra.api_driver = klass
+        assert_kind_of(klass, mixer.api)
       end
 
       it 'only creates a new one once for an instance of the including class' do
@@ -58,8 +69,10 @@ describe Kookaburra do
     end
 
     describe '#given' do
-      it 'is an instance of Kookaburra::GivenDriver' do
-        assert_kind_of(Kookaburra::GivenDriver, mixer.given)
+      it 'is an instance of Kookaburra.given_driver' do
+        klass = Class.new(Kookaburra::GivenDriver)
+        Kookaburra.given_driver = klass
+        assert_kind_of(klass, mixer.given)
       end
 
       it 'only creates a new one once for an instance of the including class' do
@@ -72,8 +85,10 @@ describe Kookaburra do
     end
 
     describe '#ui' do
-      it 'is an instance of Kookaburra::UIDriver' do
-        assert_kind_of(Kookaburra::UIDriver, mixer.ui)
+      it 'is an instance of Kookaburra.ui_driver' do
+        klass = Class.new(Kookaburra::UIDriver)
+        Kookaburra.ui_driver = klass
+        assert_kind_of(klass, mixer.ui)
       end
 
       it 'only creates a new one once for an instance of the including class' do
@@ -105,6 +120,52 @@ describe Kookaburra do
         mixer.kookaburra_reset!
         ui2 = mixer.ui
         refute_same ui, ui2
+      end
+    end
+    end
+
+  describe 'methods on the Kookaburra object' do
+    describe '#adapter' do
+      it 'is a read/write attribute' do
+        assert_nil Kookaburra.adapter
+        Kookaburra.adapter = :probably_Capybara
+        assert_equal :probably_Capybara, Kookaburra.adapter
+      end
+    end
+
+    describe '#api_driver' do
+      it 'is a read/write attribute' do
+        Kookaburra.api_driver = :an_api_driver
+        assert_equal :an_api_driver, Kookaburra.api_driver
+      end
+
+      it 'defaults to Kookaburra::APIDriver' do
+        Kookaburra.api_driver = nil
+        assert_equal Kookaburra::APIDriver, Kookaburra.api_driver
+      end
+    end
+
+    describe '#given_driver' do
+      it 'is a read/write attribute' do
+        Kookaburra.given_driver = :a_given_driver
+        assert_equal :a_given_driver, Kookaburra.given_driver
+      end
+
+      it 'defaults to Kookaburra::GivenDriver' do
+        Kookaburra.given_driver = nil
+        assert_equal Kookaburra::GivenDriver, Kookaburra.given_driver
+      end
+    end
+
+    describe '#ui_driver' do
+      it 'is a read/write attribute' do
+        Kookaburra.ui_driver = :a_ui_driver
+        assert_equal :a_ui_driver, Kookaburra.ui_driver
+      end
+
+      it 'defaults to Kookaburra::UIDriver' do
+        Kookaburra.ui_driver = nil
+        assert_equal Kookaburra::UIDriver, Kookaburra.ui_driver
       end
     end
   end
