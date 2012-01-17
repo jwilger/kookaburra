@@ -65,7 +65,8 @@ module Kookaburra
       end
 
       def component_visible?
-        at_path? && browser.has_css?(component_locator)
+        return false if respond_to?(:component_path) && !at_path?
+        browser.has_css?(component_locator)
       end
 
       def alternate_paths
