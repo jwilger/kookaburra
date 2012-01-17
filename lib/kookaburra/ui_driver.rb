@@ -3,11 +3,21 @@ module Kookaburra
     include HasBrowser
     include HasUIComponent
 
-    attr_reader :test_data
+    def test_data
+      @test_data ||= @opts.fetch(:test_data)
+    end
 
     def initialize(opts = {})
       super
-      @test_data = opts.fetch(:test_data)
+      @opts = opts
+    end
+
+    def navigate_to(component_id, parameters = {})
+      if ui_component_names.include?(component_id)
+        self.send(component_id).show!(parameters)
+      else
+        raise UIComponentNotFound, "The #{component_id} component is not registered"
+      end
     end
   end
 end
