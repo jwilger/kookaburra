@@ -21,7 +21,7 @@ module Kookaburra
       def no_500_error!
         if browser.has_css?('head title', :text => 'Internal Server Error')
           sleep 30 if ENV['GIMME_CRAP']
-          raise Unexpected500
+          raise Unexpected500, browser.body
         end
       end
     end
