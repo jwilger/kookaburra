@@ -3,14 +3,12 @@ module Kookaburra
     module HasUIComponent
       module ClassMethods
         def ui_component(component_name)
-          component_class = component_name.to_s.camelize.constantize
-
           self.ui_component_names << component_name
 
           define_method(component_name) do
             options = { :browser => browser, :test_data => test_data }
             # TODO: memoize the following line?
-            component_class.new(options)
+            component_class(component_name).new(options)
           end
 
           define_method("has_#{component_name}?") do
@@ -22,6 +20,10 @@ module Kookaburra
       module InstanceMethods
         def ui_components
           ui_component_names.map { |name| self.send(name) }
+        end
+
+        def component_class(component_name)
+          self.class.const_get(component_name.to_s.camelize)
         end
       end
 
