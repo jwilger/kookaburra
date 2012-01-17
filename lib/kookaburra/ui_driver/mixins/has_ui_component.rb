@@ -1,6 +1,10 @@
+require 'active_support/core_ext/string/inflections'
+
 module Kookaburra
   class UIDriver
     module HasUIComponent
+      UIComponentNotFound = Class.new(StandardError)
+
       module ClassMethods
         def ui_component(component_name)
           self.ui_component_names << component_name
