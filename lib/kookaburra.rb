@@ -52,6 +52,33 @@ module Kookaburra
     # We allow this to be passed in, so that we can avoid a hard-coded
     # dependency on Capybara in this gem.
     attr_accessor :adapter
+
+    # The API Driver that will be used by Kookaburra, typically a subclass of
+    # Kookaburra::APIDriver containing the testing DSL for your app. The default
+    # is an instance of Kookaburra::APIDriver.
+    attr_accessor :api_driver
+
+    def api_driver #:nodoc:
+      @api_driver ||= Kookaburra::APIDriver
+    end
+
+    # The Given Driver that will be used by Kookaburra, typically a subclass of
+    # Kookaburra::GivenDriver containing the testing DSL for your app. The default
+    # is an instance of Kookaburra::GivenDriver.
+    attr_accessor :given_driver
+
+    def given_driver #:nodoc:
+      @given_driver ||= Kookaburra::GivenDriver
+    end
+
+    # The UI Driver that will be used by Kookaburra, typically a subclass of
+    # Kookaburra::UIDriver containing the testing DSL for your app. The default
+    # is an instance of Kookaburra::UIDriver.
+    attr_accessor :ui_driver
+
+    def ui_driver #:nodoc:
+      @ui_driver ||= Kookaburra::UIDriver
+    end
   end
 
   # Whatever was set in `Kookaburra.adapter can be overriden in the mixin
@@ -72,19 +99,19 @@ module Kookaburra
 
   # Returns a configured instance of the `Kookaburra::APIDriver`
   def api
-    kookaburra_drivers[:api] ||= Kookaburra::APIDriver.new(
+    kookaburra_drivers[:api] ||= Kookaburra.api_driver.new(
       :app => kookaburra_adapter.app,
       :test_data => kookaburra_test_data)
   end
 
   # Returns a configured instance of the `Kookaburra::GivenDriver`
   def given
-    kookaburra_drivers[:given] ||= Kookaburra::GivenDriver.new(:api_driver => api)
+    kookaburra_drivers[:given] ||= Kookaburra.given_driver.new(:api_driver => api)
   end
 
   # Returns a configured instance of the `Kookaburra::UIDriver`
   def ui
-    kookaburra_drivers[:ui] ||= Kookaburra::UIDriver.new(
+    kookaburra_drivers[:ui] ||= Kookaburra.ui_driver.new(
       :browser => kookaburra_adapter.current_session,
       :test_data => kookaburra_test_data)
   end
