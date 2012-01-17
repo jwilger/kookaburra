@@ -6,11 +6,11 @@ module Kookaburra
       # This will fail if the options hash does not include a value for the key :browser
       def initialize(options = {})
         super()
-        @browserish = options.fetch(:browser)
+        @opts = options
       end
 
       def browser
-        @browserish
+        @browser ||= @opts.fetch(:browser)
       end
 
       def visit(*args)
