@@ -1,5 +1,6 @@
 source 'http://rubygems.org'
 
+gem 'i18n'
 gem 'activesupport', '>= 3.0'
 gem 'rack-test'
 
