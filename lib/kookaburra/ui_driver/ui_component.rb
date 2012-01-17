@@ -71,7 +71,7 @@ module Kookaburra
       end
 
       def at_path?
-        (component_path.to_a + alternate_paths.to_a).include?(browser.current_path)
+        (Array(component_path) + Array(alternate_paths)).include?(browser.current_path)
       end
 
       def component_visible?
