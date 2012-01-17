@@ -34,6 +34,11 @@ module Kookaburra
 
       ##### Instance methods #####
 
+      # Returns the CSS locator used to locate the component in the DOM
+      def component_locator
+        raise "You must define component_locator in subclasses of UIComponent!"
+      end
+
       def visible!
         raise "#{self.class} not currently visible!" unless visible?
       end
