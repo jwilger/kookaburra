@@ -168,5 +168,17 @@ describe Kookaburra do
         assert_equal Kookaburra::UIDriver, Kookaburra.ui_driver
       end
     end
+
+    describe '#test_data' do
+      it 'is a read/write attribute' do
+        Kookaburra.test_data = :a_test_data
+        assert_equal :a_test_data, Kookaburra.test_data
+      end
+
+      it 'defaults to Kookaburra::TestData' do
+        Kookaburra.test_data = nil
+        assert_equal Kookaburra::TestData, Kookaburra.test_data
+      end
+    end
   end
 end
