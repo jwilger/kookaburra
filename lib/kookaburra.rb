@@ -58,7 +58,7 @@ module Kookaburra
     # is an instance of Kookaburra::APIDriver.
     attr_accessor :api_driver
 
-    def api_driver #:nodoc:
+    def api_driver
       @api_driver ||= Kookaburra::APIDriver
     end
 
@@ -67,7 +67,7 @@ module Kookaburra
     # is an instance of Kookaburra::GivenDriver.
     attr_accessor :given_driver
 
-    def given_driver #:nodoc:
+    def given_driver
       @given_driver ||= Kookaburra::GivenDriver
     end
 
@@ -76,7 +76,7 @@ module Kookaburra
     # is an instance of Kookaburra::UIDriver.
     attr_accessor :ui_driver
 
-    def ui_driver #:nodoc:
+    def ui_driver
       @ui_driver ||= Kookaburra::UIDriver
     end
   end
@@ -93,7 +93,7 @@ module Kookaburra
   #
   attr_accessor :kookaburra_adapter
 
-  def kookaburra_adapter #:nodoc:
+  def kookaburra_adapter
     @kookaburra_adapter ||= Kookaburra.adapter
   end
 
