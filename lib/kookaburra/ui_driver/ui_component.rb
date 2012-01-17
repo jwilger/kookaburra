@@ -40,13 +40,8 @@ module Kookaburra
 
       def visible?
         no_500_error!
-        _visible?
-      end
-
-      def _visible?
         component_visible?
       end
-      private :_visible?
 
       def show(opts = {})
         return if visible?
