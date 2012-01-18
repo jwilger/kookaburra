@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.5.1"
+  s.version = "0.6.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Renewable Funding, LLC"]
@@ -36,7 +36,6 @@ Gem::Specification.new do |s|
     "lib/kookaburra/ui_driver/mixins/has_subcomponents.rb",
     "lib/kookaburra/ui_driver/mixins/has_ui_component.rb",
     "lib/kookaburra/ui_driver/ui_component.rb",
-    "lib/requires.rb",
     "test/helper.rb",
     "test/kookaburra/ui_driver_test.rb",
     "test/kookaburra_test.rb"
