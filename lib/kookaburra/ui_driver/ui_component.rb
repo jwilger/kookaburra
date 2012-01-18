@@ -1,3 +1,7 @@
+require 'kookaburra/ui_driver/mixins/has_browser'
+require 'kookaburra/ui_driver/mixins/has_strategies'
+require 'kookaburra/ui_driver/mixins/has_subcomponents'
+
 module Kookaburra
   class UIDriver
     class UIComponent
