@@ -1,4 +1,6 @@
 require 'active_support/core_ext/string/inflections'
+require 'active_support/core_ext/class/attribute'
+require 'kookaburra/ui_driver/ui_component'
 
 module Kookaburra
   class UIDriver
