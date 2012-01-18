@@ -2,7 +2,6 @@ module Kookaburra
   class UIDriver
     class UIComponent
       include HasBrowser
-      include HasFields
       include HasStrategies
       extend HasSubcomponents
 
