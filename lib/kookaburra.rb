@@ -1,4 +1,7 @@
-require File.join(File.dirname(__FILE__), *%w[requires])
+require 'kookaburra/test_data'
+require 'kookaburra/api_driver'
+require 'kookaburra/given_driver'
+require 'kookaburra/ui_driver'
 
 # Kookaburra is a framework for implementing the WindowDriver pattern in order
 # to keep acceptance tests maintainable.
