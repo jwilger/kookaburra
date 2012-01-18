@@ -45,9 +45,5 @@ module Kookaburra
       # This keeps mutations from being preserved between test runs.
       ( @default ||= Marshal::load(Marshal.dump(Defaults)) )[key]
     end
-
-    def factory
-      @factory ||= Kookaburra::TestData::Factory.new(self)
-    end
   end
 end
