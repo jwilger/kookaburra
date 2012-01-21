@@ -3,8 +3,8 @@ require 'kookaburra/api_driver'
 require 'kookaburra/given_driver'
 require 'kookaburra/ui_driver'
 
-# Kookaburra is a framework for implementing the WindowDriver pattern in order
-# to keep acceptance tests maintainable.
+# Kookaburra is a framework for implementing the Window Driver pattern[1] in
+# order to keep acceptance tests maintainable.
 #
 # For RSpec integration tests, just add the following to
 # `spec/support/kookaburra.rb`:
@@ -45,6 +45,8 @@ require 'kookaburra/ui_driver'
 #
 # (Obviously, the specific methods on #given and #ui are something that will be
 # unique to your application's domain.)
+#
+# [1] http://martinfowler.com/eaaDev/WindowDriver.html
 module Kookaburra
   class << self
     # Provides the default adapter for the Kookaburra library. In most cases,
