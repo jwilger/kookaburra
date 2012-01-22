@@ -1,15 +1,29 @@
 # Kookaburra #
 
-Kookaburra is a framework for implementing the [Window Driver] [1] pattern in
+Kookaburra is a framework for implementing the [Window Driver] [Window Driver] pattern in
 order to keep acceptance tests maintainable.
+
+## Installation ##
+
+Kookaburra is available as a Rubygem and [published on Rubygems.org] [Kookaburra
+Gem], so installation is trivial:
+
+    gem install kookaburra
+
+If you're using [Bundler](http://gembundler.com/) for your project, just add the
+following:
+
+    group :development, :test do
+      gem 'kookaburra'
+    end
 
 ## Setup ##
 
 Kookaburra itself abstracts some common patterns for implementing the Window
-Driver pattern for tests of Ruby web applications built on [Rack] [2]. You will need
+Driver pattern for tests of Ruby web applications built on [Rack] [Rack]. You will need
 to tell Kookaburra which classes contain the specific Domain Driver
 implementations for your application as well as which driver to use for running
-the tests (currently only tested with [Capybara] [3]). The details of setting up your
+the tests (currently only tested with [Capybara] [Capybara]). The details of setting up your
 Domain Driver layer are discussed below, but in general you will need the
 following in a locations such as `lib/my_application/kookaburra.rb` (replace
 `MyApplication` with a module name suitable to your actual application:
@@ -33,7 +47,7 @@ following in a locations such as `lib/my_application/kookaburra.rb` (replace
 
 ### RSpec ###
 
-For [RSpec] [4] integration tests, just add the following to
+For [RSpec] [RSpec] integration tests, just add the following to
 `spec/support/kookaburra_setup.rb`:
 
     require 'my_application/kookaburra'
@@ -44,7 +58,7 @@ For [RSpec] [4] integration tests, just add the following to
 
 ### Cucumber ###
 
-For Cucumber, add the following to `features/support/kookaburra_setup.rb`:
+For [Cucumber] [Cucumber], add the following to `features/support/kookaburra_setup.rb`:
 
     require 'my_application/kookaburra'
 
@@ -111,7 +125,7 @@ business concepts of your application at a fairly high level. It consists of
 three top-level drivers: the `APIDriver` (available via `#api`) for interacting
 with your application's external API, the `GivenDriver` (available via `#given`)
 which really just wraps the `APIDriver` and is used to set up state for your
-tests, and the UIDriver (available via `#given`) for describing the tasks that a
+tests, and the UIDriver (available via `#ui`) for describing the tasks that a
 user can accomplish with the application.
 
 Given the Cucumber scenario above, the step definitions call into the Domain
@@ -325,7 +339,7 @@ within your subclass:
 ### The Window Driver Layer ###
 
 While your `GivenDriver` and `UIDriver` provide a DSL that represents actions
-your users can perform in your application, the [Window Driver] [1] layer describes
+your users can perform in your application, the [Window Driver] [Window Driver] layer describes
 the individual user interface components that the user interacts with to perform
 these tasks. By describing each interface component using an OOP approach, it is
 much easier to maintain your acceptance/integration tests, because the
@@ -370,22 +384,48 @@ You describe the various user interface components by sub-classing
       end
     end
 
+### The Application Driver Layer ###
+
+`Kookaburra::APIDriver`, `Kookaburra::UIDriver` and
+`Kookaburra::UIDriver::UIComponent` rely on the Application Driver layer to
+interact with your application. In the case of the `APIDriver`, Kookaburra uses
+`Rack::Test` to send HTTP requests to your application. The `UIDriver` and
+`UIComponent` rely on whatever is configured as `Kookaburra.adapter`. Presently,
+we have only used Capybara as the application driver for Kookaburra:
+
+    Kookaburra.adapter = Capybara
+
+It's possible that something other than Capybara could be passed in, as long as
+that something presented the same API. In reality, using something other than
+Capybara is likely to require some changes to Kookaburra itself. If you have a
+particular interest in making this work, please feel free to fork the project
+and send us a [GitHub pull request] [Pull Request] with your changes.
+
 ## Contributing to kookaburra ##
  
-* Check out the latest master to make sure the feature hasn't been implemented or the bug hasn't been fixed yet
-* Check out the issue tracker to make sure someone already hasn't requested it and/or contributed it
+* Check out the latest master to make sure the feature hasn't been implemented
+  or the bug hasn't been fixed yet
+* Check out the issue tracker to make sure someone already hasn't requested it
+  and/or contributed it
 * Fork the project
 * Start a feature/bugfix branch
 * Commit and push until you are happy with your contribution
-* Make sure to add tests for it. This is important so I don't break it in a future version unintentionally.
-* Please try not to mess with the Rakefile, version, or history. If you want to have your own version, or is otherwise necessary, that is fine, but please isolate to its own commit so I can cherry-pick around it.
+* Make sure to add tests for it. This is important so I don't break it in a
+  future version unintentionally.
+* Please try not to mess with the Rakefile, version, or history. If you want to
+  have your own version, or is otherwise necessary, that is fine, but please
+  isolate to its own commit so I can cherry-pick around it.
+* Send us a [pull request] [Pull Request]
 
 ## Copyright ##
 
 Copyright &copy; 2011 Renewable Funding, LLC. See LICENSE.txt for
 further details.
 
-[1]: http://martinfowler.com/eaaDev/WindowDriver.html "Window Driver - Martin Fowler"
-[2]: http://rack.rubyforge.org/ "Rack: a Ruby Webserver Interface"
-[3]: https://github.com/jnicklas/capybara "jnicklas/capybara - GitHub"
-[4]: http://rspec.info "RSpec.info: home"
+[Window Driver]: http://martinfowler.com/eaaDev/WindowDriver.html "Window Driver - Martin Fowler"
+[Kookaburra Gem]: https://rubygems.org/gems/kookaburra "kookaburra | RubyGems.org | your community gem host"
+[Rack]: http://rack.rubyforge.org/ "Rack: a Ruby Webserver Interface"
+[Capybara]: https://github.com/jnicklas/capybara "jnicklas/capybara - GitHub"
+[RSpec]: http://rspec.info "RSpec.info: home"
+[Cucumber]: http://cukes.info/ "Cucumber - Making BDD fun"
+[Pull Request]: https://github.com/projectdx/kookaburra/pull/new/master "Send a pull request - GitHub"
