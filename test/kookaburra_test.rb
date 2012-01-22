@@ -168,5 +168,17 @@ describe Kookaburra do
         assert_equal Kookaburra::UIDriver, Kookaburra.ui_driver
       end
     end
+
+    describe '.test_data_setup' do
+      it 'evaluates the block in the context of the TestData class' do
+        Kookaburra.test_data_setup do
+          def added_by_a_test
+            :added_by_a_test
+          end
+        end
+        td = Kookaburra::TestData.new
+        assert_equal :added_by_a_test, td.added_by_a_test
+      end
+    end
   end
 end
