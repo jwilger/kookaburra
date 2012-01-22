@@ -3,15 +3,13 @@
 Kookaburra is a framework for implementing the [Window Driver] [1] pattern in
 order to keep acceptance tests maintainable.
 
-[1]: http://martinfowler.com/eaaDev/WindowDriver.html "Window Driver - Martin Fowler"
-
 ## Setup ##
 
 Kookaburra itself abstracts some common patterns for implementing the Window
-Driver pattern for tests of Ruby web applications built on Rack. You will need
+Driver pattern for tests of Ruby web applications built on [Rack] [2]. You will need
 to tell Kookaburra which classes contain the specific Domain Driver
 implementations for your application as well as which driver to use for running
-the tests (currently only tested with Capybara). The details of setting up your
+the tests (currently only tested with [Capybara] [3]). The details of setting up your
 Domain Driver layer are discussed below, but in general you will need the
 following in a locations such as `lib/my_application/kookaburra.rb` (replace
 `MyApplication` with a module name suitable to your actual application:
@@ -31,8 +29,10 @@ following in a locations such as `lib/my_application/kookaburra.rb` (replace
 
 ### RSpec ###
 
-For RSpec integration tests, just add the following to
-`spec/support/kookaburra.rb`:
+For [RSpec] [4] integration tests, just add the following to
+`spec/support/kookaburra_setup.rb`:
+
+    require 'my_application/kookaburra'
 
     RSpec.configure do |c|
       c.include(Kookaburra, :type => :request)
@@ -42,10 +42,13 @@ For RSpec integration tests, just add the following to
 
 For Cucumber, add the following to `features/support/kookaburra_setup.rb`:
 
+    require 'my_application/kookaburra'
+
     Kookaburra.adapter = Capybara
     World(Kookaburra)
 
     Before do
+      # Ensure that there isn't state-leakage between scenarios
       kookaburra_reset!
     end
 
@@ -71,8 +74,8 @@ The business specification language consists of the highest-level descriptions
 of a feature that are suitable for sharing with the non/less-technical
 stakeholders on a project.
 
-When using Cucumber with Kookaburra, your scenarios and step definitions might
-look as follows:
+Gherkin is the external DSL used by Cucumber for this purpose, and you might
+have the following scenario defined for an e-commerce application:
 
     # purchase_items_in_cart.feature
 
@@ -92,7 +95,24 @@ look as follows:
         And I see that my default payment options will be used
         And I see that my default shipping options will be used
 
-And the step definitions:
+Note that the scenario is focused on business concepts versus interface details,
+i.e. you "choose to check out" rather than "click on the checkout button". If
+for some reason your e-commerce system was going to be a terminal application
+rather than a web application, you would not need to change this scenario at
+all, because the actual business concepts described would not change.
+
+### The Domain Driver ###
+
+The Domain Driver layer is where you build up an internal DSL that describes the
+business concepts of your application at a fairly high level. It consists of
+three top-level drivers: the `APIDriver` (available via `#api`) for interacting
+with your application's external API, the `GivenDriver` (available via `#given`)
+which really just wraps the `APIDriver` and is used to set up state for your
+tests, and the UIDriver (available via `#given`) for describing the tasks that a
+user can accomplish with the application.
+
+Given the Cucumber scenario above, the step definitions call into the Domain
+Driver layer to interact with your application:
 
     # step_definitions/various_steps.rb
 
@@ -132,14 +152,14 @@ And the step definitions:
       ui.order_summary.shipping_options.should be_account_default_options
     end
 
-Note that the step definitions contain neither explicitly shared state
-(instance variables) nor any logic branches; they are simply wrappers around
-calls into the Domain Driver layer. There are several advantages to this
-approach. First, because step definitions are so simple, it isn't necessary to
-force *Very Specific Wording* on the business analyst/product owner who is writing
-the specs. For instance, if they write "I see a summary of my order" in another
+The step definitions contain neither explicitly shared state (instance
+variables) nor any logic branches; they are simply wrappers around calls into
+the Domain Driver layer. There are a couple of advantages to this approach.
+First, because step definitions are so simple, it isn't necessary to force *Very
+Specific Wording* on the business analyst/product owner who is writing the
+specs. For instance, if she writes "I see a summary of my order" in another
 scenario, it's not a big deal to have the following in your step definitions (as
-long as it's obvious that they really mean the same thing):
+long as the author of the spec confirms that they really mean the same thing):
 
     Then "I see my order summary" do
       ui.order_summary.should be_visible
@@ -149,16 +169,19 @@ long as it's obvious that they really mean the same thing):
       ui.order_summary.should be_visible
     end
 
-Because both of these step definitions are merely providing a natural language
-reference to an action in the Domain Driver, there is no overwhelming
-maintenance cost to the slight duplication, and it opens up the capacity for
-more readable Gherkin specs.
+The step definitions are nothing more than a natural language reference to an
+action in the Domain Driver; there is no overwhelming maintenance cost to the
+slight duplication, and it opens up the capacity for more readable Gherkin
+specs. The fewer false road blocks you put between your product owner and a
+written specification, the easier it becomes to ensure her participation in this
+process.
 
-Second, because all of the complexity is pushed down into the Domain Driver,
-it's now trivial to reuse the exact same code in developer-centric integration
-tests, which ensures you have parity between the way the automated acceptance
-tests run and any additional testing that the development team needs to add in.
-You could write the same test using just RSpec as follows:
+The second advantage is that by pushing all of the complexity down into the
+Domain Driver, it's now trivial to reuse the exact same code in
+developer-centric integration tests. This ensures you have parity between the
+way the automated acceptance tests run and any additional testing that the
+development team needs to add in. You could write the same test using just
+RSpec as follows:
 
     # spec/integration/purchase_items_in_cart_spec.rb
     
@@ -178,7 +201,17 @@ You could write the same test using just RSpec as follows:
       end
     end
 
-### The Domain Driver ###
+Whether in Cucumber step definitions or developer integration tests, you will
+usually interact only with the GivenDriver and the UIDriver.
+
+#### TestData ####
+
+`Kookaburra::TestData` is the component via which the `GivenDriver` and the
+`UIDriver` share information. For instance, if you create a user account via the
+`GivenDriver`, you would store the login credentials for that account in the
+`TestData` instance, so the UIDriver knows what to use when you tell it to
+`#sign_in`. This is what allows the Cucumber step definitions to remain free
+from explicitly shared state.
 
 ## Contributing to kookaburra ##
  
@@ -195,3 +228,7 @@ You could write the same test using just RSpec as follows:
 Copyright &copy; 2011 Renewable Funding, LLC. See LICENSE.txt for
 further details.
 
+[1]: http://martinfowler.com/eaaDev/WindowDriver.html "Window Driver - Martin Fowler"
+[2]: http://rack.rubyforge.org/ "Rack: a Ruby Webserver Interface"
+[3]: https://github.com/jnicklas/capybara "jnicklas/capybara - GitHub"
+[4]: http://rspec.info "RSpec.info: home"
