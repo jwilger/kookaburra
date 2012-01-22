@@ -8,8 +8,8 @@ gem 'rack-test'
 # Include everything needed to run rake, tests, features, etc.
 group :development do
   gem 'minitest'
-  gem 'bluecloth'
   gem 'yard'
+  gem 'redcarpet', '~> 1.0' # used to format documentation
   gem 'bundler'
   gem 'jeweler'
   gem 'rcov'
