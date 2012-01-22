@@ -3,50 +3,10 @@ require 'kookaburra/api_driver'
 require 'kookaburra/given_driver'
 require 'kookaburra/ui_driver'
 
-# Kookaburra is a framework for implementing the Window Driver pattern[1] in
-# order to keep acceptance tests maintainable.
-#
-# For RSpec integration tests, just add the following to
-# `spec/support/kookaburra.rb`:
-# 
-#   RSpec.configure do |c|
-#     c.include(Kookaburra, :type => :request)
-#   end
-#
-# That will make #given, #api and #ui entry-points available to your examples,
-# e.g.:
-#
-#   describe "Widget Management" do
-#     describe "viewing a list of widgets" do
-#       example "when there are no widgets" do
-#         given.there_is_a_user(:bob)
-#         given.user_has_no_widgets(:bob)
-#
-#         ui.log_in_as(:bob)
-#         ui.navigate_to(:list_of_widgets)
-#
-#         ui.list_of_widgets.should be_visible
-#         ui.list_of_widgets.should be_empty
-#       end
-#     end
-#   end
-#
-# For Cucumber, add the following to `features/support/kookaburra_setup.rb`:
-#
-#   Kookaburra.adapter = Capybara
-#   World(Kookaburra)
-#
-#   Before do
-#     kookaburra_reset!
-#   end
-#
-# After doing to, the #api, #given and #ui methods will be available in your
-# Cucumber step definitions.
-#
-# (Obviously, the specific methods on #given and #ui are something that will be
-# unique to your application's domain.)
-#
-# [1] http://martinfowler.com/eaaDev/WindowDriver.html
+# This module contains the methods for Kookaburra configuration as well as
+# accessors to the `GivenDriver`, `APIDriver` and `UIDriver`. See
+# {file:README.markdown README} for more information on setting up Kookaburra
+# for your project.
 module Kookaburra
   class << self
     # Provides the default adapter for the Kookaburra library. In most cases,
@@ -54,8 +14,9 @@ module Kookaburra
     #
     #   Kookaburra.adapter = Capybara
     #
-    # We allow this to be passed in, so that we can avoid a hard-coded
-    # dependency on Capybara in this gem.
+    # Whatever object is passed in must respond to `#app` and return a Rack
+    # application; and it must respond to `#current_session` and return an
+    # object that provides the same interface as `Capybara::Session`
     attr_accessor :adapter
 
     # The API Driver that will be used by Kookaburra, typically a subclass of
