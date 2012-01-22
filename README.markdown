@@ -78,12 +78,15 @@ Cucumber step definitions.
 Kookaburra attempts to extract some common patterns that make it easier to use
 the Window Driver pattern along with various Ruby testing frameworks, but you
 still need to define your own testing DSL. An acceptance testing stack using
-Kookaburra has the following four layers:
+Kookaburra has the following layers:
 
-1. The **Business Specification Language** (Cucumber scenarios and step definitions)
-2. The **Domain Driver** (Kookaburra::GivenDriver and Kookaburra::UIDriver)
-3. The **Window Driver** (Kookaburra::UIDriver::UIComponent)
-4. The **Application Driver** (Capybara and Rack::Test)
+1. The **Business Specification Language** (Cucumber scenarios or other
+   spcification documents)
+2. The **Test Implementation** (Cucumber step definitions, RSpec example blocks,
+   etc.)
+3. The **Domain Driver** (Kookaburra::GivenDriver and Kookaburra::UIDriver)
+4. The **Window Driver** (Kookaburra::UIDriver::UIComponent)
+5. The **Application Driver** (Capybara and Rack::Test)
 
 ### The Business Specification Language ###
 
@@ -118,18 +121,28 @@ for some reason your e-commerce system was going to be a terminal application
 rather than a web application, you would not need to change this scenario at
 all, because the actual business concepts described would not change.
 
-### The Domain Driver ###
+### The Test Implementation ###
 
-The Domain Driver layer is where you build up an internal DSL that describes the
-business concepts of your application at a fairly high level. It consists of
-three top-level drivers: the `APIDriver` (available via `#api`) for interacting
-with your application's external API, the `GivenDriver` (available via `#given`)
-which really just wraps the `APIDriver` and is used to set up state for your
-tests, and the UIDriver (available via `#ui`) for describing the tasks that a
-user can accomplish with the application.
+The Test Implementation layer exists as the line in between the Business
+Specification Language and the Domain Driver, and it includes Cucumber step
+definitions, RSpec example blocks, Test::Unit tests, etc. At this layer, your
+code orchestrates calls into the Domain Driver to mimic user interactions under
+various conditions and make assertions about the results.
 
-Given the Cucumber scenario above, the step definitions call into the Domain
-Driver layer to interact with your application:
+**Assertions always belong within the test implementation layer.** Some testing
+frameworks such as RSpec add methods like `#should` to `Object`, which has the
+effect of poisoning the entire Ruby namespace with these methods---if you are
+using RSpec, you can call `#should` anywhere in your code and it will work when
+RSpec is loaded. Do not be tempted to call a testing library's Object decorators
+anywhere outside of your test implementation (such as within `UIDriver` or
+`UIComponent` subclasses.) Doing so will tightly couple your Domain Driver
+and/or Window Driver implementation to a specific testing library. If you must
+make some type of assertion within the Domain Driver layer, a better approach is
+to simply raise an exception with an informative error message when some desired
+condition is not met.
+
+Given the Cucumber scenario above, here is how the test implementation layer
+might look:
 
     # step_definitions/various_steps.rb
 
@@ -172,6 +185,7 @@ Driver layer to interact with your application:
 The step definitions contain neither explicitly shared state (instance
 variables) nor any logic branches; they are simply wrappers around calls into
 the Domain Driver layer. There are a couple of advantages to this approach.
+
 First, because step definitions are so simple, it isn't necessary to force *Very
 Specific Wording* on the business analyst/product owner who is writing the
 specs. For instance, if she writes "I see a summary of my order" in another
@@ -197,8 +211,9 @@ The second advantage is that by pushing all of the complexity down into the
 Domain Driver, it's now trivial to reuse the exact same code in
 developer-centric integration tests. This ensures you have parity between the
 way the automated acceptance tests run and any additional testing that the
-development team needs to add in. You could write the same test using just
-RSpec as follows:
+development team needs to add in.
+
+Using RSpec, the test implementation would be as follows:
 
     # spec/integration/purchase_items_in_cart_spec.rb
     
@@ -218,26 +233,15 @@ RSpec as follows:
       end
     end
 
-Both the Cucumber step definitions and the RSpec example blocks themselves are
-actually part of the test implementation, and they exist as the line in between
-the Business Specification Language and the Domain Driver that translates
-between the two.
+### The Domain Driver ###
 
-#### Where Do the Assertions Belong? ####
-
-Assertions always belong at the test implementation level, i.e. within Cucumber
-step definitions, RSpec example blocks, etc. Some testing frameworks such as
-RSpec add methods like `#should` to `Object`, which has the effect of poisoning
-the entire Ruby namespace with these methods---if you are using RSpec, you can
-call `#should` anywhere in your code and it will work when RSpec is loaded.
-
-Do not be tempted to call a testing library's Object decorators anywhere outside
-of your test implementation (such as within `UIDriver` or `UIComponent`
-subclasses.) Doing so will tightly couple your Domain Driver and/or Window
-Driver implementation to a specific testing library. If you must make some type
-of assertion within the Domain Driver layer, a better approach is to simply
-raise an exception with an informative error message when some desired condition
-is not met.
+The Domain Driver layer is where you build up an internal DSL that describes the
+business concepts of your application at a fairly high level. It consists of
+three top-level drivers: the `APIDriver` (available via `#api`) for interacting
+with your application's external API, the `GivenDriver` (available via `#given`)
+which really just wraps the `APIDriver` and is used to set up state for your
+tests, and the UIDriver (available via `#ui`) for describing the tasks that a
+user can accomplish with the application.
 
 #### Test Data ####
 
