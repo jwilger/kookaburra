@@ -221,7 +221,7 @@ RSpec as follows:
 Whether in Cucumber step definitions or developer integration tests, you will
 usually interact only with the GivenDriver and the UIDriver.
 
-#### TestData ####
+#### Test Data ####
 
 `Kookaburra::TestData` is the component via which the `GivenDriver` and the
 `UIDriver` share information. For instance, if you create a user account via the
@@ -272,7 +272,7 @@ access default data:
       end
     end
 
-#### APIDriver ####
+#### API Driver ####
 
 The `Kookaburra::APIDriver` is used to interact with an application's external
 web services API. You tell Kookaburra about your API by creating a subclass of
@@ -287,7 +287,7 @@ web services API. You tell Kookaburra about your API by creating a subclass of
       end
     end
 
-#### GivenDriver ####
+#### Given Driver ####
 
 The `Kookaburra::GivenDriver` is used to create a particular "preexisting"
 state within your application's data and ensure you have a handle to that data
@@ -315,7 +315,24 @@ the Domain Driver DSL for your application:
       end
     end
 
-#### UIDriver ####
+Although there is nothing that actually *prevents* you from either interacting
+with the UI or directly manipulating your application via calls into the model
+from the `GivenDriver`, both things should be avoided. In the first case, the
+`GivenDriver`'s purpose is to describe state that exists *before* the user
+interaction that is being tested. Although this state may be the result of a
+previous user interaction, your tests will generally be much, much faster if you
+are able to create this state via API calls rather than driving a web browser.
+
+In the second case, by avoiding manipulating your applications's state at the
+code level and instead doing so via an external API, it is much less likely that
+you will be creating a state that your application can't actually get into in a
+production environment. Additionally, this opens up the possibility of running
+your tests against a "remote" server where you would not have access to the
+application internals. ("Remote" in the sense that it is not in the same Ruby
+process as your running tests, although it may or may not be on the same
+machine.)
+
+#### UI Driver ####
 
 `Kookaburra::UIDriver` provides the necessary tools for driving your
 application's user interface using the Window Driver pattern. You will subclass
@@ -339,13 +356,14 @@ within your subclass:
 ### The Window Driver Layer ###
 
 While your `GivenDriver` and `UIDriver` provide a DSL that represents actions
-your users can perform in your application, the [Window Driver] [Window Driver] layer describes
-the individual user interface components that the user interacts with to perform
-these tasks. By describing each interface component using an OOP approach, it is
-much easier to maintain your acceptance/integration tests, because the
-implementation details of each component are captured in a single place. If/when
-that implementation changes, you can---for example---fix every single test that
-needs to log a user into the system just by updating the SignInScreen class.
+your users can perform in your application, the [Window Driver] [Window Driver]
+layer describes the individual user interface components that the user interacts
+with to perform these tasks. By describing each interface component using an OOP
+approach, it is much easier to maintain your acceptance/integration tests,
+because the implementation details of each component are captured in a single
+place. If/when that implementation changes, you can---for example---fix every
+single test that needs to log a user into the system just by updating the
+SignInScreen class.
 
 You describe the various user interface components by sub-classing
 `Kookaburra::UIDriver::UIComponent`:
