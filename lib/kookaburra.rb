@@ -82,6 +82,10 @@ module Kookaburra
     def ui_driver
       @ui_driver ||= Kookaburra::UIDriver
     end
+
+    def test_data_setup(&blk)
+      Kookaburra::TestData.class_eval(&blk)
+    end
   end
 
   # Whatever was set in `Kookaburra.adapter can be overriden in the mixin
