@@ -218,8 +218,26 @@ RSpec as follows:
       end
     end
 
-Whether in Cucumber step definitions or developer integration tests, you will
-usually interact only with the GivenDriver and the UIDriver.
+Both the Cucumber step definitions and the RSpec example blocks themselves are
+actually part of the test implementation, and they exist as the line in between
+the Business Specification Language and the Domain Driver that translates
+between the two.
+
+#### Where Do the Assertions Belong? ####
+
+Assertions always belong at the test implementation level, i.e. within Cucumber
+step definitions, RSpec example blocks, etc. Some testing frameworks such as
+RSpec add methods like `#should` to `Object`, which has the effect of poisoning
+the entire Ruby namespace with these methods---if you are using RSpec, you can
+call `#should` anywhere in your code and it will work when RSpec is loaded.
+
+Do not be tempted to call a testing library's Object decorators anywhere outside
+of your test implementation (such as within `UIDriver` or `UIComponent`
+subclasses.) Doing so will tightly couple your Domain Driver and/or Window
+Driver implementation to a specific testing library. If you must make some type
+of assertion within the Domain Driver layer, a better approach is to simply
+raise an exception with an informative error message when some desired condition
+is not met.
 
 #### Test Data ####
 
