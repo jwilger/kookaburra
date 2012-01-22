@@ -19,11 +19,15 @@ following in a locations such as `lib/my_application/kookaburra.rb` (replace
         ::Kookaburra.adapter = Capybara
 
         # Note: the following assigned classes are defined under your
-        # application's namespace, e.g. MyApplication::Kookaburra::TestData
-        ::Kookaburra.test_data = TestData
+        # application's namespace, e.g. MyApplication::Kookaburra::APIDriver
         ::Kookaburra.api_driver = APIDriver
         ::Kookaburra.given_driver = GivenDriver
         ::Kookaburra.ui_driver = UIDriver
+
+        ::Kookaburra.test_data_setup do
+          provide_collection :accounts
+          # See section on Test Data for more examples of what can go here.
+        end
       end
     end
 
@@ -212,6 +216,49 @@ usually interact only with the GivenDriver and the UIDriver.
 `TestData` instance, so the UIDriver knows what to use when you tell it to
 `#sign_in`. This is what allows the Cucumber step definitions to remain free
 from explicitly shared state.
+
+The `TestData` class can be configured to contain both collections of test data
+as well as default data that can be used as a starting point for creating new
+resources in the application. To configure `TestData`, call
+`Kookaburra.test_data_setup` with a block (usually in your
+`lib/my_application/kookaburra.rb` file):
+
+    module MyApplication
+      module Kookaburra
+        # ...
+        ::Kookaburra.test_data_setup do
+          provide_collection :animals
+          set_default :animal,
+            :name => 'horse'
+            :size => 'large',
+            :number_of_legs => 4
+        end
+      end
+    end
+
+Then, in any context where you have an instance of `TestData` (such as in
+`GivenDriver` or `UIDriver`), you can add/retrieve items to/from collections and
+access default data:
+
+    class MyApplication::Kookaburra::GivenDriver
+      def existing_account(nickname)
+        # uses default account data created with `set_default :account, ...`
+        account = api.create_account(test_data.default(:account))
+
+        # make the details of the new account available to the rest of the test
+        test_data.accounts[nickname] = account
+      end
+    end
+
+    class MyApplication::Kookaburra::UIDriver do
+      def sign_in(account_nickname)
+        sign_in_screen.show!
+
+        # pull stored account details from TestData
+        account_info = test_data.accounts[account_nickname]
+        sign_in_screen.log_in(account_info[:username], account_info[:password])
+      end
+    end
 
 ## Contributing to kookaburra ##
  
