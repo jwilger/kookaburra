@@ -1,9 +1,12 @@
 require 'active_support/hash_with_indifferent_access'
+require 'active_support/core_ext/hash'
 
 # This is the mechanism for sharing state between Cucumber steps.
 # If you're using instance variables, YOU'RE DOING IT WRONG.
 module Kookaburra
   class TestData
+    Defaults = HashWithIndifferentAccess.new
+
     def initialize
       @data = Hash.new do |hash, key|
         hash[key] = Hash.new { |hash, key| hash[key] = HashWithIndifferentAccess.new }
@@ -13,20 +16,24 @@ module Kookaburra
     def __collection(collection_key)
       @data[collection_key]
     end
+
     def __fetch_data(collection_key, value_key)
       __collection(collection_key).fetch(value_key)
     rescue IndexError => e
       raise e.exception("Key #{value_key.inspect} not found in #{collection_key}")
     end
+
     def __get_data(collection_key, value_key)
       __collection(collection_key)[value_key]
     end
+
     def __set_data(collection_key, value_key, value_hash = {})
       __collection(collection_key)[value_key] = HashWithIndifferentAccess.new(value_hash)
     end
 
-    def self.provide_collection(name)
-      class_eval <<-RUBY
+    class << self
+      def provide_collection(name)
+        class_eval <<-RUBY
         def #{name}(key = :default)
           __get_data(:#{name}, key)
         end
@@ -36,14 +43,20 @@ module Kookaburra
         def set_#{name}(key, value_hash = {})
           __set_data(:#{name}, key, value_hash)
         end
-      RUBY
+        RUBY
+      end
+
+      def set_default(key, value)
+        Kookaburra::TestData::Defaults[key] = value
+      end
+
+      def default(key)
+        Defaults[key]
+      end
     end
 
-    Defaults = HashWithIndifferentAccess.new
     def default(key)
-      # NOTE: Marshal seems clunky, but gives us a deep copy.
-      # This keeps mutations from being preserved between test runs.
-      ( @default ||= Marshal::load(Marshal.dump(Defaults)) )[key]
+      (@defaults ||= Defaults.deep_dup)[key]
     end
   end
 end
