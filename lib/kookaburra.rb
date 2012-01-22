@@ -82,14 +82,6 @@ module Kookaburra
     def ui_driver
       @ui_driver ||= Kookaburra::UIDriver
     end
-
-    # The TestData class that will be used by Kookaburra, typically a subclass of
-    # Kookaburra::TestData.
-    attr_accessor :test_data
-
-    def test_data
-      @test_data ||= Kookaburra::TestData
-    end
   end
 
   # Whatever was set in `Kookaburra.adapter can be overriden in the mixin
@@ -146,7 +138,7 @@ module Kookaburra
   # The Kookaburra::TestData instance should not be used directly, but all of
   # the drivers should reference the same instance.
   def kookaburra_test_data
-    kookaburra_drivers[:test_data] ||= Kookaburra.test_data.new
+    kookaburra_drivers[:test_data] ||= Kookaburra::TestData.new
   end
 
   # Holds references to all drivers in a single hash, so that
