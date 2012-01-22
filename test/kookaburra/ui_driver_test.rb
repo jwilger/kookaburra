@@ -31,6 +31,7 @@ describe Kookaburra::UIDriver do
       attr_reader :was_shown, :params
     end
 
+    let(:ui) { ui_class.new }
     let(:ui_class) do
       Class.new(Kookaburra::UIDriver) do
         def browser; end
@@ -41,13 +42,11 @@ describe Kookaburra::UIDriver do
     end
 
     it 'delegates to the UIComponent#show! method' do
-      ui = ui_class.new
       ui.navigate_to :foo
       assert Foo.was_shown, "#show! was never called on the Foo component"
     end
 
     it 'passed any additional options to the UIComponent#show! method' do
-      ui = ui_class.new
       ui.navigate_to :foo, :bar => :baz
       assert_equal({:bar => :baz}, Foo.params)
     end
