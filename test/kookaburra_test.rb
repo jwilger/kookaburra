@@ -1,6 +1,12 @@
 require 'helper'
 
 describe Kookaburra do
+  before(:each) do
+    Kookaburra.api_driver = Kookaburra::APIDriver
+    Kookaburra.given_driver = Kookaburra::GivenDriver
+    Kookaburra.ui_driver = Kookaburra::UIDriver
+  end
+
   describe 'as a mixin' do
     let(:mixer_class) do
       Class.new do
@@ -138,11 +144,6 @@ describe Kookaburra do
         Kookaburra.api_driver = :an_api_driver
         assert_equal :an_api_driver, Kookaburra.api_driver
       end
-
-      it 'defaults to Kookaburra::APIDriver' do
-        Kookaburra.api_driver = nil
-        assert_equal Kookaburra::APIDriver, Kookaburra.api_driver
-      end
     end
 
     describe '#given_driver' do
@@ -150,22 +151,12 @@ describe Kookaburra do
         Kookaburra.given_driver = :a_given_driver
         assert_equal :a_given_driver, Kookaburra.given_driver
       end
-
-      it 'defaults to Kookaburra::GivenDriver' do
-        Kookaburra.given_driver = nil
-        assert_equal Kookaburra::GivenDriver, Kookaburra.given_driver
-      end
     end
 
     describe '#ui_driver' do
       it 'is a read/write attribute' do
         Kookaburra.ui_driver = :a_ui_driver
         assert_equal :a_ui_driver, Kookaburra.ui_driver
-      end
-
-      it 'defaults to Kookaburra::UIDriver' do
-        Kookaburra.ui_driver = nil
-        assert_equal Kookaburra::UIDriver, Kookaburra.ui_driver
       end
     end
 
