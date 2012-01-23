@@ -25,29 +25,17 @@ module Kookaburra
     #     Kookaburra.api_driver = MyApplication::Kookaburra::APIDriver
     attr_accessor :api_driver
 
-    def api_driver
-      @api_driver ||= Kookaburra::APIDriver
-    end
-
     # A reference to your application's subclass of `Kookaburra::GivenDriver`
     #
     # @example setting your GivenDriver
     #     Kookaburra.api_driver = MyApplication::Kookaburra::GivenDriver
     attr_accessor :given_driver
 
-    def given_driver
-      @given_driver ||= Kookaburra::GivenDriver
-    end
-
     # A reference to your application's subclass of `Kookaburra::UIDriver`
     #
     # @example setting your UIDriver
     #     Kookaburra.api_driver = MyApplication::Kookaburra::UIDriver
     attr_accessor :ui_driver
-
-    def ui_driver
-      @ui_driver ||= Kookaburra::UIDriver
-    end
 
     # Configure the test data collections and default data for your tests
     #
