@@ -115,7 +115,8 @@ module Kookaburra
 
   # Returns a configured instance of the `Kookaburra::GivenDriver`
   def given
-    kookaburra_drivers[:given] ||= Kookaburra.given_driver.new(:api_driver => api)
+    kookaburra_drivers[:given] ||= \
+      Kookaburra.given_driver.new(:api_driver => api, :test_data => kookaburra_test_data)
   end
 
   # Returns a configured instance of the `Kookaburra::UIDriver`
