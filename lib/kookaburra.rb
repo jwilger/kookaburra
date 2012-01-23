@@ -94,9 +94,7 @@ module Kookaburra
   #
   # @return [Kookaburra::APIDriver]
   def api
-    kookaburra_drivers[:api] ||= Kookaburra.api_driver.new(
-      :app => kookaburra_adapter.app,
-      :test_data => kookaburra_test_data)
+    kookaburra_drivers[:api] ||= Kookaburra.api_driver.new(:app => kookaburra_adapter.app)
   end
 
   # The configured instance of the `Kookaburra::GivenDriver` subclass for your

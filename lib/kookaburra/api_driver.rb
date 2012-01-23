@@ -1,18 +1,14 @@
 require 'rack/test'
 
 module Kookaburra
-  # Pattern:
-  # - Get some data from test_data.factory
-  # - Post it to the API
-  # - Remember the response in test_data
   class APIDriver
     include Rack::Test::Methods
-    attr_reader :app, :test_data
-    protected :app, :test_data
+
+    attr_reader :app
+    protected :app
 
     def initialize(opts)
-      @app       = opts.fetch(:app)
-      @test_data = opts.fetch(:test_data)
+      @app = opts.fetch(:app)
     end
 
   protected
