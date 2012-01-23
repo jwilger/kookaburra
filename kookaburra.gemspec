@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.7.1"
+  s.version = "0.8.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Renewable Funding, LLC"]
-  s.date = "2012-01-22"
+  s.date = "2012-01-23"
   s.description = "Cucumber + Capybara = Kookaburra? It made sense at the time."
   s.email = "devteam@renewfund.com"
   s.extra_rdoc_files = [
@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.files = [
     ".document",
     ".rvmrc",
+    ".yardopts",
     "Gemfile",
     "Gemfile.lock",
     "LICENSE.txt",
@@ -55,35 +56,35 @@ Gem::Specification.new do |s|
       s.add_runtime_dependency(%q<activesupport>, [">= 3.0"])
       s.add_runtime_dependency(%q<rack-test>, [">= 0"])
       s.add_development_dependency(%q<minitest>, [">= 0"])
-      s.add_development_dependency(%q<bluecloth>, [">= 0"])
-      s.add_development_dependency(%q<yard>, ["~> 0.6.0"])
-      s.add_development_dependency(%q<bundler>, ["~> 1.0.0"])
-      s.add_development_dependency(%q<jeweler>, ["~> 1.6.4"])
+      s.add_development_dependency(%q<yard>, [">= 0"])
+      s.add_development_dependency(%q<redcarpet>, ["~> 1.0"])
+      s.add_development_dependency(%q<bundler>, [">= 0"])
+      s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<rcov>, [">= 0"])
-      s.add_development_dependency(%q<reek>, ["~> 1.2.8"])
+      s.add_development_dependency(%q<reek>, [">= 0"])
     else
       s.add_dependency(%q<i18n>, [">= 0"])
       s.add_dependency(%q<activesupport>, [">= 3.0"])
       s.add_dependency(%q<rack-test>, [">= 0"])
       s.add_dependency(%q<minitest>, [">= 0"])
-      s.add_dependency(%q<bluecloth>, [">= 0"])
-      s.add_dependency(%q<yard>, ["~> 0.6.0"])
-      s.add_dependency(%q<bundler>, ["~> 1.0.0"])
-      s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
+      s.add_dependency(%q<yard>, [">= 0"])
+      s.add_dependency(%q<redcarpet>, ["~> 1.0"])
+      s.add_dependency(%q<bundler>, [">= 0"])
+      s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<rcov>, [">= 0"])
-      s.add_dependency(%q<reek>, ["~> 1.2.8"])
+      s.add_dependency(%q<reek>, [">= 0"])
     end
   else
     s.add_dependency(%q<i18n>, [">= 0"])
     s.add_dependency(%q<activesupport>, [">= 3.0"])
     s.add_dependency(%q<rack-test>, [">= 0"])
     s.add_dependency(%q<minitest>, [">= 0"])
-    s.add_dependency(%q<bluecloth>, [">= 0"])
-    s.add_dependency(%q<yard>, ["~> 0.6.0"])
-    s.add_dependency(%q<bundler>, ["~> 1.0.0"])
-    s.add_dependency(%q<jeweler>, ["~> 1.6.4"])
+    s.add_dependency(%q<yard>, [">= 0"])
+    s.add_dependency(%q<redcarpet>, ["~> 1.0"])
+    s.add_dependency(%q<bundler>, [">= 0"])
+    s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<rcov>, [">= 0"])
-    s.add_dependency(%q<reek>, ["~> 1.2.8"])
+    s.add_dependency(%q<reek>, [">= 0"])
   end
 end
 

@@ -2,16 +2,15 @@ require 'rack/test'
 
 module Kookaburra
   class APIDriver
-    include Rack::Test::Methods
-
-    attr_reader :app
-    protected :app
-
     def initialize(opts)
       @app = opts.fetch(:app)
     end
 
-  protected
+    protected
+
+    include Rack::Test::Methods
+
+    attr_reader :app
 
     def raise_unless_status(expected_status, short_description)
       message = "%s failed (#{last_response.status})\n#{last_response.body}" % short_description
