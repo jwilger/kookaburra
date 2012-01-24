@@ -129,18 +129,23 @@ definitions, RSpec example blocks, Test::Unit tests, etc. At this layer, your
 code orchestrates calls into the Domain Driver to mimic user interactions under
 various conditions and make assertions about the results.
 
-**Assertions always belong within the test implementation layer.** Some testing
+**Test assertions always belong within the test implementation layer.** Some testing
 frameworks such as RSpec add methods like `#should` to `Object`, which has the
 effect of poisoning the entire Ruby namespace with these methods---if you are
 using RSpec, you can call `#should` anywhere in your code and it will work when
 RSpec is loaded. Do not be tempted to call a testing library's Object decorators
 anywhere outside of your test implementation (such as within `UIDriver` or
 `UIComponent` subclasses.) Doing so will tightly couple your Domain Driver
-and/or Window Driver implementation to a specific testing library. If you must
-make some type of assertion within the Domain Driver layer, a better approach is
-to simply raise an exception with an informative error message when some desired
-condition is not met. Kookaburra provides its own `#assert` method; you may use
-this directly or build your own custom assertions using it as a base.
+and/or Window Driver implementation to a specific testing library.
+
+If you must make some type of assertion within the Domain Driver layer, a better
+approach is to simply raise an exception with an informative error message when
+some desired condition is not met. Kookaburra provides its own `#assert` method
+for this purpose. You may use it directly or build your own custom assertions
+using it as a base. However, this method should be used only for the purpose
+of short-circuiting your Domain Driver with an informative error message, not
+to test the results of your operations as you would at the test implementation
+layer.
 
 Given the Cucumber scenario above, here is how the test implementation layer
 might look:
