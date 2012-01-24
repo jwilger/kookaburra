@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Renewable Funding, LLC"]
-  s.date = "2012-01-23"
+  s.date = "2012-01-24"
   s.description = "Cucumber + Capybara = Kookaburra? It made sense at the time."
   s.email = "devteam@renewfund.com"
   s.extra_rdoc_files = [
