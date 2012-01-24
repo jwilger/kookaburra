@@ -1,3 +1,4 @@
+require 'kookaburra/assertion'
 require 'kookaburra/test_data'
 require 'kookaburra/api_driver'
 require 'kookaburra/given_driver'
