@@ -5,6 +5,7 @@ require 'kookaburra/ui_driver/mixins/has_subcomponents'
 module Kookaburra
   class UIDriver
     class UIComponent
+      include Kookaburra::Assertion
       include HasBrowser
       include HasStrategies
       extend HasSubcomponents

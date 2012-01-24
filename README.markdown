@@ -139,7 +139,8 @@ anywhere outside of your test implementation (such as within `UIDriver` or
 and/or Window Driver implementation to a specific testing library. If you must
 make some type of assertion within the Domain Driver layer, a better approach is
 to simply raise an exception with an informative error message when some desired
-condition is not met.
+condition is not met. Kookaburra provides its own `#assert` method; you may use
+this directly or build your own custom assertions using it as a base.
 
 Given the Cucumber scenario above, here is how the test implementation layer
 might look:

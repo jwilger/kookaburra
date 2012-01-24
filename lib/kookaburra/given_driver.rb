@@ -1,5 +1,7 @@
 module Kookaburra
   class GivenDriver
+    include Kookaburra::Assertion
+
     attr_reader :api
     attr_reader :test_data
 

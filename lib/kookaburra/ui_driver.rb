@@ -3,6 +3,7 @@ require 'kookaburra/ui_driver/mixins/has_ui_component'
 
 module Kookaburra
   class UIDriver
+    include Kookaburra::Assertion
     include HasBrowser
     include HasUIComponent
 

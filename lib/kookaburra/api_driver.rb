@@ -2,6 +2,8 @@ require 'rack/test'
 
 module Kookaburra
   class APIDriver
+    include Kookaburra::Assertion
+
     def initialize(opts)
       @app = opts.fetch(:app)
     end
