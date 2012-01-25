@@ -48,8 +48,9 @@ module Kookaburra
       end
 
       def visible?
-        no_500_error!
-        component_visible?
+        v= component_visible?
+        no_500_error! unless v
+        v
       end
 
       # Default implementation navigates directly to this UIComponent's

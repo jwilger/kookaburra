@@ -18,11 +18,12 @@ module Kookaburra
         no_500_error!
       end
 
+      # Does not wait, so should only be used after failing a check
+      # for being in the expected place.
       def no_500_error!
-        if browser.has_css?('head title', :text => 'Internal Server Error')
-          sleep 30 if ENV['GIMME_CRAP']
-          raise Unexpected500, browser.body
-        end
+        return if browser.all(:css, 'head title', :text => 'Internal Server Error').empty?
+        sleep 30 if ENV['GIMME_CRAP']
+        raise Unexpected500, browser.body
       end
     end
   end
