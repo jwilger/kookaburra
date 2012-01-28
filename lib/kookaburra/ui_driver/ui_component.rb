@@ -1,6 +1,7 @@
 require 'kookaburra/ui_driver/mixins/has_browser'
 require 'kookaburra/ui_driver/mixins/has_strategies'
 require 'kookaburra/ui_driver/mixins/has_subcomponents'
+require 'kookaburra/ui_driver/mixins/has_ui_component'
 
 module Kookaburra
   class UIDriver
@@ -8,6 +9,7 @@ module Kookaburra
       include Kookaburra::Assertion
       include HasBrowser
       include HasStrategies
+      include HasUIComponent
       extend HasSubcomponents
 
       ##### Class macros #####
