@@ -111,6 +111,11 @@ module Kookaburra
       def in_component(&blk)
         browser.within(component_locator, &blk)
       end
+
+      # Returns the number of elements found by `#all` for the specified criteria
+      def count(*args)
+        all(*args).size
+      end
     end
   end
 end
