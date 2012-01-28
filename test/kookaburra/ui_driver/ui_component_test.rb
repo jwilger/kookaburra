@@ -2,6 +2,15 @@ require 'helper'
 require 'minitest/mock'
 
 describe Kookaburra::UIDriver::UIComponent do
+  it 'can have nested UIComponents' do
+    InnerComponent = Class.new(Kookaburra::UIDriver::UIComponent)
+    OuterComponent = Class.new(Kookaburra::UIDriver::UIComponent) do
+      ui_component :inner_component
+    end
+    component = OuterComponent.new(:browser => Object.new)
+    assert_kind_of InnerComponent, component.inner_component
+  end
+
   let(:component_class) do
     Class.new(Kookaburra::UIDriver::UIComponent) do
       component_locator '#my_component'
