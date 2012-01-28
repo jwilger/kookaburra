@@ -10,14 +10,6 @@ module Kookaburra
       include HasStrategies
       extend HasSubcomponents
 
-      attr_reader :test_data
-
-      # This will fail if the options hash does not include a value for the key :test_data
-      def initialize(options = {})
-        super
-        @test_data = options.fetch(:test_data)
-      end
-
       ##### Class macros #####
       def self.component_locator(locator)
         define_method(:component_locator) { locator }
