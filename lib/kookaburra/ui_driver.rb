@@ -1,5 +1,5 @@
 require 'kookaburra/ui_driver/mixins/has_browser'
-require 'kookaburra/ui_driver/mixins/has_ui_component'
+require 'kookaburra/ui_driver/ui_component'
 
 module Kookaburra
   class UIDriver
