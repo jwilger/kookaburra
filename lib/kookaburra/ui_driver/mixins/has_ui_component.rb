@@ -12,7 +12,7 @@ module Kookaburra
           self.ui_component_names << component_name
 
           define_method(component_name) do
-            options = { :browser => browser, :test_data => test_data }
+            options = { :browser => browser }
             # TODO: memoize the following line?
             component_class(component_name).new(options)
           end
