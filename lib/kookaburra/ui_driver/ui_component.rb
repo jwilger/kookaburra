@@ -80,22 +80,32 @@ module Kookaburra
         []
       end
 
-    private
+      protected
+
+      # Methods provided by `browser` that will be scoped to this UIComponent.
+      #
+      # These methods are defined on UIComponent and will be delegated to
+      # `browser` after being wrapped with `#in_component` calls.
+      SCOPED_BROWSER_METHODS = :all, :attach_file, :check, :choose, :click_button,
+        :click_link, :click_link_or_button, :click_on, :field_labeled, :fill_in,
+        :find, :find_button, :find_by_id, :find_field, :find_link, :first,
+        :has_button?, :has_checked_field?, :has_content?, :has_css?, :has_field?,
+        :has_link?, :has_no_button?, :has_no_checked_field?, :has_no_content?,
+        :has_no_css?, :has_no_field?, :has_no_link?, :has_no_select?,
+        :has_no_selector?, :has_no_table?, :has_no_text?,
+        :has_no_unchecked_field?, :has_no_xpath?, :has_select?, :has_selector?,
+        :has_table?, :has_text?, :has_unchecked_field?, :has_xpath?, :select,
+        :text, :uncheck, :unselect
+
+      SCOPED_BROWSER_METHODS.each do |method|
+        define_method(method) do |args|
+          in_component { browser.send(method, *args) }
+        end
+      end
+
       def id_from_path
         browser.current_path =~ path_id_regex
         $1.present? ? $1.to_i : nil
-      end
-
-      def fill_in(locator, options)
-        in_component { browser.fill_in(locator, options) }
-      end
-
-      def click_on(locator)
-        in_component { browser.find(locator).click }
-      end
-
-      def choose(locator)
-        in_component { browser.choose(locator) }
       end
 
       def in_component(&blk)
