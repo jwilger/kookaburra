@@ -15,6 +15,7 @@ module Kookaburra
             # TODO: memoize the following line?
             component_class(component_name).new(options)
           end
+          private component_name
 
           define_method("has_#{component_name}?") do
             send(component_name).visible?
