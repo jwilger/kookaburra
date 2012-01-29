@@ -177,15 +177,15 @@ might look:
     end
 
     Then "I see my order summary" do
-      ui.order_summary.should be_visible
+      ui.should be_displaying_order_summary
     end
 
     Then "I see that my default payment options will be used" do
-      ui.order_summary.payment_options.should be_account_default_options
+      ui.should be_displaying_account_default_payment_options_in_order_summary
     end
 
     Then "I see that my default shipping options will be used" do
-      ui.order_summary.shipping_options.should be_account_default_options
+      ui.should be_displaying_account_default_shipping_options_in_order_summary
     end
 
 The step definitions contain neither explicitly shared state (instance
@@ -199,11 +199,11 @@ scenario, it's not a big deal to have the following in your step definitions (as
 long as the author of the spec confirms that they really mean the same thing):
 
     Then "I see my order summary" do
-      ui.order_summary.should be_visible
+      ui.should be_displaying_order_summary
     end
 
     Then "I see a summary of my order" do
-      ui.order_summary.should be_visible
+      ui.should be_displaying_order_summary
     end
 
 The step definitions are nothing more than a natural language reference to an
@@ -234,8 +234,8 @@ Using RSpec, the test implementation would be as follows:
         ui.choose_to_check_out
 
         ui.order_summary.should be_visible
-        ui.order_summary.payment_options.should be_account_default_options
-        ui.order_summary.shipping_options.should be_account_default_options
+        ui.should be_displaying_account_default_payment_options_in_order_summary
+        ui.should be_displaying_account_default_shipping_options_in_order_summary
       end
     end
 
@@ -371,7 +371,7 @@ within your subclass:
 
     class MyApplication::Kookaburra::UIDriver < Kookaburra::UIDriver
       # makes an instance of MyApplication::Kookaburra::UIDriver::SignInScreen
-      # available via the instance method #sign_in_screen
+      # available via the private instance method #sign_in_screen
       ui_component :sign_in_screen
 
       def sign_in(account_nickname)
@@ -380,6 +380,12 @@ within your subclass:
         sign_in_screen.submit_login(account[:username], account[:password])
       end
     end
+
+The call to `Kookaburra::UIDriver.ui_component` defines the UIComponent accessor
+as a private method in order to discourage accessing your UIComponent objects
+directly in the test implementation layer. Instead, you should build out your
+testing DSL in the `UIDriver` subclass as was done with the `#sign_in` method
+above.
 
 ### The Window Driver Layer ###
 
@@ -427,6 +433,43 @@ You describe the various user interface components by sub-classing
         self.username = username
         self.password = password
         submit!
+      end
+    end
+
+A `UIComponent` subclass can also contain nested components of its own. For
+instance:
+
+    class MyApplication::Kookaburra::UIDriver::UserList::NewUserForm < Kookaburra::UIDriver::UIComponent
+      component_locator '#new_user_form'
+    end
+
+    class MyApplication::Kookaburra::UIDriver::UserList < Kookaburra::UIDriver::UIComponent
+      component_locator '#user_list'
+
+      ui_component :new_user_form
+    end
+
+In this case, `UserList#new_user_form` is still defined as a private method. In
+order to manipulate it from your domain driver, you can define either explicit
+methods or delegators on `UserList`:
+
+    class MyApplication::Kookaburra::UIDriver::UserList < Kookaburra::UIDriver::UIComponent
+      def fill_in_new_user_form(username, password, full_name)
+        new_user_form.username = username
+        new_user_form.password = password
+        new_user_form.full_name = full_name
+      end
+
+      delegate :submit!, :to => :new_user_form, :prefix => true
+    end
+
+    class MyApplication::Kookaburra::UIDriver < Kookaburra::UIDriver
+      ui_component :user_list
+
+      def create_new_user_with_valid_data
+        user = default_user_data # factory method defined elsewhere
+        user_list.fill_in_new_user_form(user[:username], user[:password], user[:full_name])
+        user_list.new_user_form_submit!
       end
     end
 
