@@ -1,6 +1,5 @@
 require 'kookaburra/ui_driver/mixins/has_browser'
 require 'kookaburra/ui_driver/mixins/has_strategies'
-require 'kookaburra/ui_driver/mixins/has_subcomponents'
 require 'kookaburra/ui_driver/mixins/has_ui_component'
 
 module Kookaburra
@@ -10,7 +9,6 @@ module Kookaburra
       include HasBrowser
       include HasStrategies
       include HasUIComponent
-      extend HasSubcomponents
 
       ##### Class macros #####
       def self.component_locator(locator)
