@@ -56,7 +56,7 @@ module Kookaburra
     end
 
     def default(key)
-      (@defaults ||= Defaults.deep_dup)[key]
+      (@defaults ||= Defaults.deep_dup).fetch(key)
     end
   end
 end
