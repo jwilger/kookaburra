@@ -287,14 +287,14 @@ access default data:
         # do something to create account in application
         # ...
         # make the details of the new account available to the rest of the test
-        test_data.accounts[nickname] = account
+        test_data.set_accounts(nickname, account)
       end
     end
 
     class MyApplication::Kookaburra::UIDriver < Kookaburra::UIDriver
       def sign_in(account_nickname)
         # pull stored account details from TestData
-        account_info = test_data.accounts[account_nickname]
+        account_info = test_data.fetch_accounts(account_nickname)
 
         # do something to log in using that account_info
       end
@@ -339,7 +339,7 @@ the Domain Driver DSL for your application:
         # merge in the password (since API doesn't return it) and store details
         # in the TestData instance
         account_details.merge(:password => account_data[:password])
-        test_data.accounts[nickname] = account_details
+        test_data.set_accounts(nickname, account_details)
       end
     end
 
@@ -375,7 +375,7 @@ within your subclass:
       ui_component :sign_in_screen
 
       def sign_in(account_nickname)
-        account = test_data.accounts[account_nickname]
+        account = test_data.fetch_accounts(account_nickname)
         navigate_to :sign_in_screen
         sign_in_screen.submit_login(account[:username], account[:password])
       end
