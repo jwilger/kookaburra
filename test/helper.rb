@@ -15,6 +15,16 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'kookaburra'
 
 class MiniTest::Unit::TestCase
+  # TODO: make this better, so that there is only one failure message
+  def assert_raises_with_message(expected_exception, expected_message, &block)
+    begin
+      yield
+      flunk "Expected to raise a #{expected_exception}"
+    rescue => e
+      assert_kind_of expected_exception, e
+      assert_match expected_message, e.message
+    end
+  end
 end
 
 MiniTest::Unit.autorun
