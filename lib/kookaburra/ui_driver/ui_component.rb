@@ -46,16 +46,16 @@ module Kookaburra
       end
 
       # Default implementation navigates directly to this UIComponent's
-      # `#component_path`. If `opts[:query_params]` is set to a Hash, the
-      # request will be made with the resulting querystring on the URL.
-      def show(opts = {})
+      # `#component_path`.
+      #
+      # @param path_args [Argument List] Any arguments added to this method are
+      #        passed through to `#component_path`.
+      def show(*path_args)
         unless respond_to?(:component_path)
-          raise "You must either set component_path or redefine the #show method in UIComponent subclasses!"
+          raise NoMethodError, "You must either set component_path or redefine the #show method in UIComponent subclasses!"
         end
         return if visible?
-        path = component_path
-        path << ( '?' + opts[:query_params].map{|kv| "%s=%s" % kv}.join('&') ) if opts[:query_params]
-        visit path
+        visit component_path(*path_args)
       end
 
       def refresh
