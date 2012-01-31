@@ -49,4 +49,53 @@ describe Kookaburra::UIDriver::UIComponent do
       assert_equal 3, component.count('.element')
     end
   end
+
+  describe '#show' do
+    let(:browser) { MiniTest::Mock.new }
+    let(:component) do
+      c = Kookaburra::UIDriver::UIComponent.new(:browser => browser)
+      def c.no_500_error!; true; end
+      c
+    end
+
+    it 'raises a NoMethodError if #component_path is not defined' do
+      assert_raises_with_message(NoMethodError, /set component_path/)  do
+        component.show
+      end
+    end
+
+    describe "when the component is not already visible" do
+      before(:each) do
+        def component.visible?; false; end
+      end
+
+      it 'visits the path returned by #component_path' do
+        def component.component_path; '/my/path'; end
+        browser.expect(:visit, nil, ['/my/path'])
+        component.show
+      end
+
+      it 'passes any arguments through to #component_path' do
+        def browser.visit(*args); nil; end
+
+        def component.component_path(*args)
+          unless args == %w[one two three]
+            raise "Expected #component_path('one', 'two', 'three') but called with #{args.inspect}"
+          end
+        end
+
+        component.show('one', 'two', 'three')
+      end
+    end
+
+    describe "when the component is already visible" do
+      it 'does not visit the component path' do
+        def component.component_path; '/my/path'; end
+        def component.visible?; true; end
+
+        def browser.visit(*args); raise "Shouldn't get called"; end
+        component.show
+      end
+    end
+  end
 end
