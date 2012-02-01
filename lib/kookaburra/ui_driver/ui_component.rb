@@ -98,7 +98,7 @@ module Kookaburra
         :text, :uncheck, :unselect
 
       SCOPED_BROWSER_METHODS.each do |method|
-        define_method(method) do |args|
+        define_method(method) do |*args|
           in_component { browser.send(method, *args) }
         end
       end
