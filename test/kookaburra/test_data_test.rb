@@ -18,9 +18,9 @@ describe Kookaburra::TestData do
       assert_equal 'baz', td2.default(:foo)['bar']
     end
 
-    it 'raises an IndexError if the requested default has not been defined' do
+    it 'raises an ArgumentError if the requested default has not been defined' do
       td = Kookaburra::TestData.new
-      assert_raises IndexError do
+      assert_raises ArgumentError do
         td.default(:foobar)
       end
     end
