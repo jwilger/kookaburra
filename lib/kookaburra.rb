@@ -12,6 +12,16 @@ module Kookaburra
   ConfigurationError = Class.new(RuntimeError)
 
   class << self
+    def self.config_var(*names)
+      names.each do |name|
+        attr_accessor name
+        define_method(name) do
+          instance_variable_get("@#{name}") \
+            or raise ConfigurationError.new("Please specify Kookaburra.#{name} in your configuration.")
+        end
+      end
+    end
+
     # Provides the default adapter for the Kookaburra library.
     #
     # If not using Capybara, the Object must respond to `#app` and return a Rack
@@ -23,29 +33,34 @@ module Kookaburra
     #
     # @raise [ConfigurationError] raised by reader method if no adapter has been
     #        assigned yet.
-    attr_accessor :adapter
-
-    def adapter
-      @adapter or raise ConfigurationError.new("Please specify Kookaburra.adapter in your configuration.")
-    end
+    config_var :adapter
 
     # A reference to your application's subclass of `Kookaburra::APIDriver`
     #
     # @example setting your APIDriver
     #     Kookaburra.api_driver = MyApplication::Kookaburra::APIDriver
-    attr_accessor :api_driver
+    #
+    # @raise [ConfigurationError] raised by reader method if no api driver class
+    #        has been assigned yet.
+    config_var :api_driver
 
     # A reference to your application's subclass of `Kookaburra::GivenDriver`
     #
     # @example setting your GivenDriver
     #     Kookaburra.api_driver = MyApplication::Kookaburra::GivenDriver
-    attr_accessor :given_driver
+    #
+    # @raise [ConfigurationError] raised by reader method if no given driver
+    #        class has been assigned yet.
+    config_var :given_driver
 
     # A reference to your application's subclass of `Kookaburra::UIDriver`
     #
     # @example setting your UIDriver
     #     Kookaburra.api_driver = MyApplication::Kookaburra::UIDriver
-    attr_accessor :ui_driver
+    #
+    # @raise [ConfigurationError] raised by reader method if no ui driver
+    #        class has been assigned yet.
+    config_var :ui_driver
 
     # Configure the test data collections and default data for your tests
     #
