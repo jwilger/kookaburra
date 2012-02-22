@@ -48,7 +48,7 @@ describe Kookaburra do
 
       it 'defaults to the value of Kookaburra.adapter' do
         begin
-          old_adapter = Kookaburra.adapter
+          old_adapter = Kookaburra.adapter rescue nil
           Kookaburra.adapter = :global_adapter
           mixer = mixer_class.new
           assert_equal :global_adapter, mixer.kookaburra_adapter
@@ -133,9 +133,15 @@ describe Kookaburra do
   describe 'methods on the Kookaburra object' do
     describe '#adapter' do
       it 'is a read/write attribute' do
-        assert_nil Kookaburra.adapter
         Kookaburra.adapter = :probably_Capybara
         assert_equal :probably_Capybara, Kookaburra.adapter
+      end
+
+      it 'raises an exception when it is read while nil' do
+        assert_raises Kookaburra::ConfigurationError do
+          Kookaburra.adapter = nil
+          Kookaburra.adapter
+        end
       end
     end
 
