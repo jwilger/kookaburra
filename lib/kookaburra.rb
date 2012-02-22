@@ -9,6 +9,8 @@ require 'kookaburra/ui_driver'
 # {file:README.markdown README} for more information on setting up Kookaburra
 # for your project.
 module Kookaburra
+  ConfigurationError = Class.new(RuntimeError)
+
   class << self
     # Provides the default adapter for the Kookaburra library.
     #
@@ -18,7 +20,14 @@ module Kookaburra
     #
     # @example using Capybara
     #     Kookaburra.adapter = Capybara
+    #
+    # @raise [ConfigurationError] raised by reader method if no adapter has been
+    #        assigned yet.
     attr_accessor :adapter
+
+    def adapter
+      @adapter or raise ConfigurationError.new("Please specify Kookaburra.adapter in your configuration.")
+    end
 
     # A reference to your application's subclass of `Kookaburra::APIDriver`
     #
