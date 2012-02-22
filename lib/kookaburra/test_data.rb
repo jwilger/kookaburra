@@ -57,6 +57,9 @@ module Kookaburra
 
     def default(key)
       (@defaults ||= Defaults.deep_dup).fetch(key)
+    rescue IndexError => e
+      raise ArgumentError, "No default named #{key} has been set up in " \
+        + "Kookaburra.test_data_setup."
     end
   end
 end
