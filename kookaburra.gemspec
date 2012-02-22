@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.14.2"
+  s.version = "0.14.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Renewable Funding, LLC"]
-  s.date = "2012-02-01"
+  s.date = "2012-02-22"
   s.description = "Cucumber + Capybara = Kookaburra? It made sense at the time."
   s.email = "devteam@renewfund.com"
   s.extra_rdoc_files = [
@@ -40,6 +40,7 @@ Gem::Specification.new do |s|
     "test/helper.rb",
     "test/kookaburra/assertion_test.rb",
     "test/kookaburra/test_data_test.rb",
+    "test/kookaburra/ui_driver/mixins/has_browser_test.rb",
     "test/kookaburra/ui_driver/ui_component_test.rb",
     "test/kookaburra/ui_driver_test.rb",
     "test/kookaburra_test.rb"
@@ -47,7 +48,7 @@ Gem::Specification.new do |s|
   s.homepage = "http://github.com/projectdx/kookaburra"
   s.licenses = ["MIT"]
   s.require_paths = ["lib"]
-  s.rubygems_version = "1.8.15"
+  s.rubygems_version = "1.8.16"
   s.summary = "WindowDriver testing pattern for Ruby apps"
 
   if s.respond_to? :specification_version then
