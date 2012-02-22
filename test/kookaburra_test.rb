@@ -150,6 +150,13 @@ describe Kookaburra do
         Kookaburra.api_driver = :an_api_driver
         assert_equal :an_api_driver, Kookaburra.api_driver
       end
+
+      it 'raises an exception when it is read while nil' do
+        assert_raises Kookaburra::ConfigurationError do
+          Kookaburra.api_driver = nil
+          Kookaburra.api_driver
+        end
+      end
     end
 
     describe '#given_driver' do
