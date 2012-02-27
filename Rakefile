@@ -25,19 +25,17 @@ Jeweler::Tasks.new do |gem|
 end
 Jeweler::RubygemsDotOrgTasks.new
 
-require 'rake/testtask'
-Rake::TestTask.new(:test) do |test|
-  test.libs << 'lib' << 'test'
-  test.pattern = 'test/**/*_test.rb'
-  test.verbose = true
-end
+require 'rspec/core/rake_task'
 
-require 'rcov/rcovtask'
-Rcov::RcovTask.new do |test|
-  test.libs << 'test'
-  test.pattern = 'test/**/*_test.rb'
-  test.verbose = true
-  test.rcov_opts << '--exclude "gems/*"'
+task :default => :spec
+
+desc 'Run specs'
+RSpec::Core::RakeTask.new
+
+desc "Generate code coverage"
+RSpec::Core::RakeTask.new(:coverage) do |t|
+  t.rcov = true
+  t.rcov_opts = ['--exclude', 'spec']
 end
 
 require 'reek/rake/task'
@@ -46,8 +44,6 @@ Reek::Rake::Task.new do |t|
   t.verbose = false
   t.source_files = 'lib/**/*.rb'
 end
-
-task :default => :test
 
 require 'yard'
 YARD::Rake::YardocTask.new
