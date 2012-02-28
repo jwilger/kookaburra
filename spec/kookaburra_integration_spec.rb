@@ -11,15 +11,29 @@ describe 'Kookaburra Integration' do
           my_given_driver_class = Class.new(Kookaburra::GivenDriver) do
             def a_user(name)
             end
+
+            def a_widget(name, attributes = {})
+            end
           end
           given = my_given_driver_class.new
 
+          # Set up UIDriver for this test
+          sign_in_screen_class = Class.new(Kookaburra::UIDriver::UIComponent)
+          my_ui_driver_class = Class.new(Kookaburra::UIDriver) do
+            ui_component :sign_in_screen, sign_in_screen_class
+
+            def sign_in(name)
+              navigate_to sign_in_screen
+              sign_in_screen.sign_in!(test_data.users[name])
+            end
+          end
+          ui = my_ui_driver_class.new
 
           given.a_user(:bob)
-          pending 'WIP' do
-            given.a_widget(:widget_a)
-            given.a_widget(:widget_b, :name => 'Foo')
+          given.a_widget(:widget_a)
+          given.a_widget(:widget_b, :name => 'Foo')
 
+          pending 'WIP' do
             ui.sign_in(:bob)
             ui.navigate_to :widget_list
             ui.widget_list.widgets.should == [k.widgets[:widget_a], k.widgets[:widget_b]]
