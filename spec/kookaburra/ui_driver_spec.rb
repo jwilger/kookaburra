@@ -1,4 +1,6 @@
-describe 'Kookaburra::UIDriver' do
+require 'kookaburra/ui_driver'
+
+describe Kookaburra::UIDriver do
   describe '.ui_component' do
     it 'adds an accessor method for the named component that defaults to an instance of the specified class' do
       foo_component_class = Class.new

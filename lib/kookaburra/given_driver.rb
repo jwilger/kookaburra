@@ -1,4 +1,6 @@
-class Kookaburra::GivenDriver
-  def initialize(params = {})
+class Kookaburra
+  class GivenDriver
+    def initialize(params = {})
+    end
   end
 end
