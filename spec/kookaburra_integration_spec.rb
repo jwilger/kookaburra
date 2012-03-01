@@ -18,7 +18,12 @@ describe 'Kookaburra Integration' do
           given = my_given_driver_class.new
 
           # Set up UIDriver for this test
-          my_app = Object.new
+          my_app = Object.new.tap do |a|
+            def a.call(*args)
+              [200, {}, '']
+            end
+          end
+
           browser = Capybara::Session.new(:rack_test, my_app)
           sign_in_screen_class = Class.new(Kookaburra::UIDriver::UIComponent) do
             def component_path
