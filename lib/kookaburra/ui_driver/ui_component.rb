@@ -12,15 +12,11 @@ class Kookaburra
       private
 
       def browser
-        @browser or raise "No browser object was set on #{class_name} initialization."
+        @browser or raise "No browser object was set on #{self.class.name} initialization."
       end
 
       def component_path
-        raise ConfigurationError, "You must define #{class_name}#component_path."
-      end
-
-      def class_name
-        self.class.name
+        raise ConfigurationError, "You must define #{self.class.name}#component_path."
       end
     end
   end
