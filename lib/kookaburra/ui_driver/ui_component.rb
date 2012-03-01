@@ -1,3 +1,5 @@
+require 'kookaburra/exception_classes'
+
 class Kookaburra
   class UIDriver
     class UIComponent
