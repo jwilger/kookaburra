@@ -18,13 +18,18 @@ describe 'Kookaburra Integration' do
           given = my_given_driver_class.new
 
           # Set up UIDriver for this test
-          sign_in_screen_class = Class.new(Kookaburra::UIDriver::UIComponent)
+          sign_in_screen_class = Class.new(Kookaburra::UIDriver::UIComponent) do
+            def component_path
+              '/session/new'
+            end
+          end
+
           my_ui_driver_class = Class.new(Kookaburra::UIDriver) do
             ui_component :sign_in_screen, sign_in_screen_class
 
             def sign_in(name)
-              navigate_to sign_in_screen
-              sign_in_screen.sign_in!(test_data.users[name])
+              sign_in_screen.show
+              sign_in_screen.sign_in(test_data.users[name])
             end
           end
           ui = my_ui_driver_class.new
@@ -35,7 +40,7 @@ describe 'Kookaburra Integration' do
 
           pending 'WIP' do
             ui.sign_in(:bob)
-            ui.navigate_to :widget_list
+            ui.widget_list.show
             ui.widget_list.widgets.should == [k.widgets[:widget_a], k.widgets[:widget_b]]
 
             ui.create_new_widget(:widget_c, :name => 'Bar')
