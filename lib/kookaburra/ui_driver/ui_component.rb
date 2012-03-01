@@ -1,8 +1,13 @@
 require 'kookaburra/exception_classes'
+require 'kookaburra/dependency_accessor'
 
 class Kookaburra
   class UIDriver
     class UIComponent
+      extend DependencyAccessor
+
+      dependency_accessor :browser
+
       def initialize(options = {})
         @browser = options[:browser]
       end
@@ -12,10 +17,6 @@ class Kookaburra
       end
 
       private
-
-      def browser
-        @browser or raise "No browser object was set on #{self.class.name} initialization."
-      end
 
       def component_path
         raise ConfigurationError, "You must define #{self.class.name}#component_path."
