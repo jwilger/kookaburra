@@ -23,7 +23,6 @@ describe 'Kookaburra Integration' do
               '/session/new'
             end
           end
-
           my_ui_driver_class = Class.new(Kookaburra::UIDriver) do
             ui_component :sign_in_screen, sign_in_screen_class
 
