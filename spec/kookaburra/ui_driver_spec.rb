@@ -1,4 +1,5 @@
 require 'kookaburra/ui_driver'
+require 'support/shared_examples/it_has_a_dependency_accessor'
 
 describe Kookaburra::UIDriver do
   describe '.ui_component' do
@@ -16,7 +17,10 @@ describe Kookaburra::UIDriver do
     end
   end
 
-  it_behaves_like :browser_injection do
+  describe 'dependency accessors' do
     let(:subject_class) { Kookaburra::UIDriver }
+
+    it_behaves_like :it_has_a_dependency_accessor, :test_data
+    it_behaves_like :it_has_a_dependency_accessor, :browser
   end
 end
