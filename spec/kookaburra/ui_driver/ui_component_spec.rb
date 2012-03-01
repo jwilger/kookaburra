@@ -46,5 +46,31 @@ describe Kookaburra::UIDriver::UIComponent do
         component.send(:class_name).should == 'Bar::Baz'
       end
     end
+
+    describe '#browser' do
+      it 'returns the browser object passed in at initialization' do
+        browser = Object.new
+        component = Kookaburra::UIDriver::UIComponent.new(:browser => browser)
+        component.send(:browser).should === browser
+      end
+
+      context 'when the browser object is not set' do
+        it 'raises a StandardError' do
+          component = Kookaburra::UIDriver::UIComponent.new
+          lambda { component.send(:browser) } \
+            .should raise_error(StandardError)
+        end
+
+        it 'explains that the browser was not set by the UIDriver' do
+          component = Kookaburra::UIDriver::UIComponent.new
+          component.stub!(:class_name => 'Foo')
+          begin
+            component.send(:browser)
+          rescue StandardError => e
+            e.message.should == 'No browser object was set on Foo initialization.'
+          end
+        end
+      end
+    end
   end
 end
