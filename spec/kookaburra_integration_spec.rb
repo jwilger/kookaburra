@@ -15,7 +15,6 @@ describe 'Kookaburra Integration' do
             def a_widget(name, attributes = {})
             end
           end
-          given = my_given_driver_class.new
 
           # Set up UIDriver for this test
           my_app = Object.new.tap do |a|
@@ -24,7 +23,6 @@ describe 'Kookaburra Integration' do
             end
           end
 
-          browser = Capybara::Session.new(:rack_test, my_app)
           sign_in_screen_class = Class.new(Kookaburra::UIDriver::UIComponent) do
             def component_path
               '/session/new'
@@ -38,22 +36,25 @@ describe 'Kookaburra Integration' do
               sign_in_screen.sign_in(test_data.users[name])
             end
           end
-          ui = my_ui_driver_class.new(:browser => browser)
 
-          given.a_user(:bob)
-          given.a_widget(:widget_a)
-          given.a_widget(:widget_b, :name => 'Foo')
+          k = Kookaburra.new(:ui_driver_class => my_ui_driver_class,
+                            :given_driver_class => my_given_driver_class,
+                            :browser => Capybara::Session.new(:rack_test, my_app))
+
+          k.given.a_user(:bob)
+          k.given.a_widget(:widget_a)
+          k.given.a_widget(:widget_b, :name => 'Foo')
 
           pending 'WIP' do
-            ui.sign_in(:bob)
-            ui.widget_list.show
-            ui.widget_list.should have_only(k.widgets[:widget_a], k.widgets[:widget_b])
+            k.ui.sign_in(:bob)
+            k.ui.widget_list.show
+            k.ui.widget_list.should have_only(k.widgets[:widget_a], k.widgets[:widget_b])
 
-            ui.create_new_widget(:widget_c, :name => 'Bar')
-            ui.widget_list.should have_only(k.widgets[:widget_a], k.widgets[:widget_b], k.widgets[:widget_c])
+            k.ui.create_new_widget(:widget_c, :name => 'Bar')
+            k.ui.widget_list.should have_only(k.widgets[:widget_a], k.widgets[:widget_b], k.widgets[:widget_c])
 
-            ui.delete_widget(:widget_b)
-            ui.widget_list.should have_only(k.widgets[:widget_a], k.widgets[:widget_c])
+            k.ui.delete_widget(:widget_b)
+            k.ui.widget_list.should have_only(k.widgets[:widget_a], k.widgets[:widget_c])
           end
         end
       end
