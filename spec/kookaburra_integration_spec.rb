@@ -6,40 +6,57 @@ describe 'Kookaburra Integration' do
   describe "testing a Rack application" do
     describe "with an HTML interface" do
       describe "with a JSON API" do
-        it "runs the tests against the app" do
-          # Set up GivenDriver for this test
-          my_given_driver_class = Class.new(Kookaburra::GivenDriver) do
-            def a_user(name)
-            end
+        class MyAPIDriver < Kookaburra::APIDriver
+          def create_user(user)
+          end
+        end
 
-            def a_widget(name, attributes = {})
-            end
+        class MyGivenDriver < Kookaburra::GivenDriver
+          def a_user(name)
+            user = test_data.default(:user)  # => { :username => 'bob', :password => '12345' }
+            result = api.create_user(user)
+            test_data.users[name] = result
           end
 
-          # Set up UIDriver for this test
+          def a_widget(name, attributes = {})
+          end
+        end
+
+        class MySignInScreen < Kookaburra::UIDriver::UIComponent
+          def component_path
+            '/session/new'
+          end
+
+          def sign_in(user_data)
+            browser.fill_in :email, :with => user_data[:email]
+            browser.fill_in :password, :with => user_data[:password]
+            browser.click_button 'Log In'
+          end
+        end
+
+        class MyUIDriver < Kookaburra::UIDriver
+          ui_component :sign_in_screen, MySignInScreen
+
+          def sign_in(name)
+            sign_in_screen.show
+            sign_in_screen.sign_in(test_data.users[name])
+          end
+        end
+
+
+        it "runs the tests against the app" do
           my_app = Object.new.tap do |a|
             def a.call(*args)
               [200, {}, '']
             end
           end
 
-          sign_in_screen_class = Class.new(Kookaburra::UIDriver::UIComponent) do
-            def component_path
-              '/session/new'
-            end
-          end
-          my_ui_driver_class = Class.new(Kookaburra::UIDriver) do
-            ui_component :sign_in_screen, sign_in_screen_class
-
-            def sign_in(name)
-              sign_in_screen.show
-              sign_in_screen.sign_in(test_data.users[name])
-            end
-          end
-
-          k = Kookaburra.new(:ui_driver_class => my_ui_driver_class,
-                            :given_driver_class => my_given_driver_class,
-                            :browser => Capybara::Session.new(:rack_test, my_app))
+          k = Kookaburra.new({
+            :ui_driver_class    => MyUIDriver,
+            :given_driver_class => MyGivenDriver,
+            :api_driver_class   => MyAPIDriver,
+            :browser            => Capybara::Session.new(:rack_test, my_app)
+          })
 
           k.given.a_user(:bob)
           k.given.a_widget(:widget_a)
