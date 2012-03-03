@@ -1,7 +1,6 @@
 require 'kookaburra/exception_classes'
 require 'kookaburra/test_data'
 require 'kookaburra/given_driver'
-require 'kookaburra/api_driver'
 require 'kookaburra/ui_driver'
 
 class Kookaburra
@@ -27,7 +26,7 @@ class Kookaburra
   private
 
   def api
-    api_driver_class.new
+    api_driver_class.new(RackDriver.new(browser.app))
   end
 
   def test_data
