@@ -3,6 +3,35 @@
 Kookaburra is a framework for implementing the [Window Driver] [Window Driver] pattern in
 order to keep acceptance tests maintainable.
 
+## WARNING: You probably want an earlier version! ##
+
+As of 0.15.0, Kookaburra is being rewritten from the ground up. The original
+(up through 0.14.x) version was extracted from another project in which the
+testing library was being used. Unfortunately, this meant that the code in
+Kookaburra itself did not have very good test coverage, because it was being
+tested indirectly by the fact of its usage in the other project. What we've
+found is that a *lot* of complexity was sneaking into Kookaburra due to its
+having been developed without much focused TDD.
+
+Starting with 0.15.0, we are treating the previous versions as a spike. They
+were really useful for learning about the approach, but the code has enough
+design flaws that its best just to toss it.
+
+As of right now, 0.15.0 **probably will not work for you**. If you want to use
+Kookaburra in an app right now, look at the latest 0.14.x release. There is a
+"v0.14.x" branch in the git repository, and any updates to that branch will also
+get a gem release on rubygems.org. Be warned, however, that the API is almost
+certainly going to have some significant changes in the very near future (hey,
+it *is* 0.x software, after all!).
+
+---
+
+**The remainder of this README is almost certainly out of date compared to
+master and 0.15.0 and up release versions. It will be updated once there is a
+usable 0.15.x release.**
+
+---
+
 ## Installation ##
 
 Kookaburra is available as a Rubygem and [published on Rubygems.org] [Kookaburra
