@@ -1,4 +1,5 @@
 require 'kookaburra/dependency_accessor'
+require 'kookaburra/ui_driver/ui_component'
 
 class Kookaburra
   class UIDriver

@@ -6,7 +6,8 @@ describe Kookaburra do
       my_given_driver_class = Class.new do
         def initialize(*args); end
       end
-      k = Kookaburra.new(:given_driver_class => my_given_driver_class)
+      my_api_driver_class = Class.new
+      k = Kookaburra.new(:given_driver_class => my_given_driver_class, :api_driver_class => my_api_driver_class)
       k.given.should be_kind_of(my_given_driver_class)
     end
   end
