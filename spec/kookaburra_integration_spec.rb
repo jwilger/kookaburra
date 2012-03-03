@@ -6,8 +6,10 @@ describe 'Kookaburra Integration' do
   describe "testing a Rack application" do
     describe "with an HTML interface" do
       describe "with a JSON API" do
-        class MyAPIDriver < Kookaburra::APIDriver
-          def create_user(user)
+        require 'kookaburra/json_api_driver'
+        class MyAPIDriver < Kookaburra::JsonApiDriver
+          def create_user(user_data)
+            post '/users', user_data
           end
         end
 
@@ -47,7 +49,7 @@ describe 'Kookaburra Integration' do
         it "runs the tests against the app" do
           my_app = Object.new.tap do |a|
             def a.call(*args)
-              [200, {}, '']
+              [201, {}, '{"foo":"bar"}']
             end
           end
 
