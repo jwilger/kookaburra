@@ -45,13 +45,22 @@ describe 'Kookaburra Integration' do
           end
         end
 
+        class TestRackApp
+          def call(env)
+            self.send(env['PATH_INFO'].gsub(/\W/, '_'), env)
+          end
+
+          def _users(env)
+            user_data = ActiveSupport::JSON.decode(env['rack.input'].read)
+            @users ||= {}
+            @users[user_data['email']] = user_data
+            [201, {'Content-Type' => 'application/json'}, ActiveSupport::JSON.encode(user_data)]
+          end
+        end
+
 
         it "runs the tests against the app" do
-          my_app = Object.new.tap do |a|
-            def a.call(*args)
-              [201, {}, '{"foo":"bar"}']
-            end
-          end
+          my_app = TestRackApp.new
 
           k = Kookaburra.new({
             :ui_driver_class    => MyUIDriver,
