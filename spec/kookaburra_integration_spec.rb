@@ -1,6 +1,6 @@
 require 'kookaburra'
-require 'rack'
 require 'capybara'
+require 'sinatra/base'
 
 describe 'Kookaburra Integration' do
   describe "testing a Rack application" do
@@ -32,7 +32,7 @@ describe 'Kookaburra Integration' do
           def sign_in(user_data)
             browser.fill_in :email, :with => user_data[:email]
             browser.fill_in :password, :with => user_data[:password]
-            browser.click_button 'Log In'
+            browser.click_button 'Sign In'
           end
         end
 
@@ -45,16 +45,48 @@ describe 'Kookaburra Integration' do
           end
         end
 
-        class TestRackApp
-          def call(env)
-            self.send(env['PATH_INFO'].gsub(/\W/, '_'), env)
+        class TestRackApp < Sinatra::Base
+          set :raise_errors, true
+          set :show_exceptions, false
+
+          def parse_json_req_body
+            request.body.rewind
+            ActiveSupport::JSON.decode(request.body.read)
           end
 
-          def _users(env)
-            user_data = ActiveSupport::JSON.decode(env['rack.input'].read)
+          post '/users' do
+            user_data = parse_json_req_body
             @users ||= {}
             @users[user_data['email']] = user_data
-            [201, {'Content-Type' => 'application/json'}, ActiveSupport::JSON.encode(user_data)]
+            status 201
+            headers 'Content-Type' => 'application/json'
+            body user_data.to_json
+          end
+
+          post '/session' do
+          end
+
+          get '/session/new' do
+            body = <<-EOF
+              <html>
+                <head>
+                  <title>Sign In</title>
+                </head>
+                <body>
+                  <div id="sign_in_screen">
+                    <form action="/session" method="POST">
+                      <label for="email">Email:</label>
+                      <input id="email" name="email" type="text" />
+
+                      <label for="password">Password:</label>
+                      <input id="password" name="password" type="password" />
+
+                      <input type="submit" value="Sign In" />
+                    </form>
+                  </div>
+                </body>
+              </html>
+            EOF
           end
         end
 
@@ -73,8 +105,8 @@ describe 'Kookaburra Integration' do
           k.given.a_widget(:widget_a)
           k.given.a_widget(:widget_b, :name => 'Foo')
 
+          k.ui.sign_in(:bob)
           pending 'WIP' do
-            k.ui.sign_in(:bob)
             k.ui.widget_list.show
             k.ui.widget_list.should have_only(k.widgets[:widget_a], k.widgets[:widget_b])
 

@@ -14,4 +14,5 @@ group :development do
   gem 'jeweler'
   gem 'rcov'
   gem 'reek'
+  gem 'sinatra'
 end
