@@ -23,6 +23,10 @@ class Kookaburra
     ui_driver_class.new(:test_data => test_data, :browser => browser)
   end
 
+  def get_data(collection_name)
+    test_data.send(collection_name).dup.freeze
+  end
+
   private
 
   def api

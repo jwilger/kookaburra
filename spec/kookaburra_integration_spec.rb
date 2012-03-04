@@ -24,7 +24,7 @@ describe 'Kookaburra Integration' do
           end
         end
 
-        class MySignInScreen < Kookaburra::UIDriver::UIComponent
+        class SignInScreen < Kookaburra::UIDriver::UIComponent
           def component_path
             '/session/new'
           end
@@ -36,8 +36,15 @@ describe 'Kookaburra Integration' do
           end
         end
 
+        class WidgetList < Kookaburra::UIDriver::UIComponent
+          def component_path
+            '/widgets'
+          end
+        end
+
         class MyUIDriver < Kookaburra::UIDriver
-          ui_component :sign_in_screen, MySignInScreen
+          ui_component :sign_in_screen, SignInScreen
+          ui_component :widget_list, WidgetList
 
           def sign_in(name)
             sign_in_screen.show
@@ -98,7 +105,8 @@ describe 'Kookaburra Integration' do
             :ui_driver_class    => MyUIDriver,
             :given_driver_class => MyGivenDriver,
             :api_driver_class   => MyAPIDriver,
-            :browser            => Capybara::Session.new(:rack_test, my_app)
+            :browser            => Capybara::Session.new(:rack_test, my_app),
+            :test_data_collections => [:users, :widgets]
           })
 
           k.given.a_user(:bob)
@@ -106,12 +114,12 @@ describe 'Kookaburra Integration' do
           k.given.a_widget(:widget_b, :name => 'Foo')
 
           k.ui.sign_in(:bob)
+          k.ui.widget_list.show
           pending 'WIP' do
-            k.ui.widget_list.show
-            k.ui.widget_list.should have_only(k.widgets[:widget_a], k.widgets[:widget_b])
+            k.ui.widget_list.should have_only(k.get_data(:widgets).slice(:widget_a, :widget_b))
 
             k.ui.create_new_widget(:widget_c, :name => 'Bar')
-            k.ui.widget_list.should have_only(k.widgets[:widget_a], k.widgets[:widget_b], k.widgets[:widget_c])
+            k.ui.widget_list.should have_only(k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c))
 
             k.ui.delete_widget(:widget_b)
             k.ui.widget_list.should have_only(k.widgets[:widget_a], k.widgets[:widget_c])

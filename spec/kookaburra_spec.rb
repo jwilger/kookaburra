@@ -26,4 +26,24 @@ describe Kookaburra do
       k.ui.should be_kind_of(my_ui_driver_class)
     end
   end
+
+  describe '#get_data' do
+    it 'returns a equivalent copy of the test data collection specified' do
+      k = Kookaburra.new
+      foos = {:spam => 'ham'}
+      test_data = stub(:foos => foos)
+      k.stub!(:test_data => test_data)
+      k.get_data(:foos).should == foos
+    end
+
+    it 'does not return the same object that is the test data collection' do
+      k = Kookaburra.new
+      k.get_data(:foos).should_not === k.get_data(:foos)
+    end
+
+    it 'returns a frozen object' do
+      k = Kookaburra.new
+      k.get_data(:foos).should be_frozen
+    end
+  end
 end
