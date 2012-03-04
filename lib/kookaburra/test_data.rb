@@ -18,17 +18,17 @@ class Kookaburra
     class Collection
       def initialize(name)
         @name = name
-        @items = {}
+        @data = Hash.new do |hash, key|
+          raise UnknownKeyError, "Can't find test_data.#{@name}[#{key.inspect}]. Did you forget to set it?"
+        end
       end
 
-      def []=(key, value)
-        @items[key] = value
+      def ===(other)
+        self.object_id == other.object_id
       end
 
-      def [](key)
-        @items.fetch(key)
-      rescue IndexError
-        raise UnknownKeyError, "Can't find test_data.#{@name}[#{key.inspect}]. Did you forget to set it?"
+      def method_missing(*args, &block)
+        @data.send(*args, &block)
       end
     end
   end
