@@ -183,7 +183,7 @@ describe 'Kookaburra Integration' do
             widget_data = if request.media_type == 'application/json'
                             parse_json_req_body
                           else
-                            params.slice(:name)
+                            params.symbolize_keys.slice(:name)
                           end
             widget_data[:id] = `uuidgen`.strip
             @@widgets << widget_data
@@ -260,8 +260,8 @@ describe 'Kookaburra Integration' do
           k.ui.widget_list.widgets.should == k.get_data(:widgets)[:widget_a, :widget_b]
 
           k.ui.create_new_widget(:widget_c, :name => 'Bar')
+          k.ui.widget_list.widgets.should == k.get_data(:widgets)[:widget_a, :widget_b, :widget_c]
           pending 'WIP' do
-            k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c)
 
             k.ui.delete_widget(:widget_b)
             k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_c)
