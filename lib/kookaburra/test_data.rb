@@ -27,13 +27,9 @@ class Kookaburra
         self.object_id == other.object_id
       end
 
-      def [](*keys)
-        if keys.size == 1
-          @data[keys.first]
-        else
-          keys.map do |key|
-            @data[key]
-          end
+      def slice(*keys)
+        results = keys.map do |key|
+          @data[key]
         end
       end
 
