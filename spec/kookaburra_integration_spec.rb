@@ -192,28 +192,30 @@ describe 'Kookaburra Integration' do
             last_widget_created, @@last_widget_created = @@last_widget_created, nil
             content = ''
             content << <<-EOF
-              <html>
-                <head>
-                  <title>Widgets</title>
-                </head>
-                <body>
-                  <div id="widget_list">
-                    <ul>
-            EOF
-            @@widgets.each do |w|
-              content << <<-EOF
-                      <li class="widget_summary">
-                        <span class="id">#{w[:id]}</span>
-                        <span class="name">#{w[:name]}</span>
-                      </li>
-              EOF
-            end
-            content << <<-EOF
-                    </ul>
-                    <a href="/widgets/new">New Widget</a>
-                  </div>
-                </body>
-              </html>
+            <html>
+              <head>
+                <title>Widgets</title>
+              </head>
+              <body>
+                <div id="widget_list">
+                  EOF
+                  content << <<-EOF
+                  <ul>
+                  EOF
+                  @@widgets.each do |w|
+                    content << <<-EOF
+                    <li class="widget_summary">
+                      <span class="id">#{w[:id]}</span>
+                      <span class="name">#{w[:name]}</span>
+                    </li>
+                    EOF
+                  end
+                  content << <<-EOF
+                  </ul>
+                  <a href="/widgets/new">New Widget</a>
+                </div>
+              </body>
+            </html>
             EOF
             body content
           end
