@@ -88,6 +88,10 @@ describe 'Kookaburra Integration' do
           end
         end
 
+        # This is the fixture Rack application against which the integration
+        # test will run. It uses class variables to persist data, because
+        # Sinatra will instantiate a new instance of TestRackApp for each
+        # request.
         class TestRackApp < Sinatra::Base
           set :raise_errors, true
           set :show_exceptions, false
