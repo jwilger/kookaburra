@@ -20,7 +20,7 @@ describe 'Kookaburra Integration' do
 
         class MyGivenDriver < Kookaburra::GivenDriver
           def a_user(name)
-            user = { :username => 'bob', :password => '12345' }
+            user = { :email => 'bob@example.com', :password => '12345' }
             result = api.create_user(user)
             test_data.users[name] = result
           end
@@ -38,8 +38,8 @@ describe 'Kookaburra Integration' do
           end
 
           def sign_in(user_data)
-            browser.fill_in :email, :with => user_data[:email]
-            browser.fill_in :password, :with => user_data[:password]
+            browser.fill_in 'Email:', :with => user_data[:email]
+            browser.fill_in 'Password:', :with => user_data[:password]
             browser.click_button 'Sign In'
           end
         end
@@ -72,22 +72,34 @@ describe 'Kookaburra Integration' do
         class TestRackApp < Sinatra::Base
           set :raise_errors, true
           set :show_exceptions, false
+          enable :sessions
 
           def parse_json_req_body
             request.body.rewind
-            HashWithIndifferentAccess.new(ActiveSupport::JSON.decode(request.body.read))
+            ActiveSupport::JSON.decode(request.body.read).symbolize_keys
           end
 
           post '/users' do
             user_data = parse_json_req_body
             @@users ||= {}
-            @@users[user_data['email']] = user_data
+            @@users[user_data[:email]] = user_data
             status 201
             headers 'Content-Type' => 'application/json'
             body user_data.to_json
           end
 
           post '/session' do
+            user = @@users[params[:email]]
+            if user && user[:password] == params[:password]
+              session[:logged_in] = true
+              status 200
+              puts session.inspect
+              body 'You are logged in!'
+            else
+              session[:logged_in] = false
+              status 403
+              body 'Log in failed!'
+            end
           end
 
           get '/session/new' do
@@ -124,6 +136,7 @@ describe 'Kookaburra Integration' do
           end
 
           get '/widgets' do
+            raise "Not logged in!" unless session[:logged_in]
             @@widgets ||= []
             content = ''
             content << <<-EOF
@@ -134,16 +147,16 @@ describe 'Kookaburra Integration' do
                 <body>
                   <div id="widget_list">
                     <ul>
-                    EOF
-                    @@widgets.each do |w|
-                      content << <<-EOF
+            EOF
+            @@widgets.each do |w|
+              content << <<-EOF
                       <li class="widget_summary">
                         <span class="id">#{w[:id]}</span>
                         <span class="name">#{w[:name]}</span>
                       </li>
-                      EOF
-                    end
-                    content << <<-EOF
+              EOF
+            end
+            content << <<-EOF
                     </ul>
                   </div>
                 </body>
