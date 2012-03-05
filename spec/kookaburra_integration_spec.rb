@@ -208,10 +208,12 @@ describe 'Kookaburra Integration' do
             @@last_widget_created = widget_data
             if request.accept? 'text/html'
               redirect to('/widgets')
-            else
+            elsif request.accept? 'application/json'
               status 201
               headers 'Content-Type' => 'application/json'
               body widget_data.to_json
+            else
+              redirect to('/widgets')
             end
           end
 
@@ -269,7 +271,7 @@ describe 'Kookaburra Integration' do
             :ui_driver_class    => MyUIDriver,
             :given_driver_class => MyGivenDriver,
             :api_driver_class   => MyAPIDriver,
-            :browser            => Capybara::Session.new(:selenium, my_app)
+            :browser            => Capybara::Session.new(:rack_test, my_app)
           })
 
           k.given.a_user(:bob)
