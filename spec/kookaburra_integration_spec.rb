@@ -64,6 +64,12 @@ describe 'Kookaburra Integration' do
             browser.click_on 'New Widget'
           end
 
+          def choose_to_delete_widget(widget_data)
+            browser.within("#delete_#{widget_data[:id]}") do
+              browser.click_button('Delete')
+            end
+          end
+
           private
 
           def extract_widget_data(element)
@@ -96,6 +102,11 @@ describe 'Kookaburra Integration' do
             widget_list.choose_to_create_new_widget
             widget_form.submit(:name => 'My Widget')
             test_data.widgets[name] = widget_list.last_widget_created
+          end
+
+          def delete_widget(name)
+            widget_list.show
+            widget_list.choose_to_delete_widget(test_data.widgets[name])
           end
         end
 
@@ -156,6 +167,13 @@ describe 'Kookaburra Integration' do
                 </body>
               </html>
             EOF
+          end
+
+          post '/widgets/:widget_id' do
+            @@widgets.delete_if do |w|
+              w[:id] == params['widget_id']
+            end
+            redirect to('/widgets')
           end
 
           get '/widgets/new' do
@@ -226,6 +244,9 @@ describe 'Kookaburra Integration' do
                     <li class="widget_summary">
                       <span class="id">#{w[:id]}</span>
                       <span class="name">#{w[:name]}</span>
+                      <form id="delete_#{w[:id]}" action="/widgets/#{w[:id]}" method="POST">
+                        <button type="submit" value="Delete" />
+                      </form>
                     </li>
                     EOF
                   end
@@ -261,11 +282,9 @@ describe 'Kookaburra Integration' do
 
           k.ui.create_new_widget(:widget_c, :name => 'Bar')
           k.ui.widget_list.widgets.should == k.get_data(:widgets)[:widget_a, :widget_b, :widget_c]
-          pending 'WIP' do
 
-            k.ui.delete_widget(:widget_b)
-            k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_c)
-          end
+          k.ui.delete_widget(:widget_b)
+          k.ui.widget_list.widgets.should == k.get_data(:widgets)[:widget_a, :widget_c]
         end
       end
     end
