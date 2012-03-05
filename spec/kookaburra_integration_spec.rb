@@ -57,15 +57,34 @@ describe 'Kookaburra Integration' do
               }
             end
           end
+
+          def choose_to_create_new_widget
+            browser.click_on 'New Widget'
+          end
+        end
+
+        class WidgetForm < Kookaburra::UIDriver::UIComponent
+          def submit(widget_data)
+            browser.fill_in 'Name:', :with => widget_data[:name]
+            browser.click_on 'Save'
+          end
         end
 
         class MyUIDriver < Kookaburra::UIDriver
           ui_component :sign_in_screen, SignInScreen
           ui_component :widget_list, WidgetList
+          ui_component :widget_form, WidgetForm
 
           def sign_in(name)
             sign_in_screen.show
             sign_in_screen.sign_in(test_data.users[name])
+          end
+
+          def create_new_widget(name, attributes = {})
+            widget_list.show
+            widget_list.choose_to_create_new_widget
+            widget_form.submit(:name => 'My Widget')
+            test_data.widgets[name] = widget_list.last_widget_created
           end
         end
 
@@ -125,18 +144,48 @@ describe 'Kookaburra Integration' do
           end
 
           post '/widgets' do
-            widget_data = parse_json_req_body
             @@widgets ||= []
+            widget_data = if request.media_type == 'application/json'
+                            parse_json_req_body
+                          else
+                            params.slice(:name)
+                          end
             widget_data[:id] = `uuidgen`.strip
             @@widgets << widget_data
-            status 201
-            headers 'Content-Type' => 'application/json'
-            body widget_data.to_json
+            @@last_widget_created = widget_data
+            if request.accept? 'application/json'
+              status 201
+              headers 'Content-Type' => 'application/json'
+              body widget_data.to_json
+            else
+              redirect to('/widgets')
+            end
+          end
+
+          get '/widgets/new' do
+            body <<-EOF
+              <html>
+                <head>
+                  <title>New Widget</title>
+                </head>
+                <body>
+                  <div id="widget_form">
+                    <form action="/widgets" method="POST">
+                      <label for="name">Name:</label>
+                      <input id="name" name="name" type="text" />
+
+                      <input type="submit" value="Save" />
+                    </form>
+                  </div>
+                </body>
+              </html>
+            EOF
           end
 
           get '/widgets' do
             raise "Not logged in!" unless session[:logged_in]
             @@widgets ||= []
+            last_widget_created, @@last_widget_created = @@last_widget_created, nil
             content = ''
             content << <<-EOF
               <html>
@@ -157,6 +206,7 @@ describe 'Kookaburra Integration' do
             end
             content << <<-EOF
                     </ul>
+                    <a href="/widgets/new">New Widget</a>
                   </div>
                 </body>
               </html>
@@ -183,8 +233,8 @@ describe 'Kookaburra Integration' do
           k.ui.sign_in(:bob)
           k.ui.widget_list.show
           k.ui.widget_list.widgets.should == k.get_data(:widgets)[:widget_a, :widget_b]
-          pending 'WIP' do
 
+          pending 'WIP' do
             k.ui.create_new_widget(:widget_c, :name => 'Bar')
             k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c)
 
