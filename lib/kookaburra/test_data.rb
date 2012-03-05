@@ -31,8 +31,8 @@ class Kookaburra
         if keys.size == 1
           @data[keys.first]
         else
-          keys.map do |k|
-            @data[k]
+          keys.map do |key|
+            @data[key]
           end
         end
       end
