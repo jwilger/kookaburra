@@ -51,15 +51,26 @@ describe 'Kookaburra Integration' do
 
           def widgets
             browser.all('.widget_summary').map do |el|
-              {
-                :id => el.find('.id').text,
-                :name => el.find('.name').text
-              }
+              extract_widget_data(el)
             end
+          end
+
+          def last_widget_created
+            element = browser.find('.last_widget.created')
+            extract_widget_data(element)
           end
 
           def choose_to_create_new_widget
             browser.click_on 'New Widget'
+          end
+
+          private
+
+          def extract_widget_data(element)
+            {
+              :id => element.find('.id').text,
+              :name => element.find('.name').text
+            }
           end
         end
 
@@ -147,25 +158,6 @@ describe 'Kookaburra Integration' do
             EOF
           end
 
-          post '/widgets' do
-            @@widgets ||= []
-            widget_data = if request.media_type == 'application/json'
-                            parse_json_req_body
-                          else
-                            params.slice(:name)
-                          end
-            widget_data[:id] = `uuidgen`.strip
-            @@widgets << widget_data
-            @@last_widget_created = widget_data
-            if request.accept? 'application/json'
-              status 201
-              headers 'Content-Type' => 'application/json'
-              body widget_data.to_json
-            else
-              redirect to('/widgets')
-            end
-          end
-
           get '/widgets/new' do
             body <<-EOF
               <html>
@@ -186,6 +178,25 @@ describe 'Kookaburra Integration' do
             EOF
           end
 
+          post '/widgets' do
+            @@widgets ||= []
+            widget_data = if request.media_type == 'application/json'
+                            parse_json_req_body
+                          else
+                            params.slice(:name)
+                          end
+            widget_data[:id] = `uuidgen`.strip
+            @@widgets << widget_data
+            @@last_widget_created = widget_data
+            if request.accept? 'application/json'
+              status 201
+              headers 'Content-Type' => 'application/json'
+              body widget_data.to_json
+            else
+              redirect to('/widgets')
+            end
+          end
+
           get '/widgets' do
             raise "Not logged in!" unless session[:logged_in]
             @@widgets ||= []
@@ -199,6 +210,14 @@ describe 'Kookaburra Integration' do
               <body>
                 <div id="widget_list">
                   EOF
+                  if last_widget_created
+                    content << <<-EOF
+                    <div class="last_widget created">
+                      <span class="id">#{last_widget_created[:id]}</span>
+                      <span class="name">#{last_widget_created[:name]}</span>
+                    </div>
+                    EOF
+                  end
                   content << <<-EOF
                   <ul>
                   EOF
@@ -240,8 +259,8 @@ describe 'Kookaburra Integration' do
           k.ui.widget_list.show
           k.ui.widget_list.widgets.should == k.get_data(:widgets)[:widget_a, :widget_b]
 
+          k.ui.create_new_widget(:widget_c, :name => 'Bar')
           pending 'WIP' do
-            k.ui.create_new_widget(:widget_c, :name => 'Bar')
             k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c)
 
             k.ui.delete_widget(:widget_b)
