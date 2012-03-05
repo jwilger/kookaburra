@@ -21,13 +21,20 @@ class Kookaburra
     private
 
     def check_response_status!(verb, expected_status, path)
-      response_status = last_response.status
-      response_body = last_response.body
-      unless response_status == expected_status
+      actual_status = response_status
+      unless actual_status == expected_status
         raise UnexpectedResponse, 
-          "#{verb} to #{path} unexpectedly responded with an HTTP status of #{response_status}:\n" \
+          "#{verb} to #{path} unexpectedly responded with an HTTP status of #{actual_status}:\n" \
           + response_body
       end
+    end
+
+    def response_status
+      last_response.status
+    end
+
+    def response_body
+      last_response.body
     end
 
     def set_headers(headers)
