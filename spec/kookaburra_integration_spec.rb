@@ -93,7 +93,6 @@ describe 'Kookaburra Integration' do
             if user && user[:password] == params[:password]
               session[:logged_in] = true
               status 200
-              puts session.inspect
               body 'You are logged in!'
             else
               session[:logged_in] = false
