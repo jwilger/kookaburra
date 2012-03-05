@@ -280,13 +280,13 @@ describe 'Kookaburra Integration' do
 
           k.ui.sign_in(:bob)
           k.ui.widget_list.show
-          k.ui.widget_list.widgets.should == k.get_data(:widgets)[:widget_a, :widget_b]
+          k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b)
 
           k.ui.create_new_widget(:widget_c, :name => 'Bar')
-          k.ui.widget_list.widgets.should == k.get_data(:widgets)[:widget_a, :widget_b, :widget_c]
+          k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c)
 
           k.ui.delete_widget(:widget_b)
-          k.ui.widget_list.widgets.should == k.get_data(:widgets)[:widget_a, :widget_c]
+          k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_c)
         end
       end
     end

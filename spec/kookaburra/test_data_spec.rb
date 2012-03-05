@@ -14,17 +14,12 @@ describe Kookaburra::TestData do
   describe Kookaburra::TestData::Collection do
     let(:collection) { Kookaburra::TestData::Collection.new('widgets') }
 
-    describe '#[]' do
-      it 'returns the item at the specified index' do
-        collection[:foo] = :foo
-        collection[:foo].should == :foo
-      end
-
-      it 'returns an array of items if multiple indexes are specified' do
+    describe '#slice' do
+      it 'returns an array of items matching the specified keys' do
         collection[:foo] = 'foo'
         collection[:bar] = 'bar'
         collection[:baz] = 'baz'
-        collection[:foo, :baz].should == %w(foo baz)
+        collection.slice(:foo, :baz).should == %w(foo baz)
       end
     end
 
