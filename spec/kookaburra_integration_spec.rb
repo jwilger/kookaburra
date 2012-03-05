@@ -20,7 +20,7 @@ describe 'Kookaburra Integration' do
 
         class MyGivenDriver < Kookaburra::GivenDriver
           def a_user(name)
-            user = { :email => 'bob@example.com', :password => '12345' }
+            user = {:email => 'bob@example.com', :password => '12345'}
             result = api.create_user(user)
             test_data.users[name] = result
           end
