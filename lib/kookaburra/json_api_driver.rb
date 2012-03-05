@@ -24,7 +24,7 @@ class Kookaburra
     end
 
     def decode(data)
-      ActiveSupport::JSON.decode(data)
+      ActiveSupport::JSON.decode(data).symbolize_keys
     end
   end
 end

@@ -14,9 +14,18 @@ describe Kookaburra::TestData do
   describe Kookaburra::TestData::Collection do
     let(:collection) { Kookaburra::TestData::Collection.new('widgets') }
 
-    it 'is somewhat hash-like' do
-      collection[:foo] = :foo
-      collection[:foo].should == :foo
+    describe '#[]' do
+      it 'returns the item at the specified index' do
+        collection[:foo] = :foo
+        collection[:foo].should == :foo
+      end
+
+      it 'returns an array of items if multiple indexes are specified' do
+        collection[:foo] = 'foo'
+        collection[:bar] = 'bar'
+        collection[:baz] = 'baz'
+        collection[:foo, :baz].should == %w(foo baz)
+      end
     end
 
     it 'raises a Kookaburra::TestData::NoSuchKey exception for #[] with a missing key' do

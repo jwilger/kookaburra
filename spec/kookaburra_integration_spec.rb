@@ -1,6 +1,7 @@
 require 'kookaburra'
 require 'capybara'
 require 'sinatra/base'
+require 'active_support/hash_with_indifferent_access'
 
 describe 'Kookaburra Integration' do
   describe "testing a Rack application" do
@@ -10,6 +11,10 @@ describe 'Kookaburra Integration' do
         class MyAPIDriver < Kookaburra::JsonApiDriver
           def create_user(user_data)
             post '/users', user_data
+          end
+
+          def create_widget(widget_data)
+            post '/widgets', widget_data
           end
         end
 
@@ -21,6 +26,9 @@ describe 'Kookaburra Integration' do
           end
 
           def a_widget(name, attributes = {})
+            widget = {:name => 'Foo'}.merge(attributes)
+            result = api.create_widget(widget)
+            test_data.widgets[name] = result
           end
         end
 
@@ -40,6 +48,15 @@ describe 'Kookaburra Integration' do
           def component_path
             '/widgets'
           end
+
+          def widgets
+            browser.all('.widget_summary').map do |el|
+              {
+                :id => el.find('.id').text,
+                :name => el.find('.name').text
+              }
+            end
+          end
         end
 
         class MyUIDriver < Kookaburra::UIDriver
@@ -58,13 +75,13 @@ describe 'Kookaburra Integration' do
 
           def parse_json_req_body
             request.body.rewind
-            ActiveSupport::JSON.decode(request.body.read)
+            HashWithIndifferentAccess.new(ActiveSupport::JSON.decode(request.body.read))
           end
 
           post '/users' do
             user_data = parse_json_req_body
-            @users ||= {}
-            @users[user_data['email']] = user_data
+            @@users ||= {}
+            @@users[user_data['email']] = user_data
             status 201
             headers 'Content-Type' => 'application/json'
             body user_data.to_json
@@ -74,7 +91,7 @@ describe 'Kookaburra Integration' do
           end
 
           get '/session/new' do
-            body = <<-EOF
+            body <<-EOF
               <html>
                 <head>
                   <title>Sign In</title>
@@ -95,6 +112,45 @@ describe 'Kookaburra Integration' do
               </html>
             EOF
           end
+
+          post '/widgets' do
+            widget_data = parse_json_req_body
+            @@widgets ||= []
+            widget_data[:id] = `uuidgen`.strip
+            @@widgets << widget_data
+            status 201
+            headers 'Content-Type' => 'application/json'
+            body widget_data.to_json
+          end
+
+          get '/widgets' do
+            @@widgets ||= []
+            content = ''
+            content << <<-EOF
+              <html>
+                <head>
+                  <title>Widgets</title>
+                </head>
+                <body>
+                  <div id="widget_list">
+                    <ul>
+                    EOF
+                    @@widgets.each do |w|
+                      content << <<-EOF
+                      <li class="widget_summary">
+                        <span class="id">#{w[:id]}</span>
+                        <span class="name">#{w[:name]}</span>
+                      </li>
+                      EOF
+                    end
+                    content << <<-EOF
+                    </ul>
+                  </div>
+                </body>
+              </html>
+            EOF
+            body content
+          end
         end
 
 
@@ -105,8 +161,7 @@ describe 'Kookaburra Integration' do
             :ui_driver_class    => MyUIDriver,
             :given_driver_class => MyGivenDriver,
             :api_driver_class   => MyAPIDriver,
-            :browser            => Capybara::Session.new(:rack_test, my_app),
-            :test_data_collections => [:users, :widgets]
+            :browser            => Capybara::Session.new(:rack_test, my_app)
           })
 
           k.given.a_user(:bob)
@@ -115,14 +170,14 @@ describe 'Kookaburra Integration' do
 
           k.ui.sign_in(:bob)
           k.ui.widget_list.show
+          k.ui.widget_list.widgets.should == k.get_data(:widgets)[:widget_a, :widget_b]
           pending 'WIP' do
-            k.ui.widget_list.should have_only(k.get_data(:widgets).slice(:widget_a, :widget_b))
 
             k.ui.create_new_widget(:widget_c, :name => 'Bar')
-            k.ui.widget_list.should have_only(k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c))
+            k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c)
 
             k.ui.delete_widget(:widget_b)
-            k.ui.widget_list.should have_only(k.widgets[:widget_a], k.widgets[:widget_c])
+            k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_c)
           end
         end
       end
