@@ -27,6 +27,16 @@ class Kookaburra
         self.object_id == other.object_id
       end
 
+      def [](*keys)
+        if keys.size == 1
+          @data[keys.first]
+        else
+          keys.map do |k|
+            @data[k]
+          end
+        end
+      end
+
       def method_missing(*args, &block)
         @data.send(*args, &block)
       end

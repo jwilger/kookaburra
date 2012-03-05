@@ -18,7 +18,7 @@ describe Kookaburra::JsonApiDriver do
         app_driver = stub('RackDriver', :post => '{"ham":"spam"}')
         driver = Kookaburra::JsonApiDriver.new(app_driver)
         driver.send(:post, '/foo', {:bar => :baz}) \
-          .should == {'ham' => 'spam'}
+          .should == {:ham => 'spam'}
       end
     end
   end
