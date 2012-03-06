@@ -77,9 +77,23 @@ require 'kookaburra/ui_driver'
 #     end
 #   end
 class Kookaburra
+  # Returns a new Kookaburra instance that wires together your application's
+  # APIDriver, GivenDriver, and UIDriver.
+  #
+  # @option options [Kookaburra::APIDriver] :api_driver_class Your application's
+  #   subclass of {Kookaburra::APIDriver}. At the moment, only the
+  #   {Kookaburra::JsonApiDriver} is implemented
+  # @option options [Kookaburra::GivenDriver] :given_driver_class Your
+  #   application's subclass of {Kookaburra::GivenDriver}
+  # @option options [Kookaburra::UIDriver] :ui_driver_class Your application's
+  #   subclass of {Kookaburra::UIDriver}
+  # @option options [Capybara::Session] :browser The browser driver that
+  #   Kookaburra will interact with to run the tests. It must also respond to
+  #   the #app method and return a Rack application for use with the
+  #   {Kookaburra::APIDriver}.
   def initialize(options = {})
-    @given_driver_class = options[:given_driver_class]
     @api_driver_class   = options[:api_driver_class]
+    @given_driver_class = options[:given_driver_class]
     @ui_driver_class    = options[:ui_driver_class]
     @browser            = options[:browser]
   end
