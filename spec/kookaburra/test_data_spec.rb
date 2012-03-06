@@ -23,9 +23,9 @@ describe Kookaburra::TestData do
       end
     end
 
-    it 'raises a Kookaburra::TestData::NoSuchKey exception for #[] with a missing key' do
+    it 'raises a Kookaburra::UnknownKeyError exception for #[] with a missing key' do
       lambda { collection[:foo] }.should \
-        raise_error(Kookaburra::TestData::UnknownKeyError, "Can't find test_data.widgets[:foo]. Did you forget to set it?")
+        raise_error(Kookaburra::UnknownKeyError, "Can't find test_data.widgets[:foo]. Did you forget to set it?")
     end
   end
 end
