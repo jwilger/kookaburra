@@ -115,9 +115,12 @@ describe 'Kookaburra Integration' do
         # Sinatra will instantiate a new instance of TestRackApp for each
         # request.
         class TestRackApp < Sinatra::Base
-          set :raise_errors, true
-          set :show_exceptions, false
           enable :sessions
+
+          # we want error handling to behave as it would for a production
+          # deployment rather than development
+          set :raise_errors, false
+          set :show_exceptions, false
 
           def parse_json_req_body
             request.body.rewind
