@@ -1,7 +1,5 @@
 class Kookaburra
   class TestData
-    UnknownKeyError = Class.new(StandardError)
-
     def initialize
       @data = {}
     end
