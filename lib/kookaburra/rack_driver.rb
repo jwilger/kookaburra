@@ -1,4 +1,4 @@
-require 'kookaburra/exception_classes'
+require 'kookaburra/exceptions'
 require 'rack/test'
 
 class Kookaburra

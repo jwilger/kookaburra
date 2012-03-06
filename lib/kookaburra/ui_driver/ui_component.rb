@@ -1,4 +1,4 @@
-require 'kookaburra/exception_classes'
+require 'kookaburra/exceptions'
 require 'kookaburra/dependency_accessor'
 
 class Kookaburra
