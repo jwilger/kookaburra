@@ -1,4 +1,4 @@
-require 'kookaburra/exception_classes'
+require 'kookaburra/exceptions'
 require 'kookaburra/test_data'
 require 'kookaburra/given_driver'
 require 'kookaburra/ui_driver'
