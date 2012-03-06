@@ -98,14 +98,33 @@ class Kookaburra
     @browser            = options[:browser]
   end
 
+  # Returns an instance of your GivenDriver class configured to share test
+  # fixture data with the UIDriver and to use your APIDriver class to
+  # communicate with your application
   def given
     given_driver_class.new(:test_data => test_data, :api => api)
   end
 
+  # Returns an instance of your UIDriver class configured to share test fixture
+  # data with the GivenDriver and to use the browser driver you specified in
+  # {#initialize}
   def ui
     ui_driver_class.new(:test_data => test_data, :browser => browser)
   end
 
+  # Returns a frozen copy of the specified test fixture data collection.
+  # However, this is neither a deep copy nor a deep freeze, so it is possible
+  # that you could modify data outside of your GivenDriver or UIDriver. Just
+  # don't do that. Trust me.
+  #
+  # This access is provided so that you can reference the current fixture data
+  # within your test implementation in order to make assertions about the state
+  # of your application's interface.
+  #
+  # @example
+  #   given.a_widget(:foo)
+  #   ui.create_a_new_widget(:bar)
+  #   ui.widget_list.widgets.should == k.get_data(:widgets).slice(:foo, :bar)
   def get_data(collection_name)
     test_data.send(collection_name).dup.freeze
   end
