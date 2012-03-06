@@ -10,6 +10,10 @@ class Kookaburra
 
     private
 
+    def authorize(username, password)
+      @app_driver.authorize(username, password)
+    end
+
     def post(path, data)
       json_request_headers = {
         'Content-Type' => 'application/json',
