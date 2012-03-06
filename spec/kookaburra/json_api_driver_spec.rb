@@ -21,5 +21,14 @@ describe Kookaburra::JsonApiDriver do
           .should == {:ham => 'spam'}
       end
     end
+
+    describe '#authorize' do
+      it 'sets the authorization credentials on the app driver' do
+        app_driver = mock('RackDriver')
+        app_driver.should_receive(:authorize).with('a user', 'a password')
+        driver = Kookaburra::JsonApiDriver.new(app_driver)
+        driver.send(:authorize, 'a user', 'a password')
+      end
+    end
   end
 end
