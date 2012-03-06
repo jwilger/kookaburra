@@ -77,10 +77,6 @@ require 'kookaburra/ui_driver'
 #     end
 #   end
 class Kookaburra
-  extend DependencyAccessor
-
-  dependency_accessor :given_driver_class, :api_driver_class, :ui_driver_class, :browser
-
   def initialize(options = {})
     @given_driver_class = options[:given_driver_class]
     @api_driver_class   = options[:api_driver_class]
@@ -101,6 +97,9 @@ class Kookaburra
   end
 
   private
+
+  extend DependencyAccessor
+  dependency_accessor :given_driver_class, :api_driver_class, :ui_driver_class, :browser
 
   def api
     api_driver_class.new(RackDriver.new(browser.app))
