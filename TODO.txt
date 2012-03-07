@@ -1,0 +1,3 @@
+Check for server errors using the server_error_detection function passed to
+Kookaburra.new. (The code should be there, but test it out in the integration
+spec.)
