@@ -27,6 +27,14 @@ class Kookaburra
 
       private
 
+      def assert(test, message = "You might want to provide a better message, eh?")
+        if test
+          true
+        else
+          raise AssertionFailed, message
+        end
+      end
+
       def component_path
         raise ConfigurationError, "You must define #{self.class.name}#component_path."
       end
