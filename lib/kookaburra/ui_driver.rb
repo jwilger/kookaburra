@@ -6,7 +6,7 @@ class Kookaburra
     class << self
       def ui_component(component_name, component_class)
         define_method(component_name) do
-          component_class.new(:browser => browser)
+          component_class.new(:browser => browser, :server_error_detection => @server_error_detection)
         end
       end
     end
@@ -14,6 +14,7 @@ class Kookaburra
     def initialize(options = {})
       @browser = options[:browser]
       @test_data = options[:test_data]
+      @server_error_detection = options[:server_error_detection]
     end
 
     private

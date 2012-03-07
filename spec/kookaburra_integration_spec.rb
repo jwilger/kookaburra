@@ -89,6 +89,10 @@ describe 'Kookaburra Integration' do
         end
 
         class WidgetForm < Kookaburra::UIDriver::UIComponent
+          def component_locator
+            '#widget_form'
+          end
+
           def submit(widget_data)
             browser.fill_in 'Name:', :with => widget_data[:name]
             browser.click_on 'Save'
@@ -278,11 +282,16 @@ describe 'Kookaburra Integration' do
         it "runs the tests against the app" do
           my_app = TestRackApp.new
 
+          server_error_detection = lambda { |browser|
+            browser.has_css?('h1', :text => 'Internal Server Error')
+          }
+
           k = Kookaburra.new({
             :ui_driver_class    => MyUIDriver,
             :given_driver_class => MyGivenDriver,
             :api_driver_class   => MyAPIDriver,
-            :browser            => Capybara::Session.new(:rack_test, my_app)
+            :browser            => Capybara::Session.new(:rack_test, my_app),
+            :server_error_detection => server_error_detection
           })
 
           k.given.a_user(:bob)
