@@ -37,6 +37,10 @@ describe 'Kookaburra Integration' do
             '/session/new'
           end
 
+          def component_locator
+            '#sign_in_screen'
+          end
+
           def sign_in(user_data)
             browser.fill_in 'Email:', :with => user_data[:email]
             browser.fill_in 'Password:', :with => user_data[:password]
@@ -47,6 +51,10 @@ describe 'Kookaburra Integration' do
         class WidgetList < Kookaburra::UIDriver::UIComponent
           def component_path
             '/widgets'
+          end
+
+          def component_locator
+            '#widget_list'
           end
 
           def widgets
