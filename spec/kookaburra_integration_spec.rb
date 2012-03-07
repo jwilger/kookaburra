@@ -42,7 +42,7 @@ describe 'Kookaburra Integration' do
           end
 
           def sign_in(user_data)
-            assert visible?
+            assert_visible
             browser.fill_in 'Email:', :with => user_data[:email]
             browser.fill_in 'Password:', :with => user_data[:password]
             browser.click_button 'Sign In'
@@ -59,25 +59,25 @@ describe 'Kookaburra Integration' do
           end
 
           def widgets
-            assert visible?
+            assert_visible
             browser.all('.widget_summary').map do |el|
               extract_widget_data(el)
             end
           end
 
           def last_widget_created
-            assert visible?
+            assert_visible
             element = browser.find('.last_widget.created')
             extract_widget_data(element)
           end
 
           def choose_to_create_new_widget
-            assert visible?
+            assert_visible
             browser.click_on 'New Widget'
           end
 
           def choose_to_delete_widget(widget_data)
-            assert visible?
+            assert_visible
             browser.within("#delete_#{widget_data[:id]}") do
               browser.click_button('Delete')
             end
@@ -99,7 +99,7 @@ describe 'Kookaburra Integration' do
           end
 
           def submit(widget_data)
-            assert visible?
+            assert_visible
             browser.fill_in 'Name:', :with => widget_data[:name]
             browser.click_on 'Save'
           end

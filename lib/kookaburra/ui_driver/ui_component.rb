@@ -16,6 +16,7 @@ class Kookaburra
       def show(*args)
         return if visible?
         browser.visit component_path(*args)
+        assert_visible
       end
 
       def visible?
@@ -33,6 +34,10 @@ class Kookaburra
         else
           raise AssertionFailed, message
         end
+      end
+
+      def assert_visible
+        assert visible?, "The #{self.class.name} component is not visible!"
       end
 
       def component_path
