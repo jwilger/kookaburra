@@ -10,10 +10,19 @@ class Kookaburra
 
       def initialize(options = {})
         @browser = options[:browser]
+        @server_error_detection = options[:server_error_detection]
       end
 
       def show(*args)
+        return if visible?
         browser.visit component_path(*args)
+      end
+
+      def visible?
+        if server_error_detection.try(:call, browser)
+          raise UnexpectedResponse, "Your server error detection function detected a server error. Looks like your applications is busted. :-("
+        end
+        browser.has_css?(component_locator)
       end
 
       private
@@ -21,6 +30,12 @@ class Kookaburra
       def component_path
         raise ConfigurationError, "You must define #{self.class.name}#component_path."
       end
+
+      def component_locator
+        raise ConfigurationError, "You must define #{self.class.name}#component_locator."
+      end
+
+      attr_reader :server_error_detection
     end
   end
 end
