@@ -19,7 +19,7 @@ class Kookaburra
       end
 
       def visible?
-        if server_error_detection.try(:call, browser)
+        if @server_error_detection.try(:call, browser)
           raise UnexpectedResponse, "Your server error detection function detected a server error. Looks like your applications is busted. :-("
         end
         browser.has_css?(component_locator)
@@ -34,8 +34,6 @@ class Kookaburra
       def component_locator
         raise ConfigurationError, "You must define #{self.class.name}#component_locator."
       end
-
-      attr_reader :server_error_detection
     end
   end
 end

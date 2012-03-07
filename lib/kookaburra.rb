@@ -96,6 +96,7 @@ class Kookaburra
     @given_driver_class = options[:given_driver_class]
     @ui_driver_class    = options[:ui_driver_class]
     @browser            = options[:browser]
+    @server_error_detection = options[:server_error_detection]
   end
 
   # Returns an instance of your GivenDriver class configured to share test
@@ -109,7 +110,7 @@ class Kookaburra
   # data with the GivenDriver and to use the browser driver you specified in
   # {#initialize}
   def ui
-    ui_driver_class.new(:test_data => test_data, :browser => browser)
+    ui_driver_class.new(:test_data => test_data, :browser => browser, :server_error_detection => @server_error_detection)
   end
 
   # Returns a frozen copy of the specified test fixture data collection.
