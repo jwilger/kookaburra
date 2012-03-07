@@ -70,7 +70,7 @@ describe Kookaburra::UIDriver::UIComponent do
         browser = mock('Browser Session')
         browser.should_receive(:visit).with('/foo')
         component = Kookaburra::UIDriver::UIComponent.new(:browser => browser)
-        component.stub!(:component_path => '/foo', :visible? => false)
+        component.stub!(:component_path => '/foo', :visible? => false, :assert_visible => true)
         component.show
       end
 
@@ -78,7 +78,7 @@ describe Kookaburra::UIDriver::UIComponent do
         browser = mock('Browser Session', :visit => nil)
         component = Kookaburra::UIDriver::UIComponent.new(:browser => browser)
         component.should_receive(:component_path).with(:foo => :bar, :baz => :bam)
-        component.stub!(:visible? => false)
+        component.stub!(:visible? => false, :assert_visible => true)
         component.show(:foo => :bar, :baz => :bam)
       end
     end
