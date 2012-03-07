@@ -111,6 +111,19 @@ describe Kookaburra::UIDriver::UIComponent do
       end
     end
 
+    describe '#assert' do
+      it 'returns true if the condition is truthy' do
+        component = Kookaburra::UIDriver::UIComponent.new
+        component.send(:assert, true, "Shouldn't see this message").should == true
+      end
+
+      it 'raises a Kookaburra::AssertionFailed exception if the condition is not truthy' do
+        component = Kookaburra::UIDriver::UIComponent.new
+        lambda { component.send(:assert, false, "False isn't true, dummy.") } \
+          .should raise_error(Kookaburra::AssertionFailed, "False isn't true, dummy.")
+      end
+    end
+
     it_behaves_like :it_has_a_dependency_accessor, :browser do
       let(:subject_class) { Kookaburra::UIDriver::UIComponent }
     end
