@@ -14,7 +14,11 @@ class Kookaburra
       end
 
       def method_missing(name, *args, &block)
-        element.send(name, *args, &block)
+        if element.respond_to?(name)
+          element.send(name, *args, &block)
+        else
+          super
+        end
       end
 
       def respond_to?(name)
