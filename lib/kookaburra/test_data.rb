@@ -10,9 +10,6 @@ class Kookaburra
       @data[name] ||= Collection.new(name)
     end
 
-    def default(name)
-    end
-
     class Collection
       def initialize(name)
         @name = name
