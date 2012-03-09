@@ -1,5 +1,6 @@
 require 'kookaburra/exceptions'
 require 'kookaburra/dependency_accessor'
+require 'kookaburra/ui_driver/scoped_browser'
 
 class Kookaburra
   class UIDriver
@@ -36,6 +37,10 @@ class Kookaburra
 
       def component_path
         raise ConfigurationError, "You must define #{self.class.name}#component_path."
+      end
+
+      def component_scope
+        ScopedBrowser.new(browser, component_locator)
       end
 
       def component_locator

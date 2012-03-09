@@ -127,5 +127,18 @@ describe Kookaburra::UIDriver::UIComponent do
     it_behaves_like :it_has_a_dependency_accessor, :browser do
       let(:subject_class) { Kookaburra::UIDriver::UIComponent }
     end
+
+    describe '#component_scope' do
+      it 'returns a ScopedBrowser object configured with the browser passed in #initialize' do
+        browser = stub('Capybara::Session')
+        scoped_browser = stub('ScopedBrowser')
+        Kookaburra::UIDriver::ScopedBrowser.should_receive(:new) \
+          .with(browser, '#my_component') \
+          .and_return(scoped_browser)
+        component = Kookaburra::UIDriver::UIComponent.new(:browser => browser)
+        component.stub!(:component_locator => '#my_component')
+        component.send(:component_scope).should == scoped_browser
+      end
+    end
   end
 end
