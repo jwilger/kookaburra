@@ -43,9 +43,9 @@ describe 'Kookaburra Integration' do
 
           def sign_in(user_data)
             assert_visible
-            browser.fill_in 'Email:', :with => user_data[:email]
-            browser.fill_in 'Password:', :with => user_data[:password]
-            browser.click_button 'Sign In'
+            component_scope.fill_in 'Email:', :with => user_data[:email]
+            component_scope.fill_in 'Password:', :with => user_data[:password]
+            component_scope.click_button 'Sign In'
           end
         end
 
@@ -60,25 +60,25 @@ describe 'Kookaburra Integration' do
 
           def widgets
             assert_visible
-            browser.all('.widget_summary').map do |el|
+            component_scope.all('.widget_summary').map do |el|
               extract_widget_data(el)
             end
           end
 
           def last_widget_created
             assert_visible
-            element = browser.find('.last_widget.created')
+            element = component_scope.find('.last_widget.created')
             extract_widget_data(element)
           end
 
           def choose_to_create_new_widget
             assert_visible
-            browser.click_on 'New Widget'
+            component_scope.click_on 'New Widget'
           end
 
           def choose_to_delete_widget(widget_data)
             assert_visible
-            browser.within("#delete_#{widget_data[:id]}") do
+            component_scope.within("#delete_#{widget_data[:id]}") do
               browser.click_button('Delete')
             end
           end
@@ -100,8 +100,8 @@ describe 'Kookaburra Integration' do
 
           def submit(widget_data)
             assert_visible
-            browser.fill_in 'Name:', :with => widget_data[:name]
-            browser.click_on 'Save'
+            component_scope.fill_in 'Name:', :with => widget_data[:name]
+            component_scope.click_on 'Save'
           end
         end
 
