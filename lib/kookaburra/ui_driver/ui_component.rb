@@ -13,6 +13,14 @@ class Kookaburra
         @server_error_detection = options[:server_error_detection]
       end
 
+      def method_missing(name, *args, &block)
+        element.send(name, *args, &block)
+      end
+
+      def respond_to?(name)
+        super || element.respond_to?(name)
+      end
+
       def show(*args)
         return if visible?
         browser.visit component_path(*args)
@@ -20,8 +28,9 @@ class Kookaburra
       end
 
       def visible?
-        detect_server_error!
-        browser.has_css?(component_locator)
+        element.visible?
+      rescue ComponentNotFound
+        false
       end
 
       private
