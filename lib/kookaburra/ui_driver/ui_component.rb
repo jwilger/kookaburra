@@ -47,6 +47,15 @@ class Kookaburra
           raise UnexpectedResponse, "Your server error detection function detected a server error. Looks like your applications is busted. :-("
         end
       end
+
+      def element
+        detect_server_error!
+        begin
+          browser.find(component_locator)
+        rescue StandardError => e
+          raise ComponentNotFound, e.message
+        end
+      end
     end
   end
 end
