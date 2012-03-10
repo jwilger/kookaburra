@@ -1,9 +1,10 @@
 require 'kookaburra/dependency_accessor'
 require 'kookaburra/rack_driver'
+require 'kookaburra/api_driver'
 require 'active_support/json'
 
 class Kookaburra
-  class JsonApiDriver
+  class JsonApiDriver < APIDriver
     J = ActiveSupport::JSON
 
     def initialize(app_driver)
