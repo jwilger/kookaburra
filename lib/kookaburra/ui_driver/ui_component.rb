@@ -108,7 +108,7 @@ class Kookaburra
       def show(*args)
         return if visible?
         browser.visit component_path(*args)
-        assert_visible
+        assert visible?, "The #{self.class.name} component is not visible!"
       end
 
       # True if the component's element is found on the page and is considered
@@ -139,10 +139,6 @@ class Kookaburra
       # @raise [Kookaburra::AssertionFailed] raised if test evaluates to false
       def assert(test, message = "You might want to provide a better message, eh?")
         test or raise AssertionFailed, message
-      end
-
-      def assert_visible
-        assert visible?, "The #{self.class.name} component is not visible!"
       end
 
       # @abstract
