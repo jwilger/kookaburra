@@ -57,9 +57,17 @@ class Kookaburra
     #     end
     #   end
     #
-    # Your subclass must override the {#component_locator} method. Unless you
-    # override the default implementation of {#show}, you must also override the
-    # {#component_path} method.
+    # Note that the "browser operation" methods such as `#fill_in` and
+    # `#click_button` are forwarded to the {#element} object (see
+    # {#method_missing}) and are therefore automatically scoped to the
+    # component's DOM element. Although it is possible to reach outside this
+    # scope by calling methods on {#browser} (e.g. `browser.click_on "Foo"`),
+    # this should be avoided, because you'll end up with a tangled mess of
+    # UIComponents without clear responsibilities. 
+    #
+    # @abstract Subclass and implement (at least) {#component_locator}. Unless
+    #   you override the default implementation of {#show}, you must also
+    #   override the {#component_path} method.
     class UIComponent
       extend DependencyAccessor
 
@@ -121,6 +129,11 @@ class Kookaburra
 
       protected
 
+      # This is the browser driver with which the UIComponent was initialized.
+      #
+      # You almost certainly want to reference {#element} instead, as it is
+      # scoped to this component's DOM element, whereas #browser is not scoped.
+      #
       # @attribute [r] browser
       #
       # @raise [RuntimeError] if no browser was specified in call to {#initialize}
@@ -155,7 +168,9 @@ class Kookaburra
 
       # Runs the server error detection function specified in {#initialize}.
       #
-      # @raise [UnexpectedResponse] raised id the server error detection
+      # It's a noop if no server error detection was specified.
+      #
+      # @raise [UnexpectedResponse] raised if the server error detection
       #   function returns true
       def detect_server_error!
         if @server_error_detection.try(:call, browser)
@@ -164,7 +179,8 @@ class Kookaburra
       end
 
       # Provides access to the element found by the browser driver at
-      # {#component_locator}.
+      # {#component_locator}. If your browser driver is a `Capybara::Session`,
+      # then this will be a `Capybara::Node::Element`.
       #
       # @raise [UnexpectedResponse] from {#detect_server_error!}
       # @raise [ComponentNotFound] if the {#component_locator} is not found in
