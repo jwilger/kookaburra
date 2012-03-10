@@ -1,6 +1,7 @@
 require 'active_support/core_ext/string'
 
 class Kookaburra
+  # @private
   module DependencyAccessor
     def dependency_accessor(*names)
       names.each { |name| define_dependency_accessor(name) }
