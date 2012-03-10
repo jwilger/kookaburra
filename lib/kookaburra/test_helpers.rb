@@ -81,9 +81,11 @@ class Kookaburra
   #     ui.widget_list.widgets.should == k.get_data(:widgets).slice(widgets)
   #   end
   module TestHelpers
-    # Returns the {Kookaburra} instance to be used by your tests. It gets
-    # configured using the options set in {Kookaburra.configuration}, and the
-    # result is memoized.
+    # The {Kookaburra} instance to be used by your tests. It gets configured
+    # using the options set in {Kookaburra.configuration}, and the result is
+    # memoized.
+    #
+    # @return [Kookaburra]
     def k
       @k ||= Kookaburra.new(Kookaburra.configuration)
     end
