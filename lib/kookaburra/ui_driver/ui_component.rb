@@ -76,7 +76,8 @@ class Kookaburra
       #
       # @see Kookaburra::UIDriver.ui_component
       #
-      # @option options [Capybara::Session] :browser 
+      # @option options [Object] :browser probably ought to be a
+      #   `Capybara::Session` instance
       # @option options [Proc] :server_error_detection
       def initialize(options = {})
         @browser = options[:browser]
@@ -84,7 +85,7 @@ class Kookaburra
       end
 
       # If the UIComponent is sent a message it does not understand, it will
-      # forward that message on to its {#element}. This give you convenient
+      # forward that message on to its {#element}. This provides convenient
       # access to the browser driver's DSL, automatically scoped to this
       # component.
       #
@@ -105,21 +106,26 @@ class Kookaburra
 
       # Causes the UIComponent to be visible.
       #
-      # Causes the browser to navigate directly to {#component_path} (unless the
+      # The browser to navigates directly to {#component_path} (unless the
       # component is already visible).
       #
       # You may need to override this method in your own UIComponent subclasses,
       # especially for components that are dynamically added/removed on the page
-      # in response to user actions.
+      # in response to user actions. The implementation should not make any
+      # assumptions about the current state of the user interface before it is
+      # invoked.
       #
       # @param args Any arguments are passed to the {#component_path} method.
+      #
+      # @raise [RuntimeError] if the component is not visible after attempting
+      #   to make it so.
       def show(*args)
         return if visible?
         browser.visit component_path(*args)
         assert visible?, "The #{self.class.name} component is not visible!"
       end
 
-      # True if the component's element is found on the page and is considered
+      # Is the component's element found on the page and is it considered
       # "visible" by the browser driver.
       def visible?
         element.visible?
@@ -185,8 +191,6 @@ class Kookaburra
       # @raise [UnexpectedResponse] from {#detect_server_error!}
       # @raise [ComponentNotFound] if the {#component_locator} is not found in
       #   the DOM
-      #
-      # @return [Capybara::Node::Element]
       def element
         detect_server_error!
         begin

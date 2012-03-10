@@ -25,17 +25,18 @@ class Kookaburra
   # Returns a new Kookaburra instance that wires together your application's
   # APIDriver, GivenDriver, and UIDriver.
   #
-  # @option options [Kookaburra::APIDriver] :api_driver_class Your application's
+  # @option options [Class] :api_driver_class Your application's
   #   subclass of {Kookaburra::APIDriver}. At the moment, only the
   #   {Kookaburra::JsonApiDriver} is implemented
-  # @option options [Kookaburra::GivenDriver] :given_driver_class Your
+  # @option options [Class] :given_driver_class Your
   #   application's subclass of {Kookaburra::GivenDriver}
-  # @option options [Kookaburra::UIDriver] :ui_driver_class Your application's
+  # @option options [Class] :ui_driver_class Your application's
   #   subclass of {Kookaburra::UIDriver}
-  # @option options [Capybara::Session] :browser The browser driver that
-  #   Kookaburra will interact with to run the tests. It must also respond to
-  #   the #app method and return a Rack application for use with the
-  #   {Kookaburra::APIDriver}.
+  # @option options [Object] :browser The browser driver that Kookaburra will
+  #   interact with to run the tests. It must also respond to the #app method
+  #   and return a Rack application for use with the {Kookaburra::APIDriver}.
+  #   Kookaburra is intended to work with `Capybara::Session` as a browser
+  #   driver, but you could use something else that exposed the same basic API.
   def initialize(options = {})
     @api_driver_class   = options[:api_driver_class]
     @given_driver_class = options[:given_driver_class]
@@ -47,6 +48,8 @@ class Kookaburra
   # Returns an instance of your GivenDriver class configured to share test
   # fixture data with the UIDriver and to use your APIDriver class to
   # communicate with your application
+  #
+  # @return [Kookaburra::GivenDriver]
   def given
     given_driver_class.new(:test_data => test_data, :api => api)
   end
@@ -54,8 +57,12 @@ class Kookaburra
   # Returns an instance of your UIDriver class configured to share test fixture
   # data with the GivenDriver and to use the browser driver you specified in
   # {#initialize}
+  #
+  # @return [Kookaburra::UIDriver]
   def ui
-    ui_driver_class.new(:test_data => test_data, :browser => browser, :server_error_detection => @server_error_detection)
+    ui_driver_class.new(:test_data => test_data,
+                        :browser => browser,
+                        :server_error_detection => @server_error_detection)
   end
 
   # Returns a frozen copy of the specified test fixture data collection.
@@ -71,6 +78,8 @@ class Kookaburra
   #   given.a_widget(:foo)
   #   ui.create_a_new_widget(:bar)
   #   ui.widget_list.widgets.should == k.get_data(:widgets).slice(:foo, :bar)
+  #
+  # @return [Kookaburra::TestData::Collection]
   def get_data(collection_name)
     test_data.send(collection_name).dup.freeze
   end
