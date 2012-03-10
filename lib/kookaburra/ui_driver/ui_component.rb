@@ -4,10 +4,6 @@ require 'kookaburra/dependency_accessor'
 class Kookaburra
   class UIDriver
     class UIComponent
-      extend DependencyAccessor
-
-      dependency_accessor :browser
-
       def initialize(options = {})
         @browser = options[:browser]
         @server_error_detection = options[:server_error_detection]
@@ -38,6 +34,9 @@ class Kookaburra
       end
 
       private
+
+      extend DependencyAccessor
+      dependency_accessor :browser
 
       def assert(test, message = "You might want to provide a better message, eh?")
         test or raise AssertionFailed, message
