@@ -3,9 +3,9 @@
 Kookaburra is a framework for implementing the [Window Driver] [Window Driver] pattern in
 order to keep acceptance tests maintainable.
 
-## WARNING: You probably want an earlier version! ##
+## WARNING: Significant Changes since 0.14.x ##
 
-As of 0.15.0, Kookaburra is being rewritten from the ground up. The original
+As of 0.15.0, Kookaburra has been rewritten from the ground up. The original
 (up through 0.14.x) version was extracted from another project in which the
 testing library was being used. Unfortunately, this meant that the code in
 Kookaburra itself did not have very good test coverage, because it was being
@@ -16,21 +16,6 @@ having been developed without much focused TDD.
 Starting with 0.15.0, we are treating the previous versions as a spike. They
 were really useful for learning about the approach, but the code has enough
 design flaws that its best just to toss it.
-
-As of right now, 0.15.0 **probably will not work for you**. If you want to use
-Kookaburra in an app right now, look at the latest 0.14.x release. There is a
-"v0.14.x" branch in the git repository, and any updates to that branch will also
-get a gem release on rubygems.org. Be warned, however, that the API is almost
-certainly going to have some significant changes in the very near future (hey,
-it *is* 0.x software, after all!).
-
----
-
-**The remainder of this README is almost certainly out of date compared to
-master and 0.15.0 and up release versions. It will be updated once there is a
-usable 0.15.x release.**
-
----
 
 ## Installation ##
 
@@ -48,58 +33,58 @@ following:
 
 ## Setup ##
 
-Kookaburra itself abstracts some common patterns for implementing the Window
-Driver pattern for tests of Ruby web applications built on [Rack] [Rack]. You will need
+Kookaburra abstracts some common patterns for implementing the Window Driver
+pattern for tests of Ruby web applications built on [Rack] [Rack]. You will need
 to tell Kookaburra which classes contain the specific Domain Driver
 implementations for your application as well as which driver to use for running
-the tests (currently only tested with [Capybara] [Capybara]). The details of setting up your
-Domain Driver layer are discussed below, but in general you will need the
-following in a locations such as `lib/my_application/kookaburra.rb` (replace
-`MyApplication` with a module name suitable to your actual application:
-
-    module MyApplication
-      module Kookaburra
-        ::Kookaburra.adapter = Capybara
-
-        # Note: the following assigned classes are defined under your
-        # application's namespace, e.g. MyApplication::Kookaburra::APIDriver
-        ::Kookaburra.api_driver = APIDriver
-        ::Kookaburra.given_driver = GivenDriver
-        ::Kookaburra.ui_driver = UIDriver
-
-        ::Kookaburra.test_data_setup do
-          provide_collection :accounts
-          # See section on Test Data for more examples of what can go here.
-        end
-      end
-    end
+the tests (currently only tested with [Capybara] [Capybara]).
 
 ### RSpec ###
 
 For [RSpec] [RSpec] integration tests, just add the following to
 `spec/support/kookaburra_setup.rb`:
 
-    require 'my_application/kookaburra'
+    require 'kookaburra/test_helpers'
+    require 'my_app/kookaburra/api_driver'
+    require 'my_app/kookaburra/given_driver'
+    require 'my_app/kookaburra/ui_driver'
+
+    Kookaburra.configuration = {
+      :api_driver_class => MyApp::Kookaburra::APIDriver,
+      :given_driver_class => MyApp::Kookaburra::GivenDriver,
+      :ui_driver_class => MyApp::Kookaburra::UIDriver,
+      :browser => Capybara,
+      :server_error_detection => { |browser|
+        browser.has_css?('head title', :text => 'Internal Server Error')
+      }
+    }
 
     RSpec.configure do |c|
-      c.include(Kookaburra, :type => :request)
+      c.include(Kookaburra::TestHelpers, :type => :request)
     end
 
 ### Cucumber ###
 
 For [Cucumber] [Cucumber], add the following to `features/support/kookaburra_setup.rb`:
 
-    require 'my_application/kookaburra'
+    require 'kookaburra/test_helpers'
+    require 'my_app/kookaburra/api_driver'
+    require 'my_app/kookaburra/given_driver'
+    require 'my_app/kookaburra/ui_driver'
 
-    Kookaburra.adapter = Capybara
-    World(Kookaburra)
+    Kookaburra.configuration = {
+      :api_driver_class => MyApp::Kookaburra::APIDriver,
+      :given_driver_class => MyApp::Kookaburra::GivenDriver,
+      :ui_driver_class => MyApp::Kookaburra::UIDriver,
+      :browser => Capybara,
+      :server_error_detection => { |browser|
+        browser.has_css?('head title', :text => 'Internal Server Error')
+      }
+    }
 
-    Before do
-      # Ensure that there isn't state-leakage between scenarios
-      kookaburra_reset!
-    end
+    World(Kookaburra::TestHelpers)
 
-This will cause the #api, #given and #ui methods will be available in your
+This will cause the #k, #given and #ui methods will be available in your
 Cucumber step definitions.
 
 ## Defining Your Testing DSL ##
@@ -115,7 +100,7 @@ Kookaburra has the following layers:
    etc.)
 3. The **Domain Driver** (Kookaburra::GivenDriver and Kookaburra::UIDriver)
 4. The **Window Driver** (Kookaburra::UIDriver::UIComponent)
-5. The **Application Driver** (Capybara and Rack::Test)
+5. The **Application Driver** (Capybara and Kookaburra::RackDriver)
 
 ### The Business Specification Language ###
 
@@ -167,14 +152,10 @@ anywhere outside of your test implementation (such as within `UIDriver` or
 `UIComponent` subclasses.) Doing so will tightly couple your Domain Driver
 and/or Window Driver implementation to a specific testing library.
 
-If you must make some type of assertion within the Domain Driver layer, a better
-approach is to simply raise an exception with an informative error message when
-some desired condition is not met. Kookaburra provides its own `#assert` method
-for this purpose. You may use it directly or build your own custom assertions
-using it as a base. However, this method should be used only for the purpose
-of short-circuiting your Domain Driver with an informative error message, not
-to test the results of your operations as you would at the test implementation
-layer.
+`Kookaburra::UIDriver::UIComponent` does provide an `#assert` method for use
+inside your own UIComponents. This method exists to verify preconditions and
+provide more informative error messages; it is not intended to be used to make
+test verifications.
 
 Given the Cucumber scenario above, here is how the test implementation layer
 might look:
@@ -206,15 +187,15 @@ might look:
     end
 
     Then "I see my order summary" do
-      ui.should be_displaying_order_summary
+      ui.order_summary.should be_visible
     end
 
     Then "I see that my default payment options will be used" do
-      ui.should be_displaying_account_default_payment_options_in_order_summary
+      ui.order_summary.payment_options.should == k.get_data(:default_payment_options)[:my_account]
     end
 
     Then "I see that my default shipping options will be used" do
-      ui.should be_displaying_account_default_shipping_options_in_order_summary
+      ui.order_summary.shipping_options.should == k.get_data(:default_shipping_options)[:my_account]
     end
 
 The step definitions contain neither explicitly shared state (instance
@@ -228,11 +209,11 @@ scenario, it's not a big deal to have the following in your step definitions (as
 long as the author of the spec confirms that they really mean the same thing):
 
     Then "I see my order summary" do
-      ui.should be_displaying_order_summary
+      ui.order_summary.should be_visible
     end
 
     Then "I see a summary of my order" do
-      ui.should be_displaying_order_summary
+      ui.order_summary.should be_visible
     end
 
 The step definitions are nothing more than a natural language reference to an
@@ -263,131 +244,116 @@ Using RSpec, the test implementation would be as follows:
         ui.choose_to_check_out
 
         ui.order_summary.should be_visible
-        ui.should be_displaying_account_default_payment_options_in_order_summary
-        ui.should be_displaying_account_default_shipping_options_in_order_summary
+        ui.order_summary.payment_options.should == k.get_data(:default_payment_options)[:my_account]
+        ui.order_summary.shipping_options.should == k.get_data(:default_shipping_options)[:my_account]
       end
     end
 
 ### The Domain Driver ###
 
 The Domain Driver layer is where you build up an internal DSL that describes the
-business concepts of your application at a fairly high level. It consists of
-three top-level drivers: the `APIDriver` (available via `#api`) for interacting
-with your application's external API, the `GivenDriver` (available via `#given`)
-which really just wraps the `APIDriver` and is used to set up state for your
-tests, and the UIDriver (available via `#ui`) for describing the tasks that a
-user can accomplish with the application.
+business concepts of your application at a fairly high level. It consists of two
+top-level drivers: the `GivenDriver` (available via `#given`) used to set up
+state for your tests and the UIDriver (available via `#ui`) for describing the
+tasks that a user can accomplish with the application.
 
 #### Test Data ####
 
 `Kookaburra::TestData` is the component via which the `GivenDriver` and the
 `UIDriver` share information. For instance, if you create a user account via the
 `GivenDriver`, you would store the login credentials for that account in the
-`TestData` instance, so the UIDriver knows what to use when you tell it to
+`TestData` instance, so the `UIDriver` knows what to use when you tell it to
 `#sign_in`. This is what allows the Cucumber step definitions to remain free
 from explicitly shared state.
 
-The `TestData` class can be configured to contain both collections of test data
-as well as default data that can be used as a starting point for creating new
-resources in the application. To configure `TestData`, call
-`Kookaburra.test_data_setup` with a block (usually in your
-`lib/my_application/kookaburra.rb` file):
+Kookaburra automatically configures your `GivenDriver` and your `UIDriver` to share
+a `TestData` instance, which is available to both of them via their `#test_data`
+method.
 
-    module MyApplication
-      module Kookaburra
-        # ...
-        ::Kookaburra.test_data_setup do
-          provide_collection :animals
-          set_default :animal,
-            :name => 'horse'
-            :size => 'large',
-            :number_of_legs => 4
-        end
-      end
-    end
+The `TestData` instance will return a `TestData::Collection` for any method
+called on the object. The `TestData::Collection` object behaves like a `Hash`
+for the most part, however it will raise a `Kookaburra::UnknownKeyError` if you
+try to access a key that has not yet been assigned a value.
 
-Then, in any context where you have an instance of `TestData` (such as in
-`GivenDriver` or `UIDriver`), you can add/retrieve items to/from collections and
-access default data:
+Here's a quick example of TestData behavor:
 
-    class MyApplication::Kookaburra::GivenDriver < Kookaburra::GivenDriver
-      def existing_account(nickname)
-        default_account_data = test_data.default(:account)
-        # do something to create account in application
-        # ...
-        # make the details of the new account available to the rest of the test
-        test_data.set_accounts(nickname, account)
-      end
-    end
+    test_data = TestData.new
 
-    class MyApplication::Kookaburra::UIDriver < Kookaburra::UIDriver
-      def sign_in(account_nickname)
-        # pull stored account details from TestData
-        account_info = test_data.fetch_accounts(account_nickname)
+    test_data.widgets[:widget_a] = {:name => 'Widget A'}
 
-        # do something to log in using that account_info
-      end
-    end
+    test_data.widgets[:widget_a]
+    #=> {:name => 'Widget A'}
+    
+    # this will raise a Kookaburra::UnknownKeyError
+    test_data.widgets[:widget_b]
 
 #### API Driver ####
 
 The `Kookaburra::APIDriver` is used to interact with an application's external
 web services API. You tell Kookaburra about your API by creating a subclass of
-`Kookaburra::APIDriver` for your application:
+`Kookaburra::APIDriver` for your application. Because different applications may
+implement different types of APIs, Kookaburra will provide more than one base
+APIDriver class. At the moment, only a JSON API is supported via
+`Kookaburra::JsonApiDriver`:
 
-    # lib/my_application/kookaburra/api_driver.rb
+    # lib/my_app/kookaburra/api_driver.rb
 
-    class MyApplication::Kookaburra::APIDriver < Kookaburra::APIDriver
+    class MyApp::Kookaburra::APIDriver < Kookaburra::JsonApiDriver
       def create_account(account_data)
-        post_as_json 'Account', 'api/v1/accounts', :account => account_data
-        hash_from_response_json[:account]
+        post '/api/v1/accounts', account_data
       end
     end
 
+Regardless of the type of APIDriver subclass, the contents of your application's
+APIDriver should consist mainly of mappings between discrete actions and HTTP
+requests to the specified URL paths. Each driver will implement `#post`, `#get`,
+`#put`, `#head`, and `#delete` in such a way that any Ruby data structure
+provided as parameters will be appropriately translated to the API's required
+data format, and any response body from the API request will be translated into
+a Ruby data structure and returned.
+
 #### Given Driver ####
 
-The `Kookaburra::GivenDriver` is used to create a particular "preexisting"
-state within your application's data and ensure you have a handle to that data
-(when needed) prior to interacting with the UI. Like the `APIDriver`, you will
-create a subclass of `Kookaburra::GivenDriver` in which you will create part of
-the Domain Driver DSL for your application:
+The `Kookaburra::GivenDriver` is used to create a particular "preexisting" state
+within your application's data and ensure you have a handle to that data (when
+needed) prior to interacting with the UI. You will create a subclass of
+`Kookaburra::GivenDriver` in which you will create part of the Domain Driver DSL
+for your application:
 
-    # lib/my_application/kookaburra/given_driver.rb
+    # lib/my_app/kookaburra/given_driver.rb
 
-    class MyApplication::Kookaburra::GivenDriver < Kookaburra::GivenDriver
+    class MyApp::Kookaburra::GivenDriver < Kookaburra::GivenDriver
       def existing_account(nickname)
-        # grab the default account details and add a unique username and
-        # password
-        account_data = test_data.default(:account)
+        account_data = {:display_name => 'John Doe', :password => 'a password'}
         account_data[:username] = "test-user-#{`uuidgen`.strip}"
-        account_data[:password] = account_data[:username] + "-password"
 
         # use the API to create the account in the application
-        account_details = api.create_account(account_data)
+        result = api.create_account(account_data)
 
         # merge in the password (since API doesn't return it) and store details
         # in the TestData instance
-        account_details.merge(:password => account_data[:password])
-        test_data.set_accounts(nickname, account_details)
+        result.merge!(:password => account_data[:password])
+        test_data.accounts[nickname] = account_details
       end
     end
 
 Although there is nothing that actually *prevents* you from either interacting
 with the UI or directly manipulating your application via calls into the model
-from the `GivenDriver`, both things should be avoided. In the first case, the
+from the `GivenDriver`, both should be avoided. In the first case, the
 `GivenDriver`'s purpose is to describe state that exists *before* the user
 interaction that is being tested. Although this state may be the result of a
-previous user interaction, your tests will generally be much, much faster if you
-are able to create this state via API calls rather than driving a web browser.
+previous user interaction, your tests will be much, much faster if you create
+this state via API calls rather than driving a web browser.
 
-In the second case, by avoiding manipulating your applications's state at the
+In the second case, by avoiding the manipulation of your applications's state at the
 code level and instead doing so via an external API, it is much less likely that
-you will be creating a state that your application can't actually get into in a
+you will create a state that your application can't actually get into in a
 production environment. Additionally, this opens up the possibility of running
 your tests against a "remote" server where you would not have access to the
 application internals. ("Remote" in the sense that it is not in the same Ruby
 process as your running tests, although it may or may not be on the same
-machine.)
+machine. Note that this is not currently possible with Kookaburra due to our
+current reliance on Rack::Test.)
 
 #### UI Driver ####
 
@@ -396,25 +362,19 @@ application's user interface using the Window Driver pattern. You will subclass
 `Kookaburra::UIDriver` for your application and implement your testing DSL
 within your subclass:
 
-    # lib/my_application/kookaburra/ui_driver.rb
+    # lib/my_app/kookaburra/ui_driver.rb
 
-    class MyApplication::Kookaburra::UIDriver < Kookaburra::UIDriver
-      # makes an instance of MyApplication::Kookaburra::UIDriver::SignInScreen
-      # available via the private instance method #sign_in_screen
-      ui_component :sign_in_screen
+    class MyApp::Kookaburra::UIDriver < Kookaburra::UIDriver
+      # makes an instance of MyApp::Kookaburra::UIDriver::SignInScreen
+      # available via the instance method #sign_in_screen
+      ui_component :sign_in_screen, SignInScreen
 
       def sign_in(account_nickname)
-        account = test_data.fetch_accounts(account_nickname)
-        navigate_to :sign_in_screen
+        account = test_data.accounts[account_nickname]
+        sign_in_screen.show
         sign_in_screen.submit_login(account[:username], account[:password])
       end
     end
-
-The call to `Kookaburra::UIDriver.ui_component` defines the UIComponent accessor
-as a private method in order to discourage accessing your UIComponent objects
-directly in the test implementation layer. Instead, you should build out your
-testing DSL in the `UIDriver` subclass as was done with the `#sign_in` method
-above.
 
 ### The Window Driver Layer ###
 
@@ -424,81 +384,48 @@ layer describes the individual user interface components that the user interacts
 with to perform these tasks. By describing each interface component using an OOP
 approach, it is much easier to maintain your acceptance/integration tests,
 because the implementation details of each component are captured in a single
-place. If/when that implementation changes, you can---for example---fix every
-single test that needs to log a user into the system just by updating the
-SignInScreen class.
+place. For example, if/when the implementation of your application's sign in
+screen changes, you can fix every single test that needs to log a user into the
+system just by updating the `SignInScreen` class.
 
 You describe the various user interface components by sub-classing
 `Kookaburra::UIDriver::UIComponent`:
 
-    # lib/my_application/ui_driver/sign_in_screen.rb
+    # lib/my_app/ui_driver/sign_in_screen.rb
 
-    class MyApplication::Kookaburra::UIDriver::SignInScreen < Kookaburra::UIDriver::UIComponent
-      component_locator '#new_user_session'
-      component_path '/session/new'
+    class MyApp::Kookaburra::UIDriver::SignInScreen < Kookaburra::UIDriver::UIComponent
+      def component_locator
+        '#new_user_session'
+      end
+
+      def component_path
+        '/session/new'
+      end
 
       def username
-        in_component { browser.find('#session_username').value }
+        find('#session_username').value
       end
 
       def username=(new_value)
-        fill_in('#session_username', :with => new_value)
+        fill_in '#session_username', :with => new_value
       end
 
       def password
-        in_component { browser.find('#session_password').value }
+        find('#session_password').value
       end
 
       def password=(new_value)
-        fill_in('#session_password', :with => new_value)
+        fill_in '#session_password', :with => new_value
       end
 
-      def submit!
+      def submit
         click_on('Sign In')
-        no_500_error!
       end
 
       def submit_login(username, password)
         self.username = username
         self.password = password
-        submit!
-      end
-    end
-
-A `UIComponent` subclass can also contain nested components of its own. For
-instance:
-
-    class MyApplication::Kookaburra::UIDriver::UserList::NewUserForm < Kookaburra::UIDriver::UIComponent
-      component_locator '#new_user_form'
-    end
-
-    class MyApplication::Kookaburra::UIDriver::UserList < Kookaburra::UIDriver::UIComponent
-      component_locator '#user_list'
-
-      ui_component :new_user_form
-    end
-
-In this case, `UserList#new_user_form` is still defined as a private method. In
-order to manipulate it from your domain driver, you can define either explicit
-methods or delegators on `UserList`:
-
-    class MyApplication::Kookaburra::UIDriver::UserList < Kookaburra::UIDriver::UIComponent
-      def fill_in_new_user_form(username, password, full_name)
-        new_user_form.username = username
-        new_user_form.password = password
-        new_user_form.full_name = full_name
-      end
-
-      delegate :submit!, :to => :new_user_form, :prefix => true
-    end
-
-    class MyApplication::Kookaburra::UIDriver < Kookaburra::UIDriver
-      ui_component :user_list
-
-      def create_new_user_with_valid_data
-        user = default_user_data # factory method defined elsewhere
-        user_list.fill_in_new_user_form(user[:username], user[:password], user[:full_name])
-        user_list.new_user_form_submit!
+        submit
       end
     end
 
@@ -507,11 +434,9 @@ methods or delegators on `UserList`:
 `Kookaburra::APIDriver`, `Kookaburra::UIDriver` and
 `Kookaburra::UIDriver::UIComponent` rely on the Application Driver layer to
 interact with your application. In the case of the `APIDriver`, Kookaburra uses
-`Rack::Test` to send HTTP requests to your application. The `UIDriver` and
-`UIComponent` rely on whatever is configured as `Kookaburra.adapter`. Presently,
-we have only used Capybara as the application driver for Kookaburra:
-
-    Kookaburra.adapter = Capybara
+`Kookaburra::RackDriver` to send HTTP requests to your application. The `UIDriver` and
+`UIComponent` rely on whatever is passed to `Kookaburra.new` as the `:browser`
+option. Presently, we have only used Capybara as the application driver for Kookaburra.
 
 It's possible that something other than Capybara could be passed in, as long as
 that something presented the same API. In reality, using something other than
