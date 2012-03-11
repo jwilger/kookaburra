@@ -58,12 +58,9 @@ class Kookaburra
     #   end
     #
     # Note that the "browser operation" methods such as `#fill_in` and
-    # `#click_button` are forwarded to the {#element} object (see
-    # {#method_missing}) and are therefore automatically scoped to the
-    # component's DOM element. Although it is possible to reach outside this
-    # scope by calling methods on {#browser} (e.g. `browser.click_on "Foo"`),
-    # this should be avoided, because you'll end up with a tangled mess of
-    # UIComponents without clear responsibilities. 
+    # `#click_button` are forwarded to the {#browser} object (see
+    # {#method_missing}) and are automatically scoped to the component's DOM
+    # element.    
     #
     # @abstract Subclass and implement (at least) {#component_locator}. Unless
     #   you override the default implementation of {#show}, you must also
@@ -85,14 +82,14 @@ class Kookaburra
       end
 
       # If the UIComponent is sent a message it does not understand, it will
-      # forward that message on to its {#element}. This provides convenient
+      # forward that message on to its {#browser}. This provides convenient
       # access to the browser driver's DSL, automatically scoped to this
       # component.
-      #
-      # @raise [Kookaburra::ComponentNotFound] raised from {#element}
       def method_missing(name, *args, &block)
-        if element.respond_to?(name)
-          element.send(name, *args, &block)
+        if respond_to?(name)
+          browser.within(component_locator) do
+            browser.send(name, *args, &block)
+          end
         else
           super
         end
@@ -101,7 +98,7 @@ class Kookaburra
       # @private
       # Behaves as you might expect given #method_missing
       def respond_to?(name)
-        super || element.respond_to?(name)
+        super || browser.respond_to?(name)
       end
 
       # Causes the UIComponent to be visible.
@@ -136,9 +133,6 @@ class Kookaburra
       protected
 
       # This is the browser driver with which the UIComponent was initialized.
-      #
-      # You almost certainly want to reference {#element} instead, as it is
-      # scoped to this component's DOM element, whereas #browser is not scoped.
       #
       # @attribute [r] browser
       #
@@ -187,6 +181,12 @@ class Kookaburra
       # Provides access to the element found by the browser driver at
       # {#component_locator}. If your browser driver is a `Capybara::Session`,
       # then this will be a `Capybara::Node::Element`.
+      #
+      # @note Although it is possible to make scoped calls against the #element,
+      #   such as `element.click_button('Foo')`, this is much slower than simply
+      #   wrapping a call to `browser.click_button('Foo')` within the block
+      #   provided to `browser.within(component_locator)`, because it results in
+      #   twice the number of calls to find an element via the browser driver.
       #
       # @raise [UnexpectedResponse] from {#detect_server_error!}
       # @raise [ComponentNotFound] if the {#component_locator} is not found in

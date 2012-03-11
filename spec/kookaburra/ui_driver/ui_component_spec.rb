@@ -46,36 +46,45 @@ describe Kookaburra::UIDriver::UIComponent do
       component.respond_to?(:foo).should == true
     end
 
-    it 'returns true if the #element defines the specified method' do
-      element = stub('An Element', :respond_to? => true)
+    it 'returns true if the #browser defines the specified method' do
+      browser = stub('Browser Driver', :respond_to? => true)
       component = component_class.new
-      component.stub!(:element => element)
+      component.stub!(:browser => browser)
       component.respond_to?(:a_very_unlikely_method_name).should == true
     end
 
-    it 'returns false if neither the UIComponent nor the #element define the specified method' do
-      element = stub('An Element', :respond_to? => false)
+    it 'returns false if neither the UIComponent nor the #browser define the specified method' do
+      browser = stub('Browser Driver', :respond_to? => false)
       component = component_class.new
-      component.stub!(:element => element)
+      component.stub!(:browser => browser)
       component.respond_to?(:a_very_unlikely_method_name).should == false
     end
   end
 
   describe '#method_missing' do
-    it 'forwards method calls to #element' do
-      element = mock('An Element')
-      element.should_receive(:some_method) do |arg1, arg2, &block|
-        arg1.should == :a
-        arg2.should == :b
-        block.call.should == :c
-        :d
+    context 'the component says it responds to the method' do
+      it 'scopes the method call within the component_locator and forwards to #browser' do
+        browser = mock('Browser Driver')
+        browser.should_receive(:some_browser_method) \
+          .with(:arguments) \
+          .and_return(:answer_from_browser)
+        browser.should_receive(:within) do |scope, &block|
+          scope.should == '#my_component'
+          block.call(browser)
+        end
+        component = Kookaburra::UIDriver::UIComponent.new(:browser => browser)
+        component.stub!(:component_locator => '#my_component')
+        component.some_browser_method(:arguments).should == :answer_from_browser
       end
-      component = Kookaburra::UIDriver::UIComponent.new
-      component.stub!(:element => element)
-      result = component.some_method(:a, :b) do
-        :c
+    end
+
+    context 'the component says it does not respond to the method' do
+      it 'raises a NoMethodError' do
+        component = Kookaburra::UIDriver::UIComponent.new
+        component.stub!(:respond_to? => false)
+        lambda { component.no_such_method } \
+          .should raise_error(NoMethodError)
       end
-      result.should == :d
     end
   end
 
