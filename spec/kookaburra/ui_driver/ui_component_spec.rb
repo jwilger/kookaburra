@@ -88,6 +88,43 @@ describe Kookaburra::UIDriver::UIComponent do
     end
   end
 
+  describe '#visible?' do
+    it 'returns true if the component_locator is found in the DOM and is visible' do
+      browser = mock('Browser Driver')
+      browser.should_receive(:has_css?) \
+        .with('#my_component', :visible) \
+        .and_return(true)
+      component = Kookaburra::UIDriver::UIComponent.new(:browser => browser)
+      component.stub!(:component_locator => '#my_component')
+      component.visible?.should == true
+    end
+
+    it 'returns false if the component_locator id not found in the DOM' do
+      browser = stub('Browser Driver', :has_css? => false)
+      component = Kookaburra::UIDriver::UIComponent.new(
+        :browser => browser,
+        :server_error_detection => lambda { |browser|
+          false
+        }
+      )
+      component.stub!(:component_locator => '#my_component')
+      component.visible?.should == false
+    end
+
+    it 'raises UnexpectedResponse if the component_locator is not found and a server error is detected' do
+      browser = stub('Browser Driver', :has_css? => false)
+      component = Kookaburra::UIDriver::UIComponent.new(
+        :browser => browser,
+        :server_error_detection => lambda { |browser|
+          true
+        }
+      )
+      component.stub!(:component_locator => '#my_component')
+      lambda { component.visible? } \
+        .should raise_error(Kookaburra::UnexpectedResponse)
+    end
+  end
+
   describe 'private methods (for use by subclasses)' do
     describe '#component_path' do
       it 'must be defined by subclasses' do
