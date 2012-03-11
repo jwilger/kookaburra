@@ -179,28 +179,6 @@ class Kookaburra
           raise UnexpectedResponse, "Your server error detection function detected a server error. Looks like your applications is busted. :-("
         end
       end
-
-      # Provides access to the element found by the browser driver at
-      # {#component_locator}. If your browser driver is a `Capybara::Session`,
-      # then this will be a `Capybara::Node::Element`.
-      #
-      # @note Although it is possible to make scoped calls against the #element,
-      #   such as `element.click_button('Foo')`, this is much slower than simply
-      #   wrapping a call to `browser.click_button('Foo')` within the block
-      #   provided to `browser.within(component_locator)`, because it results in
-      #   twice the number of calls to find an element via the browser driver.
-      #
-      # @raise [UnexpectedResponse] from {#detect_server_error!}
-      # @raise [ComponentNotFound] if the {#component_locator} is not found in
-      #   the DOM
-      def element
-        detect_server_error!
-        begin
-          browser.find(component_locator)
-        rescue StandardError => e
-          raise ComponentNotFound, e.message
-        end
-      end
     end
   end
 end
