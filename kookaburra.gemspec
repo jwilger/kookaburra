@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.16.0"
+  s.version = "0.16.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["John Wilger", "Sam Livingston-Gray"]
-  s.date = "2012-03-11"
+  s.date = "2012-03-15"
   s.description = "Cucumber + Capybara = Kookaburra? It made sense at the time."
   s.email = "johnwilger@gmail.com"
   s.extra_rdoc_files = [
