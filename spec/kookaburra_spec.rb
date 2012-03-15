@@ -61,4 +61,20 @@ describe Kookaburra do
       k.get_data(:foos).should be_frozen
     end
   end
+
+  describe '.configuration' do
+    it 'returns the assigned value' do
+      begin
+        old_config = Kookaburra.configuration
+        Kookaburra.configuration = :test_configuration
+        Kookaburra.configuration.should == :test_configuration
+      ensure
+        Kookaburra.configuration = old_config
+      end
+    end
+
+    it 'defaults to an empty hash' do
+      Kookaburra.configuration.should == {}
+    end
+  end
 end
