@@ -20,6 +20,10 @@ class Kookaburra
     # argument to {Kookaburra#initialize}. See {Kookaburra#initialize} for the
     # list of valid keys and their contents.
     attr_accessor :configuration
+
+    def configuration
+      @configuration ||= {}
+    end
   end
 
   # Returns a new Kookaburra instance that wires together your application's
