@@ -84,7 +84,7 @@ class Kookaburra
         'Accept' => 'application/json'
       }
       response = @app_driver.send(method.to_sym, path, J.encode(data), json_request_headers)
-      J.decode(response).symbolize_keys
+      J.decode(response)
     end
   end
 end
