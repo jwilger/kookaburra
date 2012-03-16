@@ -20,7 +20,7 @@ Jeweler::Tasks.new do |gem|
   gem.summary = %Q{WindowDriver testing pattern for Ruby apps}
   gem.description = %Q{Cucumber + Capybara = Kookaburra? It made sense at the time.}
   gem.email = "johnwilger@gmail.com"
-  gem.authors = ["John Wilger", "Sam Livingston-Gray"]
+  gem.authors = ["John Wilger", "Sam Livingston-Gray", "Ravi Gadad"]
   # dependencies defined in Gemfile
 end
 Jeweler::RubygemsDotOrgTasks.new
