@@ -20,13 +20,13 @@ describe 'Kookaburra Integration' do
 
         class MyGivenDriver < Kookaburra::GivenDriver
           def a_user(name)
-            user = {:email => 'bob@example.com', :password => '12345'}
+            user = {'email' => 'bob@example.com', 'password' => '12345'}
             result = api.create_user(user)
             test_data.users[name] = result
           end
 
           def a_widget(name, attributes = {})
-            widget = {:name => 'Foo'}.merge(attributes)
+            widget = {'name' => 'Foo'}.merge(attributes)
             result = api.create_widget(widget)
             test_data.widgets[name] = result
           end
@@ -42,8 +42,8 @@ describe 'Kookaburra Integration' do
           end
 
           def sign_in(user_data)
-            fill_in 'Email:', :with => user_data[:email]
-            fill_in 'Password:', :with => user_data[:password]
+            fill_in 'Email:', :with => user_data['email']
+            fill_in 'Password:', :with => user_data['password']
             click_button 'Sign In'
           end
         end
@@ -73,15 +73,15 @@ describe 'Kookaburra Integration' do
           end
 
           def choose_to_delete_widget(widget_data)
-            find("#delete_#{widget_data[:id]}").click_button('Delete')
+            find("#delete_#{widget_data['id']}").click_button('Delete')
           end
 
           private
 
           def extract_widget_data(element)
             {
-              :id => element.find('.id').text,
-              :name => element.find('.name').text
+              'id' => element.find('.id').text,
+              'name' => element.find('.name').text
             }
           end
         end
@@ -92,7 +92,7 @@ describe 'Kookaburra Integration' do
           end
 
           def submit(widget_data)
-            fill_in 'Name:', :with => widget_data[:name]
+            fill_in 'Name:', :with => widget_data['name']
             click_on 'Save'
           end
         end
@@ -110,7 +110,7 @@ describe 'Kookaburra Integration' do
           def create_new_widget(name, attributes = {})
             widget_list.show
             widget_list.choose_to_create_new_widget
-            widget_form.submit(:name => 'My Widget')
+            widget_form.submit('name' => 'My Widget')
             test_data.widgets[name] = widget_list.last_widget_created
           end
 

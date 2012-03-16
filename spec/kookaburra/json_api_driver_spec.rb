@@ -19,7 +19,7 @@ describe Kookaburra::JsonApiDriver do
           app_driver = stub('RackDriver', method.to_sym => '{"ham":"spam"}')
           driver = Kookaburra::JsonApiDriver.new(app_driver)
           driver.send(method.to_sym, '/foo', {:bar => :baz}) \
-            .should == {:ham => 'spam'}
+            .should == {'ham' => 'spam'}
         end
       end
     end
