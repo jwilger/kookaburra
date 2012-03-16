@@ -65,11 +65,25 @@ class Kookaburra
     #   api.create_widget(:name => 'Foo')
     #   #=> {:id => 1, :name => 'Foo', :description => ''}
     def post(path, data)
+      do_json_request(:post, path, data)
+    end
+
+    def put(path, data)
+      do_json_request(:put, path, data)
+    end
+
+    def get(path, data)
+      do_json_request(:get, path, data)
+    end
+
+  private
+
+    def do_json_request(method, path, data)
       json_request_headers = {
         'Content-Type' => 'application/json',
         'Accept' => 'application/json'
       }
-      response = @app_driver.post(path, J.encode(data), json_request_headers)
+      response = @app_driver.send(method.to_sym, path, J.encode(data), json_request_headers)
       J.decode(response).symbolize_keys
     end
   end

@@ -37,6 +37,50 @@ class Kookaburra
       last_response.body
     end
 
+    # Sends a PUT request to the application.
+    #
+    # Similar to `Rack::Test::Methods#put` except that it adds more convenient
+    # access to setting request headers, it raises an exception if the response
+    # status is not 200, and it returns the response body.
+    #
+    # @param [String] path The path portion of the URI to request from the
+    #   application
+    # @param [Object] params The request params or body
+    # @param [Hash] headers A hash of any additional HTTP headers to be set on
+    #   the request.
+    # @param [Hash] env Additional environment variables that should be present
+    #   on the request.
+    # @yield [Rack::Response] Yields the last response to the block if a
+    #   block is given.
+    def put(path, params = {}, headers = {}, env = {}, &block)
+      set_headers(headers)
+      super path, params, env, &block
+      check_response_status!(:put, 200, path)
+      last_response.body
+    end
+
+    # Sends a GET request to the application.
+    #
+    # Similar to `Rack::Test::Methods#get` except that it adds more convenient
+    # access to setting request headers, it raises an exception if the response
+    # status is not 200, and it returns the response body.
+    #
+    # @param [String] path The path portion of the URI to request from the
+    #   application
+    # @param [Object] params The request params or body
+    # @param [Hash] headers A hash of any additional HTTP headers to be set on
+    #   the request.
+    # @param [Hash] env Additional environment variables that should be present
+    #   on the request.
+    # @yield [Rack::Response] Yields the last response to the block if a
+    #   block is given.
+    def get(path, params = {}, headers = {}, env = {}, &block)
+      set_headers(headers)
+      super path, params, env, &block
+      check_response_status!(:get, 200, path)
+      last_response.body
+    end
+
     private
 
     def check_response_status!(verb, expected_status, path)
