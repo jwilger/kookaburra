@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.17.0"
+  s.version = "0.17.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["John Wilger", "Sam Livingston-Gray", "Ravi Gadad"]
-  s.date = "2012-03-16"
+  s.date = "2012-03-17"
   s.description = "Cucumber + Capybara = Kookaburra? It made sense at the time."
   s.email = "johnwilger@gmail.com"
   s.extra_rdoc_files = [
@@ -39,6 +39,7 @@ Gem::Specification.new do |s|
     "lib/kookaburra/test_helpers.rb",
     "lib/kookaburra/ui_driver.rb",
     "lib/kookaburra/ui_driver/ui_component.rb",
+    "lib/kookaburra/utils/active_record_shared_connection.rb",
     "spec/kookaburra/json_api_driver_spec.rb",
     "spec/kookaburra/rack_driver_spec.rb",
     "spec/kookaburra/test_data_spec.rb",
