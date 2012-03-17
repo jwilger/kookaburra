@@ -91,7 +91,7 @@ class Kookaburra
   private
 
   extend DependencyAccessor
-  dependency_accessor :given_driver_class, :api_driver_class, :ui_driver_class, :browser
+  dependency_accessor :given_driver_class, :api_driver_class, :ui_driver_class
 
   def api
     api_driver_class.new(RackDriver.new(browser.app))
@@ -101,4 +101,7 @@ class Kookaburra
     @test_data ||= TestData.new
   end
 
+  def browser
+    @browser ||= NullBrowser.new
+  end
 end

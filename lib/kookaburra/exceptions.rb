@@ -9,4 +9,6 @@ class Kookaburra
   class AssertionFailed < RuntimeError; end
   # @private
   class ComponentNotFound < RuntimeError; end
+  # @private
+  class NullBrowserError < ConfigurationError; end
 end
