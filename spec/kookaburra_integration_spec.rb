@@ -309,4 +309,39 @@ describe 'Kookaburra Integration' do
       end
     end
   end
+
+  describe "testing Ruby Interactors" do
+    class MyUIDriver < Kookaburra::UIDriver
+    end
+
+    class MyGivenDriver < Kookaburra::GivenDriver
+    end
+
+    class APIDriver < Kookaburra::APIDriver
+    end
+
+    it "runs the tests against the app" do
+      k = Kookaburra.new({
+        :api_driver_class => MyAPIDriver,
+        :given_driver_class => MyGivenDriver,
+        :ui_driver_class    => MyUIDriver,
+      })
+
+      pending 'WIP' do
+        k.given.a_user(:bob)
+        k.given.a_widget(:widget_a)
+        k.given.a_widget(:widget_b, :name => 'Foo')
+
+        k.ui.sign_in(:bob)
+        k.ui.widget_list.show
+        k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b)
+
+        k.ui.create_new_widget(:widget_c, :name => 'Bar')
+        k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c)
+
+        k.ui.delete_widget(:widget_b)
+        k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_c)
+      end
+    end
+  end
 end
