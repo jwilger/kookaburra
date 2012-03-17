@@ -1,3 +1,5 @@
+require 'delegate'
+
 class Kookaburra
   # Each instance of {Kookaburra} has its own instance of TestData. This object
   # is used to maintain a shared understanding of the application state between
@@ -38,14 +40,15 @@ class Kookaburra
     #
     #   # Raises an UnknownKeyError
     #   test_data.widgets[:bar]
-    class Collection
+    class Collection < SimpleDelegator
       # @param [String] name The name of the collection. Used to provide
       #   helpful error messages when unknown keys are accessed.
       def initialize(name)
         @name = name
-        @data = Hash.new do |hash, key|
+        data = Hash.new do |hash, key|
           raise UnknownKeyError, "Can't find test_data.#{@name}[#{key.inspect}]. Did you forget to set it?"
         end
+        super(data)
       end
 
       # Unlike a Hash, this object is only identical to another if the actual
@@ -69,20 +72,8 @@ class Kookaburra
       #   not been set
       def slice(*keys)
         results = keys.map do |key|
-          @data[key]
+          self[key]
         end
-      end
-
-      # Any unknown messages are passed to the underlying data collection, which
-      # is a Hash.
-      def method_missing(name, *args, &block)
-        return super unless respond_to?(name)
-        @data.send(name, *args, &block)
-      end
-
-      # @private
-      def respond_to?(name)
-        super || @data.respond_to?(name)
       end
     end
   end
