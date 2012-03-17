@@ -39,10 +39,34 @@ to tell Kookaburra which classes contain the specific Domain Driver
 implementations for your application as well as which driver to use for running
 the tests (currently only tested with [Capybara] [Capybara]).
 
+### ActiveRecord and Database Transactions ###
+
+Kookaburra currently uses Rack::Test as the underlying implementation for its
+APIDriver classes. This poses a problem when you want to run your UI tests via a
+driver other than Rack::Test such as Selenium, because the APIDriver sets up
+your test data using a different database connection than the process that runs
+the server against which Selenium executes, and they do not have access to the
+same transaction.
+
+One way to handle this problem is to force ActiveRecord to use the same
+connection in both the main thread and the thread that is spun up by Capybara to
+run the application for Selenium testing. You can do so by requiring
+`kookaburra/utils/active_record_shared_connection` within your Kookaburra setup.
+
+In the near future, we plan to change Kookaburra to execute *both* its APIDriver
+and UIDriver against an actual server and ditch Rack::Test. Not only will this
+help avoid this specific problem, but it will move towards the goal of being
+able to (optionally) run these tests on a completely different machine than the
+running application.
+
 ### RSpec ###
 
 For [RSpec] [RSpec] integration tests, just add the following to
 `spec/support/kookaburra_setup.rb`:
+
+    # only if using ActiveRecord and a browser driver other than Rack::Test for
+    # UI testing
+    require 'kookaburra/utils/active_record_shared_connection'
 
     require 'kookaburra/test_helpers'
     require 'my_app/kookaburra/api_driver'
@@ -66,6 +90,10 @@ For [RSpec] [RSpec] integration tests, just add the following to
 ### Cucumber ###
 
 For [Cucumber] [Cucumber], add the following to `features/support/kookaburra_setup.rb`:
+
+    # only if using ActiveRecord and a browser driver other than Rack::Test for
+    # UI testing
+    require 'kookaburra/utils/active_record_shared_connection'
 
     require 'kookaburra/test_helpers'
     require 'my_app/kookaburra/api_driver'
