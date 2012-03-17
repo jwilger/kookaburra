@@ -82,7 +82,8 @@ class Kookaburra
       end
 
       # If the UIComponent is sent a message it does not understand, it will
-      # forward that message on to its {#browser}. This provides convenient
+      # forward that message on to its {#browser} but wrap the call in a block
+      # provided to the the browser's {#within} method. This provides convenient
       # access to the browser driver's DSL, automatically scoped to this
       # component.
       def method_missing(name, *args, &block)
