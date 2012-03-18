@@ -19,8 +19,8 @@ design flaws that its best just to toss it.
 
 ## Installation ##
 
-Kookaburra is available as a Rubygem and [published on Rubygems.org] [Kookaburra
-Gem], so installation is trivial:
+Kookaburra is available as a Rubygem and [published on Rubygems.org] [Kookaburra Gem],
+so installation is trivial:
 
     gem install kookaburra
 
@@ -78,6 +78,7 @@ For [RSpec] [RSpec] integration tests, just add the following to
       :given_driver_class => MyApp::Kookaburra::GivenDriver,
       :ui_driver_class => MyApp::Kookaburra::UIDriver,
       :browser => Capybara,
+      :rack_app => Capybara.app,
       :server_error_detection => { |browser|
         browser.has_css?('head title', :text => 'Internal Server Error')
       }
@@ -105,6 +106,7 @@ For [Cucumber] [Cucumber], add the following to `features/support/kookaburra_set
       :given_driver_class => MyApp::Kookaburra::GivenDriver,
       :ui_driver_class => MyApp::Kookaburra::UIDriver,
       :browser => Capybara,
+      :rack_app => Capybara.app,
       :server_error_detection => { |browser|
         browser.has_css?('head title', :text => 'Internal Server Error')
       }
@@ -307,10 +309,10 @@ Here's a quick example of TestData behavor:
 
     test_data = TestData.new
 
-    test_data.widgets[:widget_a] = {:name => 'Widget A'}
+    test_data.widgets[:widget_a] = {'name' => 'Widget A'}
 
     test_data.widgets[:widget_a]
-    #=> {:name => 'Widget A'}
+    #=> {'name' => 'Widget A'}
     
     # this will raise a Kookaburra::UnknownKeyError
     test_data.widgets[:widget_b]
@@ -352,15 +354,15 @@ for your application:
 
     class MyApp::Kookaburra::GivenDriver < Kookaburra::GivenDriver
       def existing_account(nickname)
-        account_data = {:display_name => 'John Doe', :password => 'a password'}
-        account_data[:username] = "test-user-#{`uuidgen`.strip}"
+        account_data = {'display_name' => 'John Doe', 'password' => 'a password'}
+        account_data['username'] = "test-user-#{`uuidgen`.strip}"
 
         # use the API to create the account in the application
         result = api.create_account(account_data)
 
-        # merge in the password (since API doesn't return it) and store details
-        # in the TestData instance
-        result.merge!(:password => account_data[:password])
+        # merge in the password, since API (hopefully!) doesn't return it, and
+        # store details in the TestData instance
+        result.merge!('password' => account_data['password'])
         test_data.accounts[nickname] = account_details
       end
     end
@@ -381,7 +383,7 @@ your tests against a "remote" server where you would not have access to the
 application internals. ("Remote" in the sense that it is not in the same Ruby
 process as your running tests, although it may or may not be on the same
 machine. Note that this is not currently possible with Kookaburra due to our
-current reliance on Rack::Test.)
+reliance on Rack::Test.)
 
 #### UI Driver ####
 
@@ -400,7 +402,7 @@ within your subclass:
       def sign_in(account_nickname)
         account = test_data.accounts[account_nickname]
         sign_in_screen.show
-        sign_in_screen.submit_login(account[:username], account[:password])
+        sign_in_screen.submit_login(account['username'], account['password'])
       end
     end
 
