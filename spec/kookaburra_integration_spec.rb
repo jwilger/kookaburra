@@ -310,7 +310,7 @@ describe 'Kookaburra Integration' do
     end
   end
 
-  describe "testing plain Ruby objects" do
+  describe "testing a Ruby API" do
     class MyUIDriver < Kookaburra::UIDriver
     end
 
