@@ -46,6 +46,7 @@ class Kookaburra
     @given_driver_class = options[:given_driver_class]
     @ui_driver_class    = options[:ui_driver_class]
     @browser            = options[:browser]
+    @rack_app               = options[:rack_app]
     @server_error_detection = options[:server_error_detection]
   end
 
@@ -94,7 +95,11 @@ class Kookaburra
   dependency_accessor :given_driver_class, :api_driver_class, :ui_driver_class
 
   def api
-    api_driver_class.new(RackDriver.new(browser.app))
+    api_driver_class.new(application_driver)
+  end
+
+  def application_driver
+    RackDriver.new(@rack_app)
   end
 
   def test_data

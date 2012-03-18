@@ -289,6 +289,7 @@ describe 'Kookaburra Integration' do
             :given_driver_class => MyGivenDriver,
             :api_driver_class   => MyAPIDriver,
             :browser            => Capybara::Session.new(:rack_test, my_app),
+            :rack_app               => my_app,
             :server_error_detection => server_error_detection
           })
 

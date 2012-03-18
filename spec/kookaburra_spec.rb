@@ -3,8 +3,6 @@ require 'kookaburra'
 describe Kookaburra do
   describe '#given' do
     it 'returns an instance of the configured GivenDriver' do
-      browser_instance = stub('Browser', :app => :a_rack_app)
-
       Kookaburra::RackDriver.should_receive(:new) \
         .with(:a_rack_app) \
         .and_return(:a_rack_driver)
@@ -22,7 +20,7 @@ describe Kookaburra do
 
       k = Kookaburra.new(:given_driver_class => my_given_driver_class,
                          :api_driver_class => my_api_driver_class,
-                         :browser => browser_instance)
+                         :rack_app => :a_rack_app)
       k.given.should == :a_given_driver
     end
   end
