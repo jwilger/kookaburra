@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.18.2"
+  s.version = "0.18.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["John Wilger", "Sam Livingston-Gray", "Ravi Gadad"]
@@ -41,6 +41,7 @@ Gem::Specification.new do |s|
     "lib/kookaburra/ui_driver.rb",
     "lib/kookaburra/ui_driver/ui_component.rb",
     "lib/kookaburra/utils/active_record_shared_connection.rb",
+    "spec/integration/test_a_rack_application_spec.rb",
     "spec/kookaburra/json_api_driver_spec.rb",
     "spec/kookaburra/null_browser_spec.rb",
     "spec/kookaburra/rack_driver_spec.rb",
@@ -48,7 +49,6 @@ Gem::Specification.new do |s|
     "spec/kookaburra/test_helpers_spec.rb",
     "spec/kookaburra/ui_driver/ui_component_spec.rb",
     "spec/kookaburra/ui_driver_spec.rb",
-    "spec/kookaburra_integration_spec.rb",
     "spec/kookaburra_spec.rb",
     "spec/support/shared_examples/it_has_a_dependency_accessor.rb"
   ]
