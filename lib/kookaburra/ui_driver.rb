@@ -48,7 +48,7 @@ class Kookaburra
       #   this component.
       def ui_component(component_name, component_class)
         define_method(component_name) do
-          component_class.new(:browser => browser, :server_error_detection => @server_error_detection)
+          component_class.new(:browser => @browser, :server_error_detection => @server_error_detection)
         end
       end
     end
@@ -69,9 +69,6 @@ class Kookaburra
     end
 
     protected
-
-    # @attribute [r] browser
-    dependency_accessor :browser
 
     # @attribute [r] test_data
     dependency_accessor :test_data

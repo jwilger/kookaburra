@@ -1,5 +1,4 @@
 require 'kookaburra/ui_driver/ui_component'
-require 'support/shared_examples/it_has_a_dependency_accessor'
 
 describe Kookaburra::UIDriver::UIComponent do
   describe '#show' do
@@ -153,10 +152,6 @@ describe Kookaburra::UIDriver::UIComponent do
         lambda { component.send(:assert, false, "False isn't true, dummy.") } \
           .should raise_error(Kookaburra::AssertionFailed, "False isn't true, dummy.")
       end
-    end
-
-    it_behaves_like :it_has_a_dependency_accessor, :browser do
-      let(:subject_class) { Kookaburra::UIDriver::UIComponent }
     end
   end
 end
