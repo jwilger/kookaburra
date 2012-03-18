@@ -36,11 +36,10 @@ class Kookaburra
   #   application's subclass of {Kookaburra::GivenDriver}
   # @option options [Class] :ui_driver_class Your application's
   #   subclass of {Kookaburra::UIDriver}
-  # @option options [Object] :browser The browser driver that Kookaburra will
-  #   interact with to run the tests. It must also respond to the #app method
-  #   and return a Rack application for use with the {Kookaburra::APIDriver}.
-  #   Kookaburra is intended to work with `Capybara::Session` as a browser
-  #   driver, but you could use something else that exposed the same basic API.
+  # @option options [Capybara::Session] :browser (optional) The browser driver
+  #   that Kookaburra will interact with to run the tests.
+  # @option options [#call] :rack_app (optional) The Rack application to test
+  #   against.
   def initialize(options = {})
     @api_driver_class       = options[:api_driver_class]
     @given_driver_class     = options[:given_driver_class]
