@@ -42,10 +42,10 @@ class Kookaburra
   #   Kookaburra is intended to work with `Capybara::Session` as a browser
   #   driver, but you could use something else that exposed the same basic API.
   def initialize(options = {})
-    @api_driver_class   = options[:api_driver_class]
-    @given_driver_class = options[:given_driver_class]
-    @ui_driver_class    = options[:ui_driver_class]
-    @browser            = options[:browser]
+    @api_driver_class       = options[:api_driver_class]
+    @given_driver_class     = options[:given_driver_class]
+    @ui_driver_class        = options[:ui_driver_class]
+    @browser                = options[:browser]
     @rack_app               = options[:rack_app]
     @server_error_detection = options[:server_error_detection]
   end
