@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.17.1"
+  s.version = "0.18.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["John Wilger", "Sam Livingston-Gray", "Ravi Gadad"]
-  s.date = "2012-03-17"
+  s.date = "2012-03-18"
   s.description = "Cucumber + Capybara = Kookaburra? It made sense at the time."
   s.email = "johnwilger@gmail.com"
   s.extra_rdoc_files = [
@@ -34,6 +34,7 @@ Gem::Specification.new do |s|
     "lib/kookaburra/exceptions.rb",
     "lib/kookaburra/given_driver.rb",
     "lib/kookaburra/json_api_driver.rb",
+    "lib/kookaburra/null_browser.rb",
     "lib/kookaburra/rack_driver.rb",
     "lib/kookaburra/test_data.rb",
     "lib/kookaburra/test_helpers.rb",
@@ -41,6 +42,7 @@ Gem::Specification.new do |s|
     "lib/kookaburra/ui_driver/ui_component.rb",
     "lib/kookaburra/utils/active_record_shared_connection.rb",
     "spec/kookaburra/json_api_driver_spec.rb",
+    "spec/kookaburra/null_browser_spec.rb",
     "spec/kookaburra/rack_driver_spec.rb",
     "spec/kookaburra/test_data_spec.rb",
     "spec/kookaburra/test_helpers_spec.rb",
@@ -60,6 +62,7 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<basic_object>, [">= 0"])
       s.add_runtime_dependency(%q<i18n>, [">= 0"])
       s.add_runtime_dependency(%q<activesupport>, [">= 3.0"])
       s.add_runtime_dependency(%q<rack-test>, [">= 0"])
@@ -72,6 +75,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<reek>, [">= 0"])
       s.add_development_dependency(%q<sinatra>, [">= 0"])
     else
+      s.add_dependency(%q<basic_object>, [">= 0"])
       s.add_dependency(%q<i18n>, [">= 0"])
       s.add_dependency(%q<activesupport>, [">= 3.0"])
       s.add_dependency(%q<rack-test>, [">= 0"])
@@ -85,6 +89,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<sinatra>, [">= 0"])
     end
   else
+    s.add_dependency(%q<basic_object>, [">= 0"])
     s.add_dependency(%q<i18n>, [">= 0"])
     s.add_dependency(%q<activesupport>, [">= 3.0"])
     s.add_dependency(%q<rack-test>, [">= 0"])
