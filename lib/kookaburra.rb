@@ -98,7 +98,9 @@ class Kookaburra
   end
 
   def application_driver
-    RackDriver.new(@rack_app)
+    unless @rack_app.nil?
+      RackDriver.new(@rack_app)
+    end
   end
 
   def test_data
