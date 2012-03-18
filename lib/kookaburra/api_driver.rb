@@ -7,5 +7,10 @@ class Kookaburra
   #
   # @abstract Subclass and provide an API client implementation
   class APIDriver
+    # Returns a new APIDriver.
+    #
+    # @param args Not actually used, but takes any arguments
+    def initialize(*args)
+    end
   end
 end
