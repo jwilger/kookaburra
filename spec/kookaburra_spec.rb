@@ -2,26 +2,47 @@ require 'kookaburra'
 
 describe Kookaburra do
   describe '#given' do
-    it 'returns an instance of the configured GivenDriver' do
-      Kookaburra::RackDriver.should_receive(:new) \
-        .with(:a_rack_app) \
-        .and_return(:a_rack_driver)
+    context 'without a :rack_app specified' do
+      it 'returns an instance of the configured GivenDriver' do
+        my_api_driver_class = mock(Class)
+        my_api_driver_class.should_receive(:new) \
+          .with(nil) \
+          .and_return(:an_api_driver)
 
-      my_api_driver_class = mock(Class)
-      my_api_driver_class.should_receive(:new) \
-        .with(:a_rack_driver) \
-        .and_return(:an_api_driver)
+        my_given_driver_class = mock(Class)
+        my_given_driver_class.should_receive(:new) do |options|
+          options[:api].should == :an_api_driver
+          :a_given_driver
+        end
 
-      my_given_driver_class = mock(Class)
-      my_given_driver_class.should_receive(:new) do |options|
-        options[:api].should == :an_api_driver
-        :a_given_driver
+        k = Kookaburra.new(:given_driver_class => my_given_driver_class,
+                           :api_driver_class => my_api_driver_class)
+        k.given.should == :a_given_driver
       end
+    end
 
-      k = Kookaburra.new(:given_driver_class => my_given_driver_class,
-                         :api_driver_class => my_api_driver_class,
-                         :rack_app => :a_rack_app)
-      k.given.should == :a_given_driver
+    context 'with a :rack_app specified' do
+      it 'returns an instance of the configured GivenDriver' do
+        Kookaburra::RackDriver.should_receive(:new) \
+          .with(:a_rack_app) \
+          .and_return(:a_rack_driver)
+
+        my_api_driver_class = mock(Class)
+        my_api_driver_class.should_receive(:new) \
+          .with(:a_rack_driver) \
+          .and_return(:an_api_driver)
+
+        my_given_driver_class = mock(Class)
+        my_given_driver_class.should_receive(:new) do |options|
+          options[:api].should == :an_api_driver
+          :a_given_driver
+        end
+
+        k = Kookaburra.new(:given_driver_class => my_given_driver_class,
+                           :api_driver_class => my_api_driver_class,
+                           :rack_app => :a_rack_app)
+        k.given.should == :a_given_driver
+      end
     end
   end
 
