@@ -310,7 +310,7 @@ describe 'Kookaburra Integration' do
     end
   end
 
-  describe "testing Ruby Interactors" do
+  describe "testing plain Ruby objects" do
     class MyUIDriver < Kookaburra::UIDriver
     end
 
@@ -320,7 +320,7 @@ describe 'Kookaburra Integration' do
     class APIDriver < Kookaburra::APIDriver
     end
 
-    it "runs the tests against the app" do
+    it "runs the tests" do
       k = Kookaburra.new({
         :api_driver_class => MyAPIDriver,
         :given_driver_class => MyGivenDriver,
