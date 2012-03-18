@@ -1,5 +1,4 @@
 require 'kookaburra/exceptions'
-require 'kookaburra/dependency_accessor'
 
 class Kookaburra
   class UIDriver
@@ -66,8 +65,6 @@ class Kookaburra
     #   you override the default implementation of {#show}, you must also
     #   override the {#component_path} method.
     class UIComponent
-      extend DependencyAccessor
-
       # New UIComponent instances are typically created for you by your
       # {Kookaburra::UIDriver} instance.
       #
@@ -136,11 +133,12 @@ class Kookaburra
       protected
 
       # This is the browser driver with which the UIComponent was initialized.
-      #
-      # @attribute [r] browser
-      #
-      # @raise [RuntimeError] if no browser was specified in call to {#initialize}
-      dependency_accessor :browser
+      # 
+      # If no :browser option was specified in {#initialize}, it returns a
+      # default {Kookaburra::NullBrowser} instance.
+      def browser
+        @browser ||= NullBrowser.new
+      end
 
       # Provides a mechanism to make assertions about the state of your
       # UIComponent without relying on a specific testing framework. A good

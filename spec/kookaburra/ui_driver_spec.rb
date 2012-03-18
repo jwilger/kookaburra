@@ -22,6 +22,5 @@ describe Kookaburra::UIDriver do
     let(:subject_class) { Kookaburra::UIDriver }
 
     it_behaves_like :it_has_a_dependency_accessor, :test_data
-    it_behaves_like :it_has_a_dependency_accessor, :browser
   end
 end
