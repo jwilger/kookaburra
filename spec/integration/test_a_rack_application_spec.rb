@@ -119,6 +119,14 @@ describe "testing a Rack application with Kookaburra" do
         end
       end
 
+      before(:all) do
+        `rake rackup:json_api_app:start`
+      end
+
+      after(:all) do
+        `rake rackup:json_api_app:stop`
+      end
+
       it "runs the tests against the app" do
         server_error_detection = lambda { |browser|
           browser.has_css?('h1', :text => 'Internal Server Error')
