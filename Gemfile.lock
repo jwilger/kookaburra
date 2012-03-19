@@ -27,6 +27,7 @@ GEM
     mime-types (1.17.2)
     multi_json (1.1.0)
     nokogiri (1.5.0)
+    patron (0.4.18)
     rack (1.4.1)
     rack-protection (1.2.0)
       rack
@@ -79,7 +80,7 @@ DEPENDENCIES
   capybara
   i18n
   jeweler
-  rack-test
+  patron
   rcov
   redcarpet (~> 1.0)
   reek

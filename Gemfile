@@ -5,7 +5,7 @@ gem 'basic_object' unless defined?(BasicObject)
 
 gem 'i18n'
 gem 'activesupport', '>= 3.0'
-gem 'rack-test'
+gem 'patron'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.

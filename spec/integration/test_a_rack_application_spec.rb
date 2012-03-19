@@ -18,6 +18,10 @@ describe "testing a Rack application with Kookaburra" do
       end
 
       class MyGivenDriver < Kookaburra::GivenDriver
+        def api
+          MyAPIDriver.new
+        end
+
         def a_user(name)
           user = {'email' => 'bob@example.com', 'password' => '12345'}
           result = api.create_user(user)

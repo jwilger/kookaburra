@@ -1,16 +1,28 @@
+require 'kookaburra/exceptions'
+require 'delegate'
+require 'patron'
+
 class Kookaburra
-  # This class currently exists only so that, in documentation, we can refer to
-  # the generic APIDriver rather than the specific {Kookaburra::JsonApiDriver},
-  # which is currently the only implementation. Once another APIDriver
-  # implementation is added to Kookaburra, anything it has in common with
-  # {Kookaburra::JsonApiDriver} should be factored up into this class.
-  #
-  # @abstract Subclass and provide an API client implementation
-  class APIDriver
-    # Returns a new APIDriver.
-    #
-    # @param args Not actually used, but takes any arguments
-    def initialize(*args)
+  class APIDriver < SimpleDelegator
+    def initialize(options = {})
+      http_client = options[:http_client] || Patron::Session.new
+      super(http_client)
+    end
+
+    def headers=(new_headers)
+      new_headers.each do |k,v|
+        headers[k] = v
+      end
+    end
+
+    def post(path, data, options = {})
+      expected_status = options[:expected_response_status] || 201
+      response = super
+      if response.status == expected_status
+        response.body
+      else
+        raise UnexpectedResponse, "POST to #{path} responded with #{response.status} status, not #{expected_status} as expected"
+      end
     end
   end
 end
