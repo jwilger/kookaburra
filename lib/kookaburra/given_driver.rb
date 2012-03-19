@@ -35,10 +35,8 @@ class Kookaburra
     # object is instantiated for you by {Kookaburra#given}.
     #
     # @option options [Kookaburra::TestData] the test data store
-    # @option options [Kookaburra::APIDriver] the APIDriver subclass to be used
     def initialize(options = {})
       @test_data = options[:test_data]
-      @api       = options[:api]
     end
 
     protected
@@ -49,12 +47,5 @@ class Kookaburra
     # @attribute [r]
     # @return [Kookaburra::TestData]
     dependency_accessor :test_data
-
-    # A reference to the {Kookaburra::APIDriver} that this GivenDriver instance
-    # was created with.
-    #
-    # @attribute [r]
-    # @return [Kookaburra::APIDriver]
-    dependency_accessor :api
   end
 end
