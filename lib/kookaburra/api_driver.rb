@@ -23,7 +23,8 @@ class Kookaburra
         response.body
       else
         raise UnexpectedResponse, "POST to #{path} responded with " \
-          + "#{response.status} status, not #{expected_status} as expected"
+          + "#{response.status} status, not #{expected_status} as expected\n\n" \
+          + response.body
       end
     end
   end
