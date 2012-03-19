@@ -3,19 +3,10 @@
 Kookaburra is a framework for implementing the [Window Driver] [Window Driver] pattern in
 order to keep acceptance tests maintainable.
 
-## WARNING: Significant Changes since 0.14.x ##
+## WARNING: Documentation Out of Date ##
 
-As of 0.15.0, Kookaburra has been rewritten from the ground up. The original
-(up through 0.14.x) version was extracted from another project in which the
-testing library was being used. Unfortunately, this meant that the code in
-Kookaburra itself did not have very good test coverage, because it was being
-tested indirectly by the fact of its usage in the other project. What we've
-found is that a *lot* of complexity was sneaking into Kookaburra due to its
-having been developed without much focused TDD.
-
-Starting with 0.15.0, we are treating the previous versions as a spike. They
-were really useful for learning about the approach, but the code has enough
-design flaws that its best just to toss it.
+The master branch on GitHub currently contains a number of significant changes
+that are not yet reflected in the following documentation.
 
 ## Installation ##
 
