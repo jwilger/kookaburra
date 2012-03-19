@@ -6,6 +6,7 @@ class Kookaburra
   class APIDriver < SimpleDelegator
     def initialize(options = {})
       http_client = options[:http_client] || Patron::Session.new
+      http_client.base_url = options[:base_url] if options.has_key?(:base_url)
       super(http_client)
     end
 
@@ -21,7 +22,8 @@ class Kookaburra
       if response.status == expected_status
         response.body
       else
-        raise UnexpectedResponse, "POST to #{path} responded with #{response.status} status, not #{expected_status} as expected"
+        raise UnexpectedResponse, "POST to #{path} responded with " \
+          + "#{response.status} status, not #{expected_status} as expected"
       end
     end
   end

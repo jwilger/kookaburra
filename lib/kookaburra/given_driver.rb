@@ -36,10 +36,13 @@ class Kookaburra
     #
     # @option options [Kookaburra::TestData] the test data store
     def initialize(options = {})
+      @initialization_options = options
       @test_data = options[:test_data]
     end
 
     protected
+
+    attr_reader :initialization_options
 
     # A reference to the {Kookaburra::TestData} object that this GivenDriver
     # instance was created with.

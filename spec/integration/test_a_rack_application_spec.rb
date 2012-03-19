@@ -19,7 +19,7 @@ describe "testing a Rack application with Kookaburra" do
 
       class MyGivenDriver < Kookaburra::GivenDriver
         def api
-          MyAPIDriver.new
+          MyAPIDriver.new(:base_url => initialization_options[:base_url])
         end
 
         def a_user(name)
