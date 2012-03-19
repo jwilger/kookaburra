@@ -49,12 +49,12 @@ describe Kookaburra::APIDriver do
     end
 
     it 'raises an UnexpectedResponse if the response status is not the specified status' do
-      response = stub('Patron::Response', :status => 555)
+      response = stub('Patron::Response', :status => 555, :body => 'foo')
       client = stub('Patron::Session', :post => response)
       api = Kookaburra::APIDriver.new(:http_client => client)
       lambda { api.post('/foo', 'bar', :expected_response_status => 666) } \
         .should raise_error(Kookaburra::UnexpectedResponse,
-                            "POST to /foo responded with 555 status, not 666 as expected")
+                            "POST to /foo responded with 555 status, not 666 as expected\n\nfoo")
     end
 
     it 'defaults the expected response status to 201' do

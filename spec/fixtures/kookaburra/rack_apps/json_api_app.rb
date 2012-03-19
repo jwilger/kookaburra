@@ -9,11 +9,7 @@ class Kookaburra
     # request.
     class JsonApiApp < Sinatra::Base
       enable :sessions
-
-      # we want error handling to behave as it would for a production
-      # deployment rather than development
-      set :raise_errors, false
-      set :show_exceptions, false
+      disable :show_exceptions
 
       def parse_json_req_body
         request.body.rewind
@@ -156,6 +152,11 @@ class Kookaburra
           </html>
         EOF
         body content
+      end
+
+      error do
+        e = request.env['sinatra.error']
+        "#{e.to_s}\n#{e.backtrace.join("\n")}"
       end
     end
   end
