@@ -39,7 +39,7 @@ class Kookaburra
     @given_driver_class     = options[:given_driver_class]
     @ui_driver_class        = options[:ui_driver_class]
     @browser                = options[:browser]
-    @base_url               = options[:base_url]
+    @app_host               = options[:app_host]
     @server_error_detection = options[:server_error_detection]
   end
 
@@ -49,7 +49,7 @@ class Kookaburra
   #
   # @return [Kookaburra::GivenDriver]
   def given
-    given_driver_class.new(:test_data => test_data, :base_url => @base_url)
+    given_driver_class.new(:test_data => test_data, :app_host => @app_host)
   end
 
   # Returns an instance of your UIDriver class configured to share test fixture
@@ -60,6 +60,7 @@ class Kookaburra
   def ui
     ui_driver_class.new(:test_data => test_data,
                         :browser => browser,
+                        :app_host => @app_host,
                         :server_error_detection => @server_error_detection)
   end
 

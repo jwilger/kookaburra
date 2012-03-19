@@ -6,14 +6,16 @@ describe Kookaburra::UIDriver do
     it 'adds an accessor method for the named component that defaults to an instance of the specified class' do
       foo_component_class = mock(Class)
       foo_component_class.should_receive(:new) \
-        .with(:browser => :a_browser, :server_error_detection => :server_error_detection) \
+        .with(:browser => :a_browser, :server_error_detection => :server_error_detection,
+              :app_host => :a_url) \
         .and_return(:a_foo_component)
 
       ui_driver_class = Class.new(Kookaburra::UIDriver) do
         ui_component :foo, foo_component_class
       end
 
-      ui = ui_driver_class.new(:browser => :a_browser, :server_error_detection => :server_error_detection)
+      ui = ui_driver_class.new(:browser => :a_browser, :server_error_detection => :server_error_detection,
+                               :app_host => :a_url)
       ui.foo.should == :a_foo_component
     end
   end

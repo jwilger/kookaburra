@@ -75,6 +75,7 @@ class Kookaburra
       # @option options [Proc] :server_error_detection
       def initialize(options = {})
         @browser = options[:browser]
+        @app_host = options[:app_host]
         @server_error_detection = options[:server_error_detection]
       end
 
@@ -116,7 +117,7 @@ class Kookaburra
       #   to make it so.
       def show(*args)
         return if visible?
-        browser.visit component_path(*args)
+        browser.visit component_url(*args)
         assert visible?, "The #{self.class.name} component is not visible!"
       end
 
@@ -159,6 +160,10 @@ class Kookaburra
       # @return [String] the URL path that should be loaded in order to reach this component
       def component_path
         raise ConfigurationError, "You must define #{self.class.name}#component_path."
+      end
+
+      def component_url(*args)
+        "#{@app_host}#{component_path(*args)}"
       end
 
       # @abstract
