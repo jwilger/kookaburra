@@ -157,7 +157,18 @@ class Kookaburra
 
       error do
         e = request.env['sinatra.error']
-        "#{e.to_s}\n#{e.backtrace.join("\n")}"
+        body << <<-EOF
+          <html>
+            <head>
+              <title>Internal Server Error</title>
+            </head>
+            <body>
+              <pre>
+              #{e.to_s}\n#{e.backtrace.join("\n")}
+              </pre>
+            </body>
+          </html>
+        EOF
       end
     end
   end
