@@ -48,7 +48,8 @@ class Kookaburra
       #   this component.
       def ui_component(component_name, component_class)
         define_method(component_name) do
-          component_class.new(:browser => @browser, :server_error_detection => @server_error_detection)
+          component_class.new(:browser => @browser, :server_error_detection => @server_error_detection,
+                              :app_host => @app_host)
         end
       end
     end
@@ -64,6 +65,7 @@ class Kookaburra
     #   error has occured
     def initialize(options = {})
       @browser = options[:browser]
+      @app_host = options[:app_host]
       @test_data = options[:test_data]
       @server_error_detection = options[:server_error_detection]
     end

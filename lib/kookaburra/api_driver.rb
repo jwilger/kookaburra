@@ -6,7 +6,7 @@ class Kookaburra
   class APIDriver < SimpleDelegator
     def initialize(options = {})
       http_client = options[:http_client] || Patron::Session.new
-      http_client.base_url = options[:base_url] if options.has_key?(:base_url)
+      http_client.base_url = options[:app_host] if options.has_key?(:app_host)
       super(http_client)
     end
 

@@ -1,7 +1,6 @@
 require 'kookaburra'
 require 'capybara'
 require 'sinatra/base'
-require 'active_support/hash_with_indifferent_access'
 
 describe "testing a Rack application with Kookaburra" do
   describe "with an HTML interface" do
@@ -19,7 +18,7 @@ describe "testing a Rack application with Kookaburra" do
 
       class MyGivenDriver < Kookaburra::GivenDriver
         def api
-          MyAPIDriver.new(:base_url => initialization_options[:base_url])
+          MyAPIDriver.new(:app_host => initialization_options[:app_host])
         end
 
         def a_user(name)
@@ -139,26 +138,24 @@ describe "testing a Rack application with Kookaburra" do
         k = Kookaburra.new({
           :ui_driver_class        => MyUIDriver,
           :given_driver_class     => MyGivenDriver,
-          :base_url               => 'http://127.0.0.1:4567',
+          :app_host               => 'http://127.0.0.1:4567',
           :browser                => Capybara::Session.new(:selenium),
           :server_error_detection => server_error_detection
         })
 
-        pending "WIP" do
-          k.given.a_user(:bob)
-          k.given.a_widget(:widget_a)
-          k.given.a_widget(:widget_b, :name => 'Foo')
+        k.given.a_user(:bob)
+        k.given.a_widget(:widget_a)
+        k.given.a_widget(:widget_b, :name => 'Foo')
 
-          k.ui.sign_in(:bob)
-          k.ui.widget_list.show
-          k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b)
+        k.ui.sign_in(:bob)
+        k.ui.widget_list.show
+        k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b)
 
-          k.ui.create_new_widget(:widget_c, :name => 'Bar')
-          k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c)
+        k.ui.create_new_widget(:widget_c, :name => 'Bar')
+        k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c)
 
-          k.ui.delete_widget(:widget_b)
-          k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_c)
-        end
+        k.ui.delete_widget(:widget_b)
+        k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_c)
       end
     end
   end
