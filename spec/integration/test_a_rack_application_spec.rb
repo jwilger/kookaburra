@@ -132,7 +132,7 @@ describe "testing a Rack application with Kookaburra" do
 
       it "runs the tests against the app" do
         server_error_detection = lambda { |browser|
-          browser.has_css?('h1', :text => 'Internal Server Error')
+          browser.has_css?('head title', :text => 'Internal Server Error')
         }
 
         k = Kookaburra.new({
