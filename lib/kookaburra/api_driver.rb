@@ -18,11 +18,47 @@ class Kookaburra
 
     def post(path, data, options = {})
       expected_status = options[:expected_response_status] || 201
-      response = super
+      response = super(path, data)
       if response.status == expected_status
         response.body
       else
         raise UnexpectedResponse, "POST to #{path} responded with " \
+          + "#{response.status} status, not #{expected_status} as expected\n\n" \
+          + response.body
+      end
+    end
+
+    def put(path, data, options = {})
+      expected_status = options[:expected_response_status] || 200
+      response = super(path, data)
+      if response.status == expected_status
+        response.body
+      else
+        raise UnexpectedResponse, "PUT to #{path} responded with " \
+          + "#{response.status} status, not #{expected_status} as expected\n\n" \
+          + response.body
+      end
+    end
+
+    def get(path, options = {})
+      expected_status = options[:expected_response_status] || 200
+      response = super(path)
+      if response.status == expected_status
+        response.body
+      else
+        raise UnexpectedResponse, "GET to #{path} responded with " \
+          + "#{response.status} status, not #{expected_status} as expected\n\n" \
+          + response.body
+      end
+    end
+
+    def delete(path, options = {})
+      expected_status = options[:expected_response_status] || 200
+      response = super(path)
+      if response.status == expected_status
+        response.body
+      else
+        raise UnexpectedResponse, "DELETE to #{path} responded with " \
           + "#{response.status} status, not #{expected_status} as expected\n\n" \
           + response.body
       end

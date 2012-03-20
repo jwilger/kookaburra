@@ -27,7 +27,7 @@ describe Kookaburra::APIDriver do
   describe '#post' do
     it 'delegates posting to the http client' do
       client = mock('Patron::Session')
-      client.should_receive(:post).with('/foo', 'bar', {}) \
+      client.should_receive(:post).with('/foo', 'bar') \
         .and_return(stub(:status => 201, :body => ''))
       api = Kookaburra::APIDriver.new(:http_client => client)
       api.post('/foo', 'bar')
