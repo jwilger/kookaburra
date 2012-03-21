@@ -47,18 +47,3 @@ end
 
 require 'yard'
 YARD::Rake::YardocTask.new
-
-namespace :rackup do
-  namespace :json_api_app do
-    desc "Start the JsonApiApp service"
-    task :start do
-      puts `rackup -Ispec/fixtures -p 4567 -P rackup-json_api_app.pid -D spec/fixtures/kookaburra/rack_apps/json_api_app.ru`
-    end
-
-    desc "Stop the JsonApiApp service"
-    task :stop do
-      puts `kill -9 #{File.read('rackup-json_api_app.pid')}`
-      puts `rm rackup-json_api_app.pid`
-    end
-  end
-end
