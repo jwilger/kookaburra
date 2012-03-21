@@ -27,5 +27,17 @@ class Kookaburra
           + response.body
       end
     end
+
+    def get(path, options = {})
+      expected_status = options[:expected_response_status] || 200
+      response = super
+      if response.status == expected_status
+        response.body
+      else
+        raise UnexpectedResponse, "GET to #{path} responded with " \
+          + "#{response.status} status, not #{expected_status} as expected\n\n" \
+          + response.body
+      end
+    end
   end
 end

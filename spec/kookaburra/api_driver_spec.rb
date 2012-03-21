@@ -1,6 +1,13 @@
 require 'kookaburra/api_driver'
 
 describe Kookaburra::APIDriver do
+  let(:response) { stub('Patron::Response', :body => 'foo', :status => 200) }
+  let(:api) { Kookaburra::APIDriver.new(:http_client => client) }
+  let(:client) {
+         mock('Patron::Session', :post => response, :get => response,
+         :put => response, :delete => response)
+  }
+
   describe '#initialize' do
     it 'instantiates a new http client if no :http_client option is passed' do
       Patron::Session.should_receive(:new).and_return(stub.as_null_object)
@@ -18,51 +25,60 @@ describe Kookaburra::APIDriver do
       headers = mock('Hash')
       headers.should_receive(:[]=).with('Foo', 'bar')
       headers.should_receive(:[]=).with('Baz', 'bam')
-      client = stub('Patron::Session', :headers => headers)
-      api = Kookaburra::APIDriver.new(:http_client => client)
+      client.stub!(:headers => headers)
       api.headers = {'Foo' => 'bar', 'Baz' => 'bam'}
     end
   end
 
   describe '#post' do
-    it 'delegates posting to the http client' do
-      client = mock('Patron::Session')
+    before(:each) do
+      response.stub!(:status => 201)
+    end
+
+    it 'delegates to the http client' do
       client.should_receive(:post).with('/foo', 'bar', {}) \
-        .and_return(stub(:status => 201, :body => ''))
-      api = Kookaburra::APIDriver.new(:http_client => client)
+        .and_return(response)
       api.post('/foo', 'bar')
     end
 
-    it 'returns the response body of the post' do
-      response = stub('Patron::Response', :body => 'foo', :status => 201)
-      client = stub('Patron::Session', :post => response)
-      api = Kookaburra::APIDriver.new(:http_client => client)
+    it 'returns the response body' do
       api.post('/foo', 'bar').should == 'foo'
     end
 
     it 'does not raise an UnexpectedResponse if the response status matches the specified expectation' do
-      response = stub('Patron::Response', :status => 666, :body => '')
-      client = stub('Patron::Session', :post => response)
-      api = Kookaburra::APIDriver.new(:http_client => client)
+      response.stub!(:status => 666)
       lambda { api.post('/foo', 'bar', :expected_response_status => 666) } \
         .should_not raise_error
     end
 
     it 'raises an UnexpectedResponse if the response status is not the specified status' do
-      response = stub('Patron::Response', :status => 555, :body => 'foo')
-      client = stub('Patron::Session', :post => response)
-      api = Kookaburra::APIDriver.new(:http_client => client)
       lambda { api.post('/foo', 'bar', :expected_response_status => 666) } \
         .should raise_error(Kookaburra::UnexpectedResponse,
-                            "POST to /foo responded with 555 status, not 666 as expected\n\nfoo")
+                            "POST to /foo responded with 201 status, not 666 as expected\n\nfoo")
+    end
+  end
+
+  describe '#get' do
+    it 'delegates to the http client' do
+      client.should_receive(:get).with('/foo', {}) \
+        .and_return(response)
+      api.get('/foo')
     end
 
-    it 'defaults the expected response status to 201' do
-      response = stub('Patron::Response', :status => 201, :body => '')
-      client = stub('Patron::Session', :post => response)
-      api = Kookaburra::APIDriver.new(:http_client => client)
-      lambda { api.post('/foo', 'bar') } \
+    it 'returns the response body' do
+      api.get('/foo').should == 'foo'
+    end
+
+    it 'does not raise an UnexpectedResponse if the response status matches the specified expectation' do
+      response.stub!(:status => 666)
+      lambda { api.get('/foo', :expected_response_status => 666) } \
         .should_not raise_error
+    end
+
+    it 'raises an UnexpectedResponse if the response status is not the specified status' do
+      lambda { api.get('/foo', :expected_response_status => 666) } \
+        .should raise_error(Kookaburra::UnexpectedResponse,
+                            "GET to /foo responded with 200 status, not 666 as expected\n\nfoo")
     end
   end
 end
