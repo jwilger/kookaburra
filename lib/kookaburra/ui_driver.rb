@@ -72,8 +72,6 @@ class Kookaburra
 
     protected
 
-    attr_reader :browser
-
     # @attribute [r] test_data
     dependency_accessor :test_data
   end
