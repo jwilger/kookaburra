@@ -1,11 +1,181 @@
 require 'kookaburra'
 require 'capybara'
 require 'sinatra/base'
+require 'kookaburra/json_api_driver'
+require 'active_support/json'
+require 'active_support/hash_with_indifferent_access'
 
 describe "testing a Rack application with Kookaburra" do
   describe "with an HTML interface" do
     describe "with a JSON API" do
-      require 'kookaburra/json_api_driver'
+      # This is the fixture Rack application against which the integration
+      # test will run. It uses class variables to persist data, because
+      # Sinatra will instantiate a new instance of TestRackApp for each
+      # request.
+      class JsonApiApp < Sinatra::Base
+        enable :sessions
+        disable :show_exceptions
+
+        def parse_json_req_body
+          request.body.rewind
+          ActiveSupport::JSON.decode(request.body.read).symbolize_keys
+        end
+
+        post '/users' do
+          user_data = parse_json_req_body
+          @@users ||= {}
+          @@users[user_data[:email]] = user_data
+          status 201
+          headers 'Content-Type' => 'application/json'
+          body user_data.to_json
+        end
+
+        post '/session' do
+          user = @@users[params[:email]]
+          if user && user[:password] == params[:password]
+            session[:logged_in] = true
+            status 200
+            body 'You are logged in!'
+          else
+            session[:logged_in] = false
+            status 403
+            body 'Log in failed!'
+          end
+        end
+
+        get '/session/new' do
+          body <<-EOF
+            <html>
+              <head>
+                <title>Sign In</title>
+              </head>
+              <body>
+                <div id="sign_in_screen">
+                  <form action="/session" method="POST">
+                    <label for="email">Email:</label>
+                    <input id="email" name="email" type="text" />
+
+                    <label for="password">Password:</label>
+                    <input id="password" name="password" type="password" />
+
+                    <input type="submit" value="Sign In" />
+                  </form>
+                </div>
+              </body>
+            </html>
+          EOF
+        end
+
+        post '/widgets/:widget_id' do
+          @@widgets.delete_if do |w|
+            w[:id] == params['widget_id']
+          end
+          redirect to('/widgets')
+        end
+
+        get '/widgets/new' do
+          body <<-EOF
+            <html>
+              <head>
+                <title>New Widget</title>
+              </head>
+              <body>
+                <div id="widget_form">
+                  <form action="/widgets" method="POST">
+                    <label for="name">Name:</label>
+                    <input id="name" name="name" type="text" />
+
+                    <input type="submit" value="Save" />
+                  </form>
+                </div>
+              </body>
+            </html>
+          EOF
+        end
+
+        post '/widgets' do
+          @@widgets ||= []
+          widget_data = if request.media_type == 'application/json'
+                          parse_json_req_body
+                        else
+                          params.symbolize_keys.slice(:name)
+                        end
+          widget_data[:id] = `uuidgen`.strip
+          @@widgets << widget_data
+          @@last_widget_created = widget_data
+          if request.accept? 'text/html'
+            redirect to('/widgets')
+          elsif request.accept? 'application/json'
+            status 201
+            headers 'Content-Type' => 'application/json'
+            body widget_data.to_json
+          else
+            redirect to('/widgets')
+          end
+        end
+
+        get '/widgets' do
+          raise "Not logged in!" unless session[:logged_in]
+          @@widgets ||= []
+          last_widget_created, @@last_widget_created = @@last_widget_created, nil
+          content = ''
+          content << <<-EOF
+          <html>
+            <head>
+              <title>Widgets</title>
+            </head>
+            <body>
+              <div id="widget_list">
+          EOF
+          if last_widget_created
+            content << <<-EOF
+                  <div class="last_widget created">
+                    <span class="id">#{last_widget_created[:id]}</span>
+                    <span class="name">#{last_widget_created[:name]}</span>
+                  </div>
+            EOF
+          end
+          content << <<-EOF
+                <ul>
+          EOF
+          @@widgets.each do |w|
+            content << <<-EOF
+                  <li class="widget_summary">
+                    <span class="id">#{w[:id]}</span>
+                    <span class="name">#{w[:name]}</span>
+                    <form id="delete_#{w[:id]}" action="/widgets/#{w[:id]}" method="POST">
+                      <button type="submit" value="Delete" />
+                    </form>
+                  </li>
+            EOF
+          end
+          content << <<-EOF
+                </ul>
+                <a href="/widgets/new">New Widget</a>
+              </div>
+            </body>
+          </html>
+          EOF
+          body content
+        end
+
+        error do
+          e = request.env['sinatra.error']
+          body << <<-EOF
+          <html>
+            <head>
+              <title>Internal Server Error</title>
+            </head>
+            <body>
+              <pre>
+          #{e.to_s}\n#{e.backtrace.join("\n")}
+              </pre>
+            </body>
+          </html>
+          EOF
+        end
+      end
+
       class MyAPIDriver < Kookaburra::JsonApiDriver
         def create_user(user_data)
           post '/users', user_data
@@ -123,11 +293,22 @@ describe "testing a Rack application with Kookaburra" do
       end
 
       before(:all) do
-        `rake rackup:json_api_app:start`
+        @rack_server_port = 3339
+        @rack_server_pid = fork do
+          Rack::Server.start(
+            :app => JsonApiApp.new,
+            :server => :webrick,
+            :Host => '127.0.0.1',
+            :Port => @rack_server_port,
+            :environment => 'production'
+          )
+        end
+        sleep 1 # Give the server a chance to start up.
       end
 
       after(:all) do
-        `rake rackup:json_api_app:stop`
+        Process.kill(9, @rack_server_pid)
+        Process.wait
       end
 
       it "runs the tests against the app" do
@@ -138,7 +319,7 @@ describe "testing a Rack application with Kookaburra" do
         k = Kookaburra.new({
           :ui_driver_class        => MyUIDriver,
           :given_driver_class     => MyGivenDriver,
-          :app_host               => 'http://127.0.0.1:4567',
+          :app_host               => 'http://127.0.0.1:%d' % @rack_server_port,
           :browser                => Capybara::Session.new(:selenium),
           :server_error_detection => server_error_detection
         })
