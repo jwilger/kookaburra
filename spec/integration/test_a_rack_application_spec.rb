@@ -1,7 +1,9 @@
 require 'kookaburra'
-require 'capybara'
-require 'sinatra/base'
 require 'kookaburra/json_api_driver'
+require 'capybara'
+
+# These are required for the Rack app used for testing
+require 'sinatra/base'
 require 'active_support/json'
 require 'active_support/hash_with_indifferent_access'
 
