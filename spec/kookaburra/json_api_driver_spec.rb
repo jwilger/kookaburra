@@ -5,7 +5,7 @@ describe Kookaburra::JsonApiDriver do
 
   let(:api) {
     stub('APIDriver', :get => response, :post => response, :put => response,
-         :delete => response, :headers= => nil)
+         :delete => response, :headers => {})
   }
 
   let(:json) { Kookaburra::JsonApiDriver.new(:api_driver => api) }
@@ -22,10 +22,11 @@ describe Kookaburra::JsonApiDriver do
     end
 
     it 'sets appropriate headers for a JSON API request' do
-      api = mock('APIDriver')
-      api.should_receive(:headers=).with('Content-Type' => 'application/json',
-                                         'Accept' => 'application/json')
       Kookaburra::JsonApiDriver.new(:api_driver => api)
+      api.headers.should == {
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json'
+      }
     end
   end
 

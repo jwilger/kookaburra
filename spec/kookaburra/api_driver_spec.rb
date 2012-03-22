@@ -24,16 +24,6 @@ describe Kookaburra::APIDriver do
     end
   end
 
-  describe '#headers=' do
-    it 'sets each header on the client session' do
-      headers = mock('Hash')
-      headers.should_receive(:[]=).with('Foo', 'bar')
-      headers.should_receive(:[]=).with('Baz', 'bam')
-      client.stub!(:headers => headers)
-      api.headers = {'Foo' => 'bar', 'Baz' => 'bam'}
-    end
-  end
-
   describe '#post' do
     before(:each) do
       response.stub!(:status => 201)
