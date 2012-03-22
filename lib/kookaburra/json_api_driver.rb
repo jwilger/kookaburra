@@ -20,5 +20,11 @@ class Kookaburra
       output = super(path, encoded_input, *args)
       J.decode(output)
     end
+
+    def put(path, data, *args)
+      encoded_input = J.encode(data)
+      output = super(path, encoded_input, *args)
+      J.decode(output)
+    end
   end
 end

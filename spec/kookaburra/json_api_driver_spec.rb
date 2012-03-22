@@ -29,14 +29,14 @@ describe Kookaburra::JsonApiDriver do
     end
   end
 
-  describe '#post' do
-    it 'delegates to a Kookaburra::APIDriver by default' do
-      delegate = stub('Kookaburra::APIDriver', :foo => :bar).as_null_object
-      Kookaburra::APIDriver.should_receive(:new).once.and_return(delegate)
-      json = Kookaburra::JsonApiDriver.new
-      json.foo.should == :bar
-    end
+  it 'delegates to a Kookaburra::APIDriver by default' do
+    delegate = stub('Kookaburra::APIDriver', :foo => :bar).as_null_object
+    Kookaburra::APIDriver.should_receive(:new).once.and_return(delegate)
+    json = Kookaburra::JsonApiDriver.new
+    json.foo.should == :bar
+  end
 
+  describe '#post' do
     it 'delegates to the api driver as a JSON request' do
       api.should_receive(:post) \
         .with('/foo', '{"foo":"bar"}') \
@@ -46,6 +46,19 @@ describe Kookaburra::JsonApiDriver do
 
     it 'returns the JSON-decoded response body' do
       json.post('/foo', 'bar').should == {'foo' => 'bar'}
+    end
+  end
+
+  describe '#put' do
+    it 'delegates to the api driver as a JSON request' do
+      api.should_receive(:put) \
+        .with('/foo', '{"foo":"bar"}') \
+        .and_return('{"baz":"bam"}')
+      json.put('/foo', 'foo' => 'bar')
+    end
+
+    it 'returns the JSON-decoded response body' do
+      json.put('/foo', 'bar').should == {'foo' => 'bar'}
     end
   end
 end
