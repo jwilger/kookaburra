@@ -74,4 +74,17 @@ describe Kookaburra::JsonApiDriver do
       json.get('/foo').should == {'foo' => 'bar'}
     end
   end
+
+  describe '#delete' do
+    it 'delegates to the api driver as a JSON request' do
+      api.should_receive(:delete) \
+        .with('/foo') \
+        .and_return('{"baz":"bam"}')
+      json.delete('/foo')
+    end
+
+    it 'returns the JSON-decoded response body' do
+      json.delete('/foo').should == {'foo' => 'bar'}
+    end
+  end
 end

@@ -31,5 +31,10 @@ class Kookaburra
       output = super
       J.decode(output)
     end
+
+    def delete(*args)
+      output = super
+      J.decode(output)
+    end
   end
 end
