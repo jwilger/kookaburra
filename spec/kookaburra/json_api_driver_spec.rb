@@ -21,7 +21,7 @@ describe Kookaburra::JsonApiDriver do
   end
 
   describe '#post' do
-    it 'uses that api driver with which the object was initialized' do
+    it 'uses the api driver with which the object was initialized' do
       api = stub('APIDriver', :post => '{"foo":"bar"}', :headers= => nil)
       Kookaburra::APIDriver.should_receive(:new).once.and_return(api)
       json = Kookaburra::JsonApiDriver.new
