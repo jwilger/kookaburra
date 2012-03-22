@@ -59,20 +59,20 @@ class Kookaburra
     #
     # @option options [Object] browser Most likely a `Capybara::Session`
     #   instance.
-    # @option options [Kookaburra::TestData] test_data
+    # @option options [Kookaburra::MentalModel] mental_model
     # @option options [Proc] server_error_detection A lambda that is passed the
     #   `browser` object and should return `true` if the page indicates a server
     #   error has occured
     def initialize(options = {})
       @browser = options[:browser]
       @app_host = options[:app_host]
-      @test_data = options[:test_data]
+      @mental_model = options[:mental_model]
       @server_error_detection = options[:server_error_detection]
     end
 
     protected
 
-    # @attribute [r] test_data
-    dependency_accessor :test_data
+    # @attribute [r] mental_model
+    dependency_accessor :mental_model
   end
 end

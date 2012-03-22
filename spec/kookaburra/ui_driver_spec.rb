@@ -23,6 +23,6 @@ describe Kookaburra::UIDriver do
   describe 'dependency accessors' do
     let(:subject_class) { Kookaburra::UIDriver }
 
-    it_behaves_like :it_has_a_dependency_accessor, :test_data
+    it_behaves_like :it_has_a_dependency_accessor, :mental_model
   end
 end
