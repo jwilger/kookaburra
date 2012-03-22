@@ -6,10 +6,10 @@ class Kookaburra
   class JsonApiDriver < SimpleDelegator
     def initialize(options = {})
       api_driver = options[:api_driver] || APIDriver.new(:app_host => options[:app_host])
-      api_driver.headers = {
+      api_driver.headers.merge!(
         'Content-Type' => 'application/json',
         'Accept' => 'application/json'
-      }
+      )
       super(api_driver)
     end
 

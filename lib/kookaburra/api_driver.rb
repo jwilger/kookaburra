@@ -18,14 +18,6 @@ class Kookaburra
       super(http_client)
     end
 
-    # Sets headers that should be present on each request for the lifetime of
-    # this object.
-    def headers=(new_headers)
-      new_headers.each do |k,v|
-        headers[k] = v
-      end
-    end
-
     # Makes a POST request via the `:http_client`
     #
     # @param [String] path The path to request (e.g. "/foo")
