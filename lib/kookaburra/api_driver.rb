@@ -17,27 +17,40 @@ class Kookaburra
     end
 
     def post(path, data, options = {})
-      expected_status = options[:expected_response_status] || 201
-      response = super
-      if response.status == expected_status
-        response.body
-      else
-        raise UnexpectedResponse, "POST to #{path} responded with " \
+      request(:post, path, options, data)
+    end
+
+    def get(path, options = {})
+      request(:get, path, options)
+    end
+
+    private
+
+    def request(type, path, options = {}, data = nil)
+      # don't send a data argument if it's not passed in, because some methods
+      # on target object may not have the proper arity (i.e. #get and #delete).
+      args = [type, path, data, options].compact
+      response = __getobj__.send(*args)
+
+      check_response_status!(type, response, options)
+      response.body
+    end
+
+    def check_response_status!(request_type, response, options)
+      verb, default_status = verb_map[request_type]
+      expected_status = options[:expected_response_status] || default_status
+      unless expected_status == response.status
+        raise UnexpectedResponse, "#{verb} to #{response.url} responded with " \
           + "#{response.status} status, not #{expected_status} as expected\n\n" \
           + response.body
       end
     end
 
-    def get(path, options = {})
-      expected_status = options[:expected_response_status] || 200
-      response = super
-      if response.status == expected_status
-        response.body
-      else
-        raise UnexpectedResponse, "GET to #{path} responded with " \
-          + "#{response.status} status, not #{expected_status} as expected\n\n" \
-          + response.body
-      end
+    def verb_map 
+      {
+        :get => ['GET', 200],
+        :post => ['POST', 201]
+      }
     end
   end
 end
