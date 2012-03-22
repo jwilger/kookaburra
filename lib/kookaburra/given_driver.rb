@@ -7,12 +7,17 @@ class Kookaburra
   # comprised of several distinct API calls as well as access to Kookaburra's
   # test data store.
   #
-  # @abstract Subclass and implement your Given DSL
+  # @abstract Subclass and implement your Given DSL. You must also provide an
+  #   implementation of #api that returns an instance of your APIDriver.
   #
   # @example GivenDriver subclass
   #   module MyApp
   #     module Kookaburra
   #       class GivenDriver < ::Kookaburra::GivenDriver
+  #         def api
+  #           @api ||= APIDriver.new(:app_host => initialization_options[:app_host])
+  #         end
+  #
   #         def a_widget(name, attributes = {})
   #           # Set up the data that will be passed to the API by merging any
   #           # passed attributes into the default data.
@@ -34,7 +39,10 @@ class Kookaburra
     # It is unlikely that you would call #initialize yourself; your GivenDriver
     # object is instantiated for you by {Kookaburra#given}.
     #
-    # @option options [Kookaburra::MentalModel] the test data store
+    # @option options [Kookaburra::MentalModel] :mental_model the MentalModel
+    #   instance used by your tests
+    # @option options [String] :app_host The root URL of your running
+    #   application (e.g. "http://my_app.example.com:12345")
     def initialize(options = {})
       @initialization_options = options
       @mental_model = options[:mental_model]
@@ -42,6 +50,10 @@ class Kookaburra
 
     protected
 
+    # The full set of options passed in to {#initialize}
+    #
+    # Access is provided so that you can use these when instantiating your
+    # {APIDriver} in your {#api} implementation.
     attr_reader :initialization_options
 
     # A reference to the {Kookaburra::MentalModel} object that this GivenDriver
