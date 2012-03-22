@@ -33,8 +33,15 @@ class Kookaburra
   #   application's subclass of {Kookaburra::GivenDriver}
   # @option options [Class] :ui_driver_class Your application's
   #   subclass of {Kookaburra::UIDriver}
-  # @option options [Capybara::Session] :browser (optional) The browser driver
+  # @option options [Capybara::Session] :browser The browser driver
   #   that Kookaburra will interact with to run the tests.
+  # @option options [String] :app_host The URL of your running application
+  #   server against which the tests will be run (e.g.
+  #   "http://my_app.example.com:12345")
+  # @option options [Proc] :server_error_detection A proc that will receive the
+  #   object passed in to the :browser option as an argument and must return
+  #   `true` if the server responded with an unexpected error or `false` if it
+  #   did not.
   def initialize(options = {})
     @given_driver_class     = options[:given_driver_class]
     @ui_driver_class        = options[:ui_driver_class]
@@ -44,8 +51,7 @@ class Kookaburra
   end
 
   # Returns an instance of your GivenDriver class configured to share test
-  # fixture data with the UIDriver and to use your APIDriver class to
-  # communicate with your application
+  # fixture data with the UIDriver
   #
   # @return [Kookaburra::GivenDriver]
   def given
@@ -64,13 +70,13 @@ class Kookaburra
                         :server_error_detection => @server_error_detection)
   end
 
-  # Returns a frozen copy of the specified test fixture data collection.
+  # Returns a frozen copy of the specified {MentalModel::Collection}.
   # However, this is neither a deep copy nor a deep freeze, so it is possible
   # that you could modify data outside of your GivenDriver or UIDriver. Just
   # don't do that. Trust me.
   #
-  # This access is provided so that you can reference the current fixture data
-  # within your test implementation in order to make assertions about the state
+  # This access is provided so that you can reference the current mental model
+  # within your test implementation and make assertions about the state
   # of your application's interface.
   #
   # @example
