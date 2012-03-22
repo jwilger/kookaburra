@@ -16,25 +16,35 @@ class Kookaburra
     end
 
     def post(path, data, *args)
-      encoded_input = J.encode(data)
-      output = super(path, encoded_input, *args)
-      J.decode(output)
+      request(:post, path, data, *args)
     end
 
     def put(path, data, *args)
-      encoded_input = J.encode(data)
-      output = super(path, encoded_input, *args)
-      J.decode(output)
+      request(:put, path, data, *args)
     end
 
-    def get(*args)
-      output = super
-      J.decode(output)
+    def get(path, *args)
+      request(:get, path, nil, *args)
     end
 
-    def delete(*args)
-      output = super
-      J.decode(output)
+    def delete(path, *args)
+      request(:delete, path, nil, *args)
+    end
+
+    private
+
+    def request(type, path, data = nil, *args)
+      args = [path, encode(data), args].flatten.compact
+      output = __getobj__.send(type, *args)
+      decode(output)
+    end
+
+    def encode(data)
+      ActiveSupport::JSON.encode(data) unless data.nil?
+    end
+
+    def decode(data)
+      ActiveSupport::JSON.decode(data)
     end
   end
 end
