@@ -4,8 +4,6 @@ require 'active_support/json'
 
 class Kookaburra
   class JsonApiDriver < SimpleDelegator
-    J = ActiveSupport::JSON
-
     def initialize(options = {})
       api_driver = options[:api_driver] || APIDriver.new(:app_host => options[:app_host])
       api_driver.headers = {
