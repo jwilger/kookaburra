@@ -280,25 +280,25 @@ tasks that a user can accomplish with the application.
 
 #### Test Data ####
 
-`Kookaburra::TestData` is the component via which the `GivenDriver` and the
+`Kookaburra::MentalModel` is the component via which the `GivenDriver` and the
 `UIDriver` share information. For instance, if you create a user account via the
 `GivenDriver`, you would store the login credentials for that account in the
-`TestData` instance, so the `UIDriver` knows what to use when you tell it to
+`MentalModel` instance, so the `UIDriver` knows what to use when you tell it to
 `#sign_in`. This is what allows the Cucumber step definitions to remain free
 from explicitly shared state.
 
 Kookaburra automatically configures your `GivenDriver` and your `UIDriver` to share
-a `TestData` instance, which is available to both of them via their `#test_data`
+a `MentalModel` instance, which is available to both of them via their `#test_data`
 method.
 
-The `TestData` instance will return a `TestData::Collection` for any method
-called on the object. The `TestData::Collection` object behaves like a `Hash`
+The `MentalModel` instance will return a `TestData::Collection` for any method
+called on the object. The `MentalModel::Collection` object behaves like a `Hash`
 for the most part, however it will raise a `Kookaburra::UnknownKeyError` if you
 try to access a key that has not yet been assigned a value.
 
-Here's a quick example of TestData behavor:
+Here's a quick example of MentalModel behavor:
 
-    test_data = TestData.new
+    test_data = MentalModel.new
 
     test_data.widgets[:widget_a] = {'name' => 'Widget A'}
 
@@ -352,7 +352,7 @@ for your application:
         result = api.create_account(account_data)
 
         # merge in the password, since API (hopefully!) doesn't return it, and
-        # store details in the TestData instance
+        # store details in the MentalModel instance
         result.merge!('password' => account_data['password'])
         test_data.accounts[nickname] = account_details
       end

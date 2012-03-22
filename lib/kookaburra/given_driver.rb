@@ -21,9 +21,9 @@ class Kookaburra
   #           # Call the API method and get the resulting response as Ruby data.
   #           result = api.create_widget(data)
   #
-  #           # Store the resulting widget data in the TestData object, so that
+  #           # Store the resulting widget data in the MentalModel object, so that
   #           # it can be referenced in other operations.
-  #           test_data.widgets[name] = result
+  #           mental_model.widgets[name] = result
   #         end
   #       end
   #     end
@@ -34,21 +34,21 @@ class Kookaburra
     # It is unlikely that you would call #initialize yourself; your GivenDriver
     # object is instantiated for you by {Kookaburra#given}.
     #
-    # @option options [Kookaburra::TestData] the test data store
+    # @option options [Kookaburra::MentalModel] the test data store
     def initialize(options = {})
       @initialization_options = options
-      @test_data = options[:test_data]
+      @mental_model = options[:mental_model]
     end
 
     protected
 
     attr_reader :initialization_options
 
-    # A reference to the {Kookaburra::TestData} object that this GivenDriver
+    # A reference to the {Kookaburra::MentalModel} object that this GivenDriver
     # instance was created with.
     #
     # @attribute [r]
-    # @return [Kookaburra::TestData]
-    dependency_accessor :test_data
+    # @return [Kookaburra::MentalModel]
+    dependency_accessor :mental_model
   end
 end

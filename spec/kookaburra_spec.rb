@@ -5,7 +5,7 @@ describe Kookaburra do
     it 'returns an instance of the configured GivenDriver' do
       my_given_driver_class = mock(Class)
       my_given_driver_class.should_receive(:new) do |options|
-        options[:test_data].should be_kind_of(Kookaburra::TestData)
+        options[:mental_model].should be_kind_of(Kookaburra::MentalModel)
         :a_given_driver
       end
 
@@ -33,8 +33,8 @@ describe Kookaburra do
     it 'returns a equivalent copy of the test data collection specified' do
       k = Kookaburra.new
       foos = {:spam => 'ham'}
-      test_data = stub(:foos => foos)
-      k.stub!(:test_data => test_data)
+      mental_model = stub(:foos => foos)
+      k.stub!(:mental_model => mental_model)
       k.get_data(:foos).should == foos
     end
 

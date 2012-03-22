@@ -1,9 +1,9 @@
-require 'kookaburra/test_data'
+require 'kookaburra/mental_model'
 
-describe Kookaburra::TestData do
+describe Kookaburra::MentalModel do
   describe '#method_missing' do
     it 'returns a Collection' do
-      subject.foo.should be_kind_of(Kookaburra::TestData::Collection)
+      subject.foo.should be_kind_of(Kookaburra::MentalModel::Collection)
     end
 
     it 'returns different Collections for different messages' do
@@ -11,8 +11,8 @@ describe Kookaburra::TestData do
     end
   end
 
-  describe Kookaburra::TestData::Collection do
-    let(:collection) { Kookaburra::TestData::Collection.new('widgets') }
+  describe Kookaburra::MentalModel::Collection do
+    let(:collection) { Kookaburra::MentalModel::Collection.new('widgets') }
 
     describe '#slice' do
       it 'returns an array of items matching the specified keys' do
@@ -25,7 +25,7 @@ describe Kookaburra::TestData do
 
     it 'raises a Kookaburra::UnknownKeyError exception for #[] with a missing key' do
       lambda { collection[:foo] }.should \
-        raise_error(Kookaburra::UnknownKeyError, "Can't find test_data.widgets[:foo]. Did you forget to set it?")
+        raise_error(Kookaburra::UnknownKeyError, "Can't find mental_model.widgets[:foo]. Did you forget to set it?")
     end
   end
 end

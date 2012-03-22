@@ -1,5 +1,5 @@
 require 'kookaburra/exceptions'
-require 'kookaburra/test_data'
+require 'kookaburra/mental_model'
 require 'kookaburra/given_driver'
 require 'kookaburra/ui_driver'
 
@@ -49,7 +49,7 @@ class Kookaburra
   #
   # @return [Kookaburra::GivenDriver]
   def given
-    given_driver_class.new(:test_data => test_data, :app_host => @app_host)
+    given_driver_class.new(:mental_model => mental_model, :app_host => @app_host)
   end
 
   # Returns an instance of your UIDriver class configured to share test fixture
@@ -58,7 +58,7 @@ class Kookaburra
   #
   # @return [Kookaburra::UIDriver]
   def ui
-    ui_driver_class.new(:test_data => test_data,
+    ui_driver_class.new(:mental_model => mental_model,
                         :browser => browser,
                         :app_host => @app_host,
                         :server_error_detection => @server_error_detection)
@@ -78,9 +78,9 @@ class Kookaburra
   #   ui.create_a_new_widget(:bar)
   #   ui.widget_list.widgets.should == k.get_data(:widgets).slice(:foo, :bar)
   #
-  # @return [Kookaburra::TestData::Collection]
+  # @return [Kookaburra::MentalModel::Collection]
   def get_data(collection_name)
-    test_data.send(collection_name).dup.freeze
+    mental_model.send(collection_name).dup.freeze
   end
 
   private
@@ -88,8 +88,8 @@ class Kookaburra
   extend DependencyAccessor
   dependency_accessor :given_driver_class, :ui_driver_class
 
-  def test_data
-    @test_data ||= TestData.new
+  def mental_model
+    @mental_model ||= MentalModel.new
   end
 
   def browser

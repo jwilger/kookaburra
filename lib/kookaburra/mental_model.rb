@@ -1,37 +1,37 @@
 require 'delegate'
 
 class Kookaburra
-  # Each instance of {Kookaburra} has its own instance of TestData. This object
+  # Each instance of {Kookaburra} has its own instance of MentalModel. This object
   # is used to maintain a shared understanding of the application state between
   # your {GivenDriver} and your {UIDriver}. You can access the various test data
   # collections in your test implementations via {Kookaburra#get_data}.
-  class TestData
+  class MentalModel
     def initialize
       @data = {}
     end
 
-    # TestData instances will respond to any message that has an arity of 0 by
-    # returning either a new or existing {TestData::Collection} having the name
+    # MentalModel instances will respond to any message that has an arity of 0 by
+    # returning either a new or existing {MentalModel::Collection} having the name
     # of the method.
     def method_missing(name, *args)
       return super unless args.empty?
       @data[name] ||= Collection.new(name)
     end
 
-    # TestData instances respond to everything.
+    # MentalModel instances respond to everything.
     #
     # @see #method_missing
     def respond_to?
       true
     end
 
-    # A TestData::Collection behaves much like a `Hash` object, with the
+    # A MentalModel::Collection behaves much like a `Hash` object, with the
     # exception that it will raise an {UnknownKeyError} rather than return nil
     # if you attempt to access a key that has not been set. The exception
     # attempts to provide a more helpful error message.
     #
     # @example
-    #   widgets = Kookaburra::TestData::Collection.new('widgets')
+    #   widgets = Kookaburra::MentalModel::Collection.new('widgets')
     #
     #   widgets[:foo] = :a_foo
     #   
@@ -39,14 +39,14 @@ class Kookaburra
     #   #=> :a_foo
     #
     #   # Raises an UnknownKeyError
-    #   test_data.widgets[:bar]
+    #   mental_model.widgets[:bar]
     class Collection < SimpleDelegator
       # @param [String] name The name of the collection. Used to provide
       #   helpful error messages when unknown keys are accessed.
       def initialize(name)
         @name = name
         data = Hash.new do |hash, key|
-          raise UnknownKeyError, "Can't find test_data.#{@name}[#{key.inspect}]. Did you forget to set it?"
+          raise UnknownKeyError, "Can't find mental_model.#{@name}[#{key.inspect}]. Did you forget to set it?"
         end
         super(data)
       end

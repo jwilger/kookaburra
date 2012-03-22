@@ -196,13 +196,13 @@ describe "testing a Rack application with Kookaburra" do
         def a_user(name)
           user = {'email' => 'bob@example.com', 'password' => '12345'}
           result = api.create_user(user)
-          test_data.users[name] = result
+          mental_model.users[name] = result
         end
 
         def a_widget(name, attributes = {})
           widget = {'name' => 'Foo'}.merge(attributes)
           result = api.create_widget(widget)
-          test_data.widgets[name] = result
+          mental_model.widgets[name] = result
         end
       end
 
@@ -278,19 +278,19 @@ describe "testing a Rack application with Kookaburra" do
 
         def sign_in(name)
           sign_in_screen.show
-          sign_in_screen.sign_in(test_data.users[name])
+          sign_in_screen.sign_in(mental_model.users[name])
         end
 
         def create_new_widget(name, attributes = {})
           widget_list.show
           widget_list.choose_to_create_new_widget
           widget_form.submit('name' => 'My Widget')
-          test_data.widgets[name] = widget_list.last_widget_created
+          mental_model.widgets[name] = widget_list.last_widget_created
         end
 
         def delete_widget(name)
           widget_list.show
-          widget_list.choose_to_delete_widget(test_data.widgets[name])
+          widget_list.choose_to_delete_widget(mental_model.widgets[name])
         end
       end
 
