@@ -62,6 +62,30 @@ describe Kookaburra::APIDriver do
     end
   end
 
+  describe '#put' do
+    it 'delegates to the http client' do
+      client.should_receive(:put).with('/foo', 'bar', {}) \
+        .and_return(response)
+      api.put('/foo', 'bar')
+    end
+
+    it 'returns the response body' do
+      api.put('/foo', 'bar').should == 'foo'
+    end
+
+    it 'does not raise an UnexpectedResponse if the response status matches the specified expectation' do
+      response.stub!(:status => 666)
+      lambda { api.put('/foo', 'bar', :expected_response_status => 666) } \
+        .should_not raise_error
+    end
+
+    it 'raises an UnexpectedResponse if the response status is not the specified status' do
+      lambda { api.put('/foo', 'bar', :expected_response_status => 666) } \
+        .should raise_error(Kookaburra::UnexpectedResponse,
+                            "PUT to /foo responded with 200 status, not 666 as expected\n\nfoo")
+    end
+  end
+
   describe '#get' do
     it 'delegates to the http client' do
       client.should_receive(:get).with('/foo', {}) \
