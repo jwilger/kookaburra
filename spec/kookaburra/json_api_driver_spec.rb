@@ -1,6 +1,15 @@
 require 'kookaburra/json_api_driver'
 
 describe Kookaburra::JsonApiDriver do
+  let(:response) { '{"foo":"bar"}' }
+
+  let(:api) {
+    stub('APIDriver', :get => response, :post => response, :put => response,
+         :delete => response, :headers= => nil)
+  }
+
+  let(:json) { Kookaburra::JsonApiDriver.new(:api_driver => api) }
+
   describe '#initialize' do
     it 'instantiates a new APIDriver if no :api_driver option is passed' do
       Kookaburra::APIDriver.should_receive(:new).and_return(stub.as_null_object)
@@ -21,25 +30,21 @@ describe Kookaburra::JsonApiDriver do
   end
 
   describe '#post' do
-    it 'uses the api driver with which the object was initialized' do
-      api = stub('APIDriver', :post => '{"foo":"bar"}', :headers= => nil)
-      Kookaburra::APIDriver.should_receive(:new).once.and_return(api)
+    it 'delegates to a Kookaburra::APIDriver by default' do
+      delegate = stub('Kookaburra::APIDriver', :foo => :bar).as_null_object
+      Kookaburra::APIDriver.should_receive(:new).once.and_return(delegate)
       json = Kookaburra::JsonApiDriver.new
-      json.post('/foo', 'bar')
+      json.foo.should == :bar
     end
 
     it 'delegates to the api driver as a JSON request' do
-      api = mock('APIDriver', :headers= => nil)
       api.should_receive(:post) \
         .with('/foo', '{"foo":"bar"}') \
         .and_return('{"baz":"bam"}')
-      json = Kookaburra::JsonApiDriver.new(:api_driver => api)
       json.post('/foo', 'foo' => 'bar')
     end
 
     it 'returns the JSON-decoded response body' do
-      api = stub('APIDriver', :post => '{"foo":"bar"}', :headers= => nil)
-      json = Kookaburra::JsonApiDriver.new(:api_driver => api)
       json.post('/foo', 'bar').should == {'foo' => 'bar'}
     end
   end
