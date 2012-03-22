@@ -85,4 +85,28 @@ describe Kookaburra::APIDriver do
                             "GET to /foo responded with 200 status, not 666 as expected\n\nfoo")
     end
   end
+
+  describe '#delete' do
+    it 'delegates to the http client' do
+      client.should_receive(:delete).with('/foo', {}) \
+        .and_return(response)
+      api.delete('/foo')
+    end
+
+    it 'returns the response body' do
+      api.delete('/foo').should == 'foo'
+    end
+
+    it 'does not raise an UnexpectedResponse if the response status matches the specified expectation' do
+      response.stub!(:status => 666)
+      lambda { api.delete('/foo', :expected_response_status => 666) } \
+        .should_not raise_error
+    end
+
+    it 'raises an UnexpectedResponse if the response status is not the specified status' do
+      lambda { api.delete('/foo', :expected_response_status => 666) } \
+        .should raise_error(Kookaburra::UnexpectedResponse,
+                            "DELETE to /foo responded with 200 status, not 666 as expected\n\nfoo")
+    end
+  end
 end

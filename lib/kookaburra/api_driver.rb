@@ -24,6 +24,10 @@ class Kookaburra
       request(:get, path, options)
     end
 
+    def delete(path, options = {})
+      request(:delete, path, options)
+    end
+
     private
 
     def request(type, path, options = {}, data = nil)
@@ -49,7 +53,8 @@ class Kookaburra
     def verb_map 
       {
         :get => ['GET', 200],
-        :post => ['POST', 201]
+        :post => ['POST', 201],
+        :delete => ['DELETE', 200]
       }
     end
   end
