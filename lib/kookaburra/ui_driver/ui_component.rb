@@ -70,9 +70,14 @@ class Kookaburra
       #
       # @see Kookaburra::UIDriver.ui_component
       #
-      # @option options [Object] :browser probably ought to be a
-      #   `Capybara::Session` instance
-      # @option options [Proc] :server_error_detection
+      # @option options [Capybara::Session] :browser This is the browser driver
+      #   that allows you to interact with the web application's interface.
+      # @option options [String] :app_host The root URL of your running
+      #   application (e.g. "http://my_app.example.com:12345")
+      # @option options [Proc] :server_error_detection A proc that will receive
+      #   the object passed in to the :browser option as an argument and must
+      #   return `true` if the server responded with an unexpected error or
+      #   `false` if it did not.
       def initialize(options = {})
         @browser = options[:browser]
         @app_host = options[:app_host]
@@ -95,7 +100,8 @@ class Kookaburra
       end
 
       # @private
-      # Behaves as you might expect given #method_missing
+      # (Not really private, but YARD seemingly lacks RDoc's :nodoc tag, and the
+      # semantics here don't differ from Object#respond_to?)
       def respond_to?(name)
         super || browser.respond_to?(name)
       end
@@ -158,16 +164,22 @@ class Kookaburra
 
       # @abstract
       # @return [String] the URL path that should be loaded in order to reach this component
+      # @raise [Kookaburra::ConfigurationError] raised if you haven't provided
+      #   an implementation
       def component_path
         raise ConfigurationError, "You must define #{self.class.name}#component_path."
       end
 
+      # Returns the full URL by appending {#component_path} to the value of the
+      # :app_host option passed to {#initialize}.
       def component_url(*args)
         "#{@app_host}#{component_path(*args)}"
       end
 
       # @abstract
       # @return [String] the CSS3 selector that will find the element in the DOM
+      # @raise [Kookaburra::ConfigurationError] raised if you haven't provided
+      #   an implementation
       def component_locator
         raise ConfigurationError, "You must define #{self.class.name}#component_locator."
       end
