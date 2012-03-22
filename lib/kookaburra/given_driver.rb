@@ -50,6 +50,16 @@ class Kookaburra
 
     protected
 
+    # Used to access your APIDriver in your own GivenDriver implementation
+    #
+    # @abstract
+    # @return [Kookaburra::APIDriver]
+    # @raise [Kookaburra::ConfigurationError] raised if you do not provide an
+    #   implementation.
+    def api
+      raise ConfigurationError, "You must implement #api in your subclass."
+    end
+
     # The full set of options passed in to {#initialize}
     #
     # Access is provided so that you can use these when instantiating your
