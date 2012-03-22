@@ -20,6 +20,10 @@ class Kookaburra
       request(:post, path, options, data)
     end
 
+    def put(path, data, options = {})
+      request(:put, path, options, data)
+    end
+
     def get(path, options = {})
       request(:get, path, options)
     end
@@ -54,6 +58,7 @@ class Kookaburra
       {
         :get => ['GET', 200],
         :post => ['POST', 201],
+        :put => ['PUT', 200],
         :delete => ['DELETE', 200]
       }
     end
