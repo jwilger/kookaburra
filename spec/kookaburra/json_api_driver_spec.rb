@@ -61,4 +61,17 @@ describe Kookaburra::JsonApiDriver do
       json.put('/foo', 'bar').should == {'foo' => 'bar'}
     end
   end
+
+  describe '#get' do
+    it 'delegates to the api driver as a JSON request' do
+      api.should_receive(:get) \
+        .with('/foo') \
+        .and_return('{"baz":"bam"}')
+      json.get('/foo')
+    end
+
+    it 'returns the JSON-decoded response body' do
+      json.get('/foo').should == {'foo' => 'bar'}
+    end
+  end
 end
