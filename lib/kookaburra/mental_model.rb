@@ -5,6 +5,12 @@ class Kookaburra
   # is used to maintain a shared understanding of the application state between
   # your {GivenDriver} and your {UIDriver}. You can access the various test data
   # collections in your test implementations via {Kookaburra#get_data}.
+  #
+  # The mental model is not intended to represent a copy of all of the data
+  # within your application. Rather it is meant to represent the mental image of
+  # the data that a user of your application might have while working with your
+  # system. Certainly you *can* store whatever you want in it, but thinking
+  # about it in these terms can help you design better, more robust tests.
   class MentalModel
     def initialize
       @data = {}
