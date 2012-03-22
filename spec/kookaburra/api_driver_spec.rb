@@ -1,8 +1,12 @@
 require 'kookaburra/api_driver'
 
 describe Kookaburra::APIDriver do
-  let(:response) { stub('Patron::Response', :body => 'foo', :status => 200) }
   let(:api) { Kookaburra::APIDriver.new(:http_client => client) }
+
+  let(:response) {
+    stub('Patron::Response', :body => 'foo', :status => 200, :url => '/foo')
+  }
+
   let(:client) {
          mock('Patron::Session', :post => response, :get => response,
          :put => response, :delete => response)
