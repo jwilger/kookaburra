@@ -9,14 +9,13 @@ class Kookaburra
   # @example RSpec setup
   #   # in 'spec/support/kookaburra_setup.rb'
   #   require 'kookaburra/test_helpers'
-  #   require 'my_app/kookaburra/api_driver'
   #   require 'my_app/kookaburra/given_driver'
   #   require 'my_app/kookaburra/ui_driver'
   #   
   #   Kookaburra.configuration = {
   #     :given_driver_class => MyApp::Kookaburra::GivenDriver,
-  #     :api_driver_class => MyApp::Kookaburra::APIDriver,
   #     :ui_driver_class => MyApp::Kookaburra::UIDriver,
+  #     :app_host => 'http://my_app.example.com:12345',
   #     :browser => Capybara,
   #     :server_error_detection => lambda { |browser|
   #       browser.has_css?('h1', text: 'Internal Server Error')
@@ -47,14 +46,13 @@ class Kookaburra
   # @example Cucumber setup
   #   # in 'features/support/kookaburra_setup.rb'
   #   require 'kookaburra/test_helpers'
-  #   require 'my_app/kookaburra/api_driver'
   #   require 'my_app/kookaburra/given_driver'
   #   require 'my_app/kookaburra/ui_driver'
   #   
   #   Kookaburra.configuration = {
   #     :given_driver_class => MyApp::Kookaburra::GivenDriver,
-  #     :api_driver_class => MyApp::Kookaburra::APIDriver,
   #     :ui_driver_class => MyApp::Kookaburra::UIDriver,
+  #     :app_host => 'http://my_app.example.com:12345',
   #     :browser => Capybara,
   #     :server_error_detection => lambda { |browser|
   #       browser.has_css?('h1', text: 'Internal Server Error')

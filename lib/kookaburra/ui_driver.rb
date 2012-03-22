@@ -4,9 +4,9 @@ require 'kookaburra/ui_driver/ui_component'
 class Kookaburra
   # You UIDriver subclass is where you define the DSL for testing your
   # application via its user interface. Methods defined in your DSL should
-  # represent business processes rather than user interface manipulations. A
+  # represent business actions rather than user interface manipulations. A
   # good test of this is whether the names of your methods would need to change
-  # significantly if the business process needed to be implemented in a vastly
+  # significantly if the application needed to be implemented in a vastly
   # different manner (a text-only terminal app vs. a web app, for instance).
   #
   # @abstract Subclass and implement your UI testing DSL
@@ -57,11 +57,13 @@ class Kookaburra
     # It is unlikely that you would instantiate your UIDriver on your own; the
     # object is configured for you when you call {Kookaburra#ui}.
     #
-    # @option options [Object] browser Most likely a `Capybara::Session`
-    #   instance.
-    # @option options [Kookaburra::MentalModel] mental_model
-    # @option options [Proc] server_error_detection A lambda that is passed the
-    #   `browser` object and should return `true` if the page indicates a server
+    # @option options [Capybara::Session] :browser Most likely a
+    #   `Capybara::Session` instance.
+    # @option options [Kookaburra::MentalModel] :mental_model
+    # @option options [String] :app_host The root URL of your running
+    #   application (e.g. "http://my_app.example.com:12345")
+    # @option options [Proc] :server_error_detection A lambda that is passed the
+    #   `:browser` object and should return `true` if the page indicates a server
     #   error has occured
     def initialize(options = {})
       @browser = options[:browser]
