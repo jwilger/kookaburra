@@ -81,6 +81,45 @@ class Kookaburra
           self[key]
         end
       end
+
+      # Deletes a key/value pair from the collection, and persists the deleted pair
+      # in a subcollection.
+      #
+      # Deleting a key/value pair from a collection on the MentalModel works just
+      # like `Hash#delete` but with a side effect - deleted members are added to
+      # a subcollection, accessible at `#deleted`.
+      #
+      # @param key the key to delete from the collection
+      #
+      # @return the value of the deleted key/value pair
+      #
+      # @raise [Kookaburra::UnknownKeyError] if the specified key has not been set
+      def delete(key, &block)
+        self[key] # simple fetch to possibly trigger UnknownKeyError
+        deleted[key] = super
+      end
+
+      # Finds or initializes, and returns, the subcollection of deleted items
+      #
+      # Key/value pairs `#delete`d from a collection on the MentalModel will be added
+      # to this subcollection.
+      #
+      # @return [Kookaburra::MentalModel::Collection] the deleted items subcollection
+      def deleted
+        @deleted ||= self.class.new("deleted")
+      end
+
+      # Deletes key/value pairs from the collection for which the given block evaluates
+      # to true, and persists all deleted pairs in a subcollection.
+      #
+      # Works just like `Hash#delete_if` but with a side effect - deleted members are
+      # added to a subcollection, accessible at `#deleted`.
+      #
+      # @return [Hash] the key/value pairs still remaining after the deletion
+      def delete_if(&block)
+        move = lambda { |k,v| deleted[k] = v; true }
+        super { |k,v| block.call(k,v) && move.call(k,v) }
+      end
     end
   end
 end
