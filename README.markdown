@@ -284,6 +284,13 @@ called on the object. The `MentalModel::Collection` object behaves like a `Hash`
 for the most part, however it will raise a `Kookaburra::UnknownKeyError` if you
 try to access a key that has not yet been assigned a value.
 
+Deletions (via `#delete` or `#delete_if`) will actually remove the key/value
+pair from the collection, but add it to a subcollection (available at
+`MentalModel::Collection#deleted`). This reflects the fact that the user's
+mental model of the dataset would also include any intentional exceptions -
+the user will, for example,  want to verify that an item they deleted does
+not appear to be available in the system.
+
 Here's a quick example of MentalModel behavor:
 
     mental_model = MentalModel.new
@@ -292,9 +299,19 @@ Here's a quick example of MentalModel behavor:
 
     mental_model.widgets[:widget_a]
     #=> {'name' => 'Widget A'}
-    
+
     # this will raise a Kookaburra::UnknownKeyError
     mental_model.widgets[:widget_b]
+
+    mental_model.widgets.delete(:widget_a)
+    #=> {'name' => 'Widget A'}
+
+    # this will now also raise a Kookaburra::UnknownKeyError...
+    mental_model.widgets[:widget_a]
+
+    # ...but the pair is now available here:
+    mental_model.widgets.deleted[:widget_a]
+    #=> {'name' => 'Widget A'}
 
 #### Given Driver ####
 
