@@ -30,7 +30,7 @@ server could be running on the same machine, it doesn't need to be), and it is
 the responsibility of the test implementation to ensure that the server is
 running. Take a look at Kookaburra's own integration specs for one example of
 how to achieve this for a [Rack-based] [Rack] application. (Note that you cannot
-easily start the application server in a seperate thread. Because Ruby uses
+easily start the application server in a separate thread. Because Ruby uses
 green threads, the HTTP library used in the APIDriver will block while making
 its requests and prevent the application server thread from responding.)
 
