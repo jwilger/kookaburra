@@ -1,3 +1,4 @@
+require 'kookaburra/exceptions'
 require 'kookaburra/api_driver'
 
 describe Kookaburra::APIDriver do
