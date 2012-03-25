@@ -1,6 +1,8 @@
 require 'active_support/core_ext/hash'
 require 'kookaburra/dependency_accessor'
+require 'kookaburra/assertion'
 require 'kookaburra/ui_driver/ui_component'
+require 'kookaburra/ui_driver/ui_component/address_bar'
 
 class Kookaburra
   # You UIDriver subclass is where you define the DSL for testing your
@@ -58,6 +60,7 @@ class Kookaburra
   #   ui.account_management.account_list.should be_visible
   class UIDriver
     extend DependencyAccessor
+    include Assertion
 
     class << self
       # Tells the UIDriver about your {UIComponent} subclasses.
@@ -105,6 +108,10 @@ class Kookaburra
 
     # Provides access to the options with which the object was initialized
     attr_reader :options
+
+    # @attribute [r] address_bar
+    # @return [Kookaburra::UIComponent::UIComponent::AddressBar]
+    ui_component :address_bar, UIComponent::AddressBar
 
     # @attribute [r] mental_model
     dependency_accessor :mental_model

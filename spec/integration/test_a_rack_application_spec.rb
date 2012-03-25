@@ -277,19 +277,23 @@ describe "testing a Rack application with Kookaburra" do
         ui_component :widget_form, WidgetForm
 
         def sign_in(name)
-          sign_in_screen.show
+          address_bar.go_to sign_in_screen
           sign_in_screen.sign_in(mental_model.users[name])
         end
 
+        def view_widget_list
+          address_bar.go_to widget_list
+        end
+
         def create_new_widget(name, attributes = {})
-          widget_list.show
+          assert widget_list.visible?, "Widget list is not visible!"
           widget_list.choose_to_create_new_widget
           widget_form.submit('name' => 'My Widget')
           mental_model.widgets[name] = widget_list.last_widget_created
         end
 
         def delete_widget(name)
-          widget_list.show
+          assert widget_list.visible?, "Widget list is not visible!"
           widget_list.choose_to_delete_widget(mental_model.widgets[name])
         end
       end
@@ -331,7 +335,7 @@ describe "testing a Rack application with Kookaburra" do
         k.given.a_widget(:widget_b, :name => 'Foo')
 
         k.ui.sign_in(:bob)
-        k.ui.widget_list.show
+        k.ui.view_widget_list
         k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b)
 
         k.ui.create_new_widget(:widget_c, :name => 'Bar')
