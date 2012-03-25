@@ -1,8 +1,5 @@
 source 'http://rubygems.org'
 
-# Only need this gem for Ruby < 1.9.2
-gem 'basic_object' unless defined?(BasicObject)
-
 gem 'i18n'
 gem 'activesupport', '>= 3.0'
 gem 'patron'

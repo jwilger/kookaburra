@@ -1,4 +1,5 @@
 require 'kookaburra'
+require 'active_support/core_ext/module/delegation'
 
 class Kookaburra
   # This module is intended to be mixed in to your testing context to provide
