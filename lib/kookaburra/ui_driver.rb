@@ -1,5 +1,4 @@
 require 'active_support/core_ext/hash'
-require 'kookaburra/dependency_accessor'
 require 'kookaburra/assertion'
 require 'kookaburra/ui_driver/ui_component'
 require 'kookaburra/ui_driver/ui_component/address_bar'
