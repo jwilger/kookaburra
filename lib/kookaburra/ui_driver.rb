@@ -1,4 +1,5 @@
 require 'active_support/core_ext/hash'
+require 'active_support/core_ext/module/delegation'
 require 'kookaburra/assertion'
 require 'kookaburra/ui_driver/ui_component'
 require 'kookaburra/ui_driver/ui_component/address_bar'

@@ -1,3 +1,5 @@
+require 'active_support/core_ext/module/delegation'
+
 class Kookaburra
   # Your GivenDriver subclass is used to define your testing DSL for setting up
   # test preconditions. Unlike {Kookaburra::APIDriver}, which is meant to be a
