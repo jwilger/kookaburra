@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.21.1"
+  s.version = "0.22.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["John Wilger", "Sam Livingston-Gray", "Ravi Gadad"]
@@ -30,24 +30,27 @@ Gem::Specification.new do |s|
     "kookaburra.gemspec",
     "lib/kookaburra.rb",
     "lib/kookaburra/api_driver.rb",
+    "lib/kookaburra/assertion.rb",
+    "lib/kookaburra/configuration.rb",
     "lib/kookaburra/dependency_accessor.rb",
     "lib/kookaburra/exceptions.rb",
     "lib/kookaburra/given_driver.rb",
     "lib/kookaburra/json_api_driver.rb",
     "lib/kookaburra/mental_model.rb",
-    "lib/kookaburra/null_browser.rb",
     "lib/kookaburra/test_helpers.rb",
     "lib/kookaburra/ui_driver.rb",
     "lib/kookaburra/ui_driver/ui_component.rb",
+    "lib/kookaburra/ui_driver/ui_component/address_bar.rb",
     "spec/integration/test_a_rack_application_spec.rb",
     "spec/kookaburra/api_driver_spec.rb",
+    "spec/kookaburra/configuration_spec.rb",
     "spec/kookaburra/json_api_driver_spec.rb",
     "spec/kookaburra/mental_model_spec.rb",
-    "spec/kookaburra/null_browser_spec.rb",
-    "spec/kookaburra/test_helpers_spec.rb",
+    "spec/kookaburra/ui_driver/ui_component/address_bar_spec.rb",
     "spec/kookaburra/ui_driver/ui_component_spec.rb",
     "spec/kookaburra/ui_driver_spec.rb",
     "spec/kookaburra_spec.rb",
+    "spec/support/shared_examples/it_can_make_assertions.rb",
     "spec/support/shared_examples/it_has_a_dependency_accessor.rb"
   ]
   s.homepage = "http://github.com/projectdx/kookaburra"
@@ -60,7 +63,6 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<basic_object>, [">= 0"])
       s.add_runtime_dependency(%q<i18n>, [">= 0"])
       s.add_runtime_dependency(%q<activesupport>, [">= 3.0"])
       s.add_runtime_dependency(%q<patron>, [">= 0"])
@@ -73,7 +75,6 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<reek>, [">= 0"])
       s.add_development_dependency(%q<sinatra>, [">= 0"])
     else
-      s.add_dependency(%q<basic_object>, [">= 0"])
       s.add_dependency(%q<i18n>, [">= 0"])
       s.add_dependency(%q<activesupport>, [">= 3.0"])
       s.add_dependency(%q<patron>, [">= 0"])
@@ -87,7 +88,6 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<sinatra>, [">= 0"])
     end
   else
-    s.add_dependency(%q<basic_object>, [">= 0"])
     s.add_dependency(%q<i18n>, [">= 0"])
     s.add_dependency(%q<activesupport>, [">= 3.0"])
     s.add_dependency(%q<patron>, [">= 0"])
