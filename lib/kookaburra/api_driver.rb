@@ -9,7 +9,7 @@ class Kookaburra
     # response status code.
     #
     # @param [Kookaburra::Configuration] configuration
-    # @param [Patron::Session] http_client (Patron::Session.new)
+    # @param [Patron::Session] http_client
     def initialize(configuration, http_client = Patron::Session.new)
       http_client.base_url = configuration.app_host
       super(http_client)

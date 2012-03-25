@@ -22,15 +22,15 @@ class Kookaburra
   #         ui_component :questionnaire, Questionnaire
   #
   #         def view_the_widgets
-  #           widget_list.show
+  #           address_bar.go_to(widget_list)
   #         end
   #
   #         def view_all_of_the_widgets
-  #           widget_list.show(:include_hidden => true)
+  #           address_bar.go_to(widget_list.url(:include_hidden => true))
   #         end
   #
   #         def complete_the_widget_questionnaire(answers = {})
-  #           questionnaire.show
+  #           address_bar.go_to(questionnaire)
   #           questionnaire.page_1.submit(answers[:page_1])
   #           questionnaire.page_2.submit(answers[:page_2])
   #           questionnaire.page_3.submit(answers[:page_3])
@@ -97,16 +97,12 @@ class Kookaburra
 
     protected
 
-    # The configuration passed on initialization
-    # @return [Kookaburra::Configuration]
-    attr_reader :configuration
-
     # @attribute [r] address_bar
     # @return [Kookaburra::UIComponent::UIComponent::AddressBar]
     ui_component :address_bar, UIComponent::AddressBar
 
     # @attribute [r] mental_model
     # @return [Kookaburra::MentalModel]
-    delegate :mental_model, :to => :configuration
+    delegate :mental_model, :to => :@configuration
   end
 end
