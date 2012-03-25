@@ -12,7 +12,7 @@ class Kookaburra
     # when a pre-condition is not met, rather than waiting on an operation
     # further down the line to fail.
     #
-    # @param test an expression that will be evaluated in a boolean context
+    # @param [boolean expression] test an expression that will be evaluated in a boolean context
     # @param [String] message the exception message that will be used if
     #   test is false
     #

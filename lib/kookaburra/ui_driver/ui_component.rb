@@ -64,7 +64,7 @@ class Kookaburra
     # element.    
     #
     # @abstract Subclass and implement (at least) {#component_locator}. Unless
-    #   you override the default implementation of {#show}, you must also
+    #   you override the default implementation of {#url}, you must also
     #   override the {#component_path} method.
     class UIComponent
       include Assertion
@@ -74,14 +74,7 @@ class Kookaburra
       #
       # @see Kookaburra::UIDriver.ui_component
       #
-      # @option options [Capybara::Session] :browser This is the browser driver
-      #   that allows you to interact with the web application's interface.
-      # @option options [String] :app_host The root URL of your running
-      #   application (e.g. "http://my_app.example.com:12345")
-      # @option options [Proc] :server_error_detection A proc that will receive
-      #   the object passed in to the :browser option as an argument and must
-      #   return `true` if the server responded with an unexpected error or
-      #   `false` if it did not.
+      # @param [Kookaburra::Configuration] configuration
       def initialize(configuration)
         @browser = configuration.browser
         @app_host = configuration.app_host
@@ -121,7 +114,7 @@ class Kookaburra
       end
 
       # Returns the full URL by appending {#component_path} to the value of the
-      # :app_host option passed to {#initialize}.
+      # {Kookaburra::Configuration#app_host} from the initialized configuration.
       def url(*args)
         "#{@app_host}#{component_path(*args)}"
       end
@@ -147,7 +140,8 @@ class Kookaburra
         raise ConfigurationError, "You must define #{self.class.name}#component_locator."
       end
 
-      # Runs the server error detection function specified in {#initialize}.
+      # Runs the server error detection function specified in
+      # {Kookaburra::Configuration#server_error_detection}.
       #
       # It's a noop if no server error detection was specified.
       #

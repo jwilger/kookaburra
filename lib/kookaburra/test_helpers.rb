@@ -13,15 +13,15 @@ class Kookaburra
   #   require 'my_app/kookaburra/given_driver'
   #   require 'my_app/kookaburra/ui_driver'
   #   
-  #   Kookaburra.configuration = {
-  #     :given_driver_class => MyApp::Kookaburra::GivenDriver,
-  #     :ui_driver_class => MyApp::Kookaburra::UIDriver,
-  #     :app_host => 'http://my_app.example.com:12345',
-  #     :browser => Capybara,
-  #     :server_error_detection => lambda { |browser|
-  #       browser.has_css?('h1', text: 'Internal Server Error')
+  #   Kookaburra.configure do |c|
+  #     c.given_driver_class = myapp::kookaburra::givendriver,
+  #     c.ui_driver_class = myapp::kookaburra::uidriver,
+  #     c.app_host = 'http://my_app.example.com:12345',
+  #     c.browser = capybara,
+  #     c.server_error_detection { |browser|
+  #       browser.has_css?('h1', text: 'internal server error')
   #     }
-  #   }
+  #   end
   #
   #   RSpec.configure do |c|
   #     c.include(Kookaburra::TestHelpers, :type => :request)
@@ -50,15 +50,15 @@ class Kookaburra
   #   require 'my_app/kookaburra/given_driver'
   #   require 'my_app/kookaburra/ui_driver'
   #   
-  #   Kookaburra.configuration = {
-  #     :given_driver_class => MyApp::Kookaburra::GivenDriver,
-  #     :ui_driver_class => MyApp::Kookaburra::UIDriver,
-  #     :app_host => 'http://my_app.example.com:12345',
-  #     :browser => Capybara,
-  #     :server_error_detection => lambda { |browser|
-  #       browser.has_css?('h1', text: 'Internal Server Error')
+  #   Kookaburra.configure do |c|
+  #     c.given_driver_class = myapp::kookaburra::givendriver,
+  #     c.ui_driver_class = myapp::kookaburra::uidriver,
+  #     c.app_host = 'http://my_app.example.com:12345',
+  #     c.browser = capybara,
+  #     c.server_error_detection { |browser|
+  #       browser.has_css?('h1', text: 'internal server error')
   #     }
-  #   }
+  #   end
   #
   #   World(Kookaburra::TestHelpers)
   #

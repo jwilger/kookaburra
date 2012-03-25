@@ -3,14 +3,62 @@ require 'delegate'
 require 'kookaburra/dependency_accessor'
 
 class Kookaburra
+  # Provides access to the configuration data used throughout Kookaburra
   class Configuration
     extend DependencyAccessor
+
+    # The class to use as your GivenDriver
+    #
+    # @attribute [rw] given_driver_class
+    # @raise [Kookaburra::ConfigurationError] if you try to read this attribute
+    #   without it having been set
     dependency_accessor :given_driver_class
+
+    # The class to use as your UIDriver
+    #
+    # @attribute [rw] ui_driver_class
+    # @raise [Kookaburra::ConfigurationError] if you try to read this attribute
+    #   without it having been set
     dependency_accessor :ui_driver_class
+
+    # This object is used by {Kookaburra::UIDriver::UIComponent} to interface
+    # with the web browser. Typically it should be an instance of
+    # `Capybara::Session`
+    #
+    # @attribute [rw] browser
+    # @raise [Kookaburra::ConfigurationError] if you try to read this attribute
+    #   without it having been set
     dependency_accessor :browser
+
+    # This is the root URL of your running application, including the port
+    # number if necessary. (e.g. "http://my.example.com:12345")
+    #
+    # @attribute [rw] app_host
+    # @raise [Kookaburra::ConfigurationError] if you try to read this attribute
+    #   without it having been set
     dependency_accessor :app_host
+
+    # This is the {Kookaburra::MentalModel} that is shared between your
+    # GivenDriver and your UIDriver. This attribute is managed by {Kookaburra},
+    # so you shouldn't need to change it yourself.
+    #
+    # @attribute [rw] mental_model
+    # @raise [Kookaburra::ConfigurationError] if you try to read this attribute
+    #   without it having been set
     dependency_accessor :mental_model
 
+    # Specify a function that can be used to determine if a server error has
+    # occured within your application.
+    #
+    # If the function returns `true`, then Kookaburra will assume that the
+    # application has responded with an error.
+    #
+    # @yield whichever object was assigned to {#browser}
+    #
+    # @example If the page title is "Internal Server Error"
+    #   config.server_error_detection { |browser|
+    #     browser.has_css?('head title', :text => 'Internal Server Error')
+    #   }
     def server_error_detection(&blk)
       if block_given?
         @server_error_detection = blk

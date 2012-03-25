@@ -17,7 +17,7 @@ class Kookaburra
     # @param [Kookaburra::Configuration] configuration
     # @param [Kookaburra::APIDriver] api_driver (Kookaburra::APIDriver.new)
     #   The APIDriver instance to be delegated to. Changing this is probably
-    #   only useful for testing.
+    #   only useful for testing Kookaburra itself.
     def initialize(configuration, api_driver = nil)
       api_driver = api_driver || APIDriver.new(configuration)
       api_driver.headers.merge!(

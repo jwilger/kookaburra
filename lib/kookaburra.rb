@@ -26,6 +26,9 @@ class Kookaburra
       @configuration ||= Configuration.new
     end
 
+    # Yields the current configuration so that it can be modified
+    #
+    # @yield [Kookaburra::Configuration]
     def configure(&blk)
       blk.call(configuration)
     end

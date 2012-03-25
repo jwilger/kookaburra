@@ -45,6 +45,9 @@ class Kookaburra
 
     attr_reader :configuration
 
+    # Access to the shared {Kookaburra::MentalModel} instance
+    #
+    # @attribute [rw] mental_model
     delegate :mental_model, :to => :configuration
 
     # Used to access your APIDriver in your own GivenDriver implementation
