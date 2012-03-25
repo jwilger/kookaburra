@@ -35,6 +35,14 @@ describe Kookaburra::UIDriver do
     end
   end
 
+  describe '#url' do
+    it 'returns the configured app_host' do
+      config = stub('Configuration', :app_host => 'http://my.example.com')
+      driver = Kookaburra::UIDriver.new(config)
+      driver.url.should == 'http://my.example.com'
+    end
+  end
+
   it_behaves_like :it_can_make_assertions do
     let(:subject) { Kookaburra::UIDriver.new(stub('Configuration')) }
   end

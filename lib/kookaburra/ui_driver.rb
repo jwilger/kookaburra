@@ -95,6 +95,15 @@ class Kookaburra
       @configuration = configuration
     end
 
+    # Returns the URL for this {UIDriver}.
+    #
+    # This implementation simply returns the
+    # {Kookaburra::Configuration#app_host}, but you might override it if you are
+    # using sub-drivers (see {.ui_driver}) and want them to be addressable.
+    def url
+      @configuration.app_host
+    end
+
     protected
 
     # @attribute [r] address_bar
