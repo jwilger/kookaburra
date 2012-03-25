@@ -1,4 +1,3 @@
-require 'kookaburra/exceptions'
 require 'kookaburra/mental_model'
 
 describe Kookaburra::MentalModel do

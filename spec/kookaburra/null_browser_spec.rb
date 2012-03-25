@@ -1,4 +1,3 @@
-require 'kookaburra/exceptions'
 require 'kookaburra/null_browser'
 
 describe Kookaburra::NullBrowser do
