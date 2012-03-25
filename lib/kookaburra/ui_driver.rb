@@ -36,6 +36,25 @@ class Kookaburra
   #       end
   #     end
   #   end
+  #
+  # With larger applications, it may be beneficial to break down your business
+  # actions into multiple classes. The top-level {UIDriver} can have sub-drivers
+  # associated with it (and those can have sub-drivers, too; but let's not get
+  # carried away, eh?):
+  #
+  #   class AccountManagementDriver < Kookaburra::UIDriver
+  #     ui_component :account_list, AccountList
+  #     # ...
+  #   end
+  #
+  #   class MyUIDriver < Kookaburra::UIDriver
+  #     ui_driver :account_management, AccountManagementDriver
+  #     # ...
+  #   end
+  #
+  # In your test implementation, you can then do (among other things):
+  #
+  #   ui.account_management.account_list.should be_visible
   class UIDriver
     extend DependencyAccessor
 
