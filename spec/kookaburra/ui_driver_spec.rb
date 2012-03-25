@@ -1,5 +1,6 @@
 require 'kookaburra/ui_driver'
 require 'support/shared_examples/it_has_a_dependency_accessor'
+require 'support/shared_examples/it_can_make_assertions'
 
 describe Kookaburra::UIDriver do
   describe '.ui_component' do
@@ -43,4 +44,6 @@ describe Kookaburra::UIDriver do
 
     it_behaves_like :it_has_a_dependency_accessor, :mental_model
   end
+
+  it_behaves_like :it_can_make_assertions
 end

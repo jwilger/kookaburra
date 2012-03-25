@@ -1,37 +1,7 @@
 require 'kookaburra/ui_driver/ui_component'
+require 'support/shared_examples/it_can_make_assertions'
 
 describe Kookaburra::UIDriver::UIComponent do
-  describe '#show' do
-    context 'the component is not currently visible' do
-      it 'causes the browser to navigate to the value of #component_path' do
-        browser = mock('Browser Session')
-        browser.should_receive(:visit).with('/foo')
-        component = Kookaburra::UIDriver::UIComponent.new(:browser => browser)
-        component.stub!(:component_path => '/foo')
-        component.stub!(:visible?).and_return(false, true)
-        component.show
-      end
-
-      it 'passes any arguments to the #component_path for processing' do
-        browser = mock('Browser Session', :visit => nil)
-        component = Kookaburra::UIDriver::UIComponent.new(:browser => browser)
-        component.should_receive(:component_path).with(:foo => :bar, :baz => :bam)
-        component.stub!(:visible?).and_return(false, true)
-        component.show(:foo => :bar, :baz => :bam)
-      end
-    end
-
-    context 'the component is already visible' do
-      it 'does not navigate to #component path' do
-        browser = mock('Browser Session')
-        browser.should_receive(:visit).never
-        component = Kookaburra::UIDriver::UIComponent.new(:browser => browser)
-        component.stub!(:component_path => '/foo', :visible? => true)
-        component.show
-      end
-    end
-  end
-
   describe '#respond_to?' do
     let(:component_class) do
       Class.new(Kookaburra::UIDriver::UIComponent) do
@@ -124,7 +94,15 @@ describe Kookaburra::UIDriver::UIComponent do
     end
   end
 
-  describe 'private methods (for use by subclasses)' do
+  describe '#url' do
+    it 'returns the app_host + #component_path' do
+      component = Kookaburra::UIDriver::UIComponent.new(:app_host => 'http://my.example.com')
+      component.stub!(:component_path => '/foo/bar')
+      component.url.should == 'http://my.example.com/foo/bar'
+    end
+  end
+
+  describe 'protected methods (for use by subclasses)' do
     describe '#component_path' do
       it 'must be defined by subclasses' do
         component = Kookaburra::UIDriver::UIComponent.new
@@ -141,17 +119,6 @@ describe Kookaburra::UIDriver::UIComponent do
       end
     end
 
-    describe '#assert' do
-      it 'returns true if the condition is truthy' do
-        component = Kookaburra::UIDriver::UIComponent.new
-        component.send(:assert, true, "Shouldn't see this message").should == true
-      end
-
-      it 'raises a Kookaburra::AssertionFailed exception if the condition is not truthy' do
-        component = Kookaburra::UIDriver::UIComponent.new
-        lambda { component.send(:assert, false, "False isn't true, dummy.") } \
-          .should raise_error(Kookaburra::AssertionFailed, "False isn't true, dummy.")
-      end
-    end
+    it_behaves_like :it_can_make_assertions
   end
 end

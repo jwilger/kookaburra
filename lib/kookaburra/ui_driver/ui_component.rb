@@ -1,4 +1,5 @@
 require 'kookaburra/exceptions'
+require 'kookaburra/assertion'
 require 'active_support/core_ext/object/try'
 
 class Kookaburra
@@ -66,6 +67,8 @@ class Kookaburra
     #   you override the default implementation of {#show}, you must also
     #   override the {#component_path} method.
     class UIComponent
+      include Assertion
+
       # New UIComponent instances are typically created for you by your
       # {Kookaburra::UIDriver} instance.
       #
@@ -107,27 +110,6 @@ class Kookaburra
         super || browser.respond_to?(name)
       end
 
-      # Causes the UIComponent to be visible.
-      #
-      # The browser to navigates directly to {#component_path} (unless the
-      # component is already visible).
-      #
-      # You may need to override this method in your own UIComponent subclasses,
-      # especially for components that are dynamically added/removed on the page
-      # in response to user actions. The implementation should not make any
-      # assumptions about the current state of the user interface before it is
-      # invoked.
-      #
-      # @param args Any arguments are passed to the {#component_path} method.
-      #
-      # @raise [RuntimeError] if the component is not visible after attempting
-      #   to make it so.
-      def show(*args)
-        return if visible?
-        browser.visit component_url(*args)
-        assert visible?, "The #{self.class.name} component is not visible!"
-      end
-
       # Is the component's element found on the page and is it considered
       # "visible" by the browser driver.
       def visible?
@@ -136,6 +118,12 @@ class Kookaburra
           detect_server_error!
         end
         visible
+      end
+
+      # Returns the full URL by appending {#component_path} to the value of the
+      # :app_host option passed to {#initialize}.
+      def url(*args)
+        "#{@app_host}#{component_path(*args)}"
       end
 
       protected
@@ -148,33 +136,12 @@ class Kookaburra
         @browser ||= NullBrowser.new
       end
 
-      # Provides a mechanism to make assertions about the state of your
-      # UIComponent without relying on a specific testing framework. A good
-      # reason to use this would be to provide a more informative error message
-      # when a pre-condition is not met, rather than waiting on an operation
-      # further down the line to fail.
-      #
-      # @param test an expression that will be evaluated in a boolean context
-      # @param [String] message the exception message that will be used if
-      #   test is false
-      #
-      # @raise [Kookaburra::AssertionFailed] raised if test evaluates to false
-      def assert(test, message = "You might want to provide a better message, eh?")
-        test or raise AssertionFailed, message
-      end
-
       # @abstract
       # @return [String] the URL path that should be loaded in order to reach this component
       # @raise [Kookaburra::ConfigurationError] raised if you haven't provided
       #   an implementation
       def component_path
         raise ConfigurationError, "You must define #{self.class.name}#component_path."
-      end
-
-      # Returns the full URL by appending {#component_path} to the value of the
-      # :app_host option passed to {#initialize}.
-      def component_url(*args)
-        "#{@app_host}#{component_path(*args)}"
       end
 
       # @abstract
