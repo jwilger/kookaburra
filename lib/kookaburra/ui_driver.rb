@@ -48,8 +48,19 @@ class Kookaburra
       #   this component.
       def ui_component(component_name, component_class)
         define_method(component_name) do
-          component_class.new(:browser => @browser, :server_error_detection => @server_error_detection,
-                              :app_host => @app_host)
+          component_class.new(options.slice(:browser, :server_error_detection, :app_host))
+        end
+      end
+
+      # Tells the UIDriver about sub-drivers (other {UIDriver} subclasses).
+      #
+      # @param [Symbol] driver_name Will create an instance method of this
+      #   name that returns an instance of the driver_class
+      # @param [Class] driver_class The {UIDriver} subclass that defines
+      #   this driver.
+      def ui_driver(driver_name, driver_class)
+        define_method(driver_name) do
+          driver_class.new(options.slice(:browser, :server_error_detection, :app_host, :mental_model))
         end
       end
     end
@@ -66,13 +77,14 @@ class Kookaburra
     #   `:browser` object and should return `true` if the page indicates a server
     #   error has occured
     def initialize(options = {})
-      @browser = options[:browser]
-      @app_host = options[:app_host]
+      @options = options
       @mental_model = options[:mental_model]
-      @server_error_detection = options[:server_error_detection]
     end
 
     protected
+
+    # Provides access to the options with which the object was initialized
+    attr_reader :options
 
     # @attribute [r] mental_model
     dependency_accessor :mental_model
