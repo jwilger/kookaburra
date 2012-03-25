@@ -1,4 +1,5 @@
 require 'delegate'
+require 'kookaburra/exceptions'
 
 class Kookaburra
   # Each instance of {Kookaburra} has its own instance of MentalModel. This object

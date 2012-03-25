@@ -1,4 +1,5 @@
 require 'kookaburra/exceptions'
+require 'active_support/core_ext/object/try'
 
 class Kookaburra
   class UIDriver

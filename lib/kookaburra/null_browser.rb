@@ -1,4 +1,5 @@
 require 'basic_object'
+require 'kookaburra/exceptions'
 
 class Kookaburra
   # If you don't specify a browser in your {Kookaburra#configuration} but you
