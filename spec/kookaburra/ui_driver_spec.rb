@@ -20,6 +20,24 @@ describe Kookaburra::UIDriver do
     end
   end
 
+  describe '.ui_driver' do
+    it 'adds an accessor method for the named driver that defaults to an instance of the specified class' do
+      foo_driver_class = mock(Class)
+      foo_driver_class.should_receive(:new) \
+        .with(:browser => :a_browser, :server_error_detection => :server_error_detection,
+              :app_host => :a_url, :mental_model => :a_mental_model) \
+        .and_return(:a_foo_driver)
+
+      ui_driver_class = Class.new(Kookaburra::UIDriver) do
+        ui_driver :foo, foo_driver_class
+      end
+
+      ui = ui_driver_class.new(:browser => :a_browser, :server_error_detection => :server_error_detection,
+                               :app_host => :a_url, :mental_model => :a_mental_model)
+      ui.foo.should == :a_foo_driver
+    end
+  end
+
   describe 'dependency accessors' do
     let(:subject_class) { Kookaburra::UIDriver }
 
