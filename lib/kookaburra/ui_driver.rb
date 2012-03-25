@@ -1,3 +1,4 @@
+require 'active_support/core_ext/hash'
 require 'kookaburra/dependency_accessor'
 require 'kookaburra/ui_driver/ui_component'
 
