@@ -1,4 +1,4 @@
-require 'kookaburra'
+require 'kookaburra/test_helpers'
 require 'kookaburra/json_api_driver'
 require 'capybara'
 
@@ -190,7 +190,7 @@ describe "testing a Rack application with Kookaburra" do
 
       class MyGivenDriver < Kookaburra::GivenDriver
         def api
-          MyAPIDriver.new(:app_host => initialization_options[:app_host])
+          MyAPIDriver.new(configuration)
         end
 
         def a_user(name)
@@ -318,31 +318,31 @@ describe "testing a Rack application with Kookaburra" do
       end
 
       it "runs the tests against the app" do
-        server_error_detection = lambda { |browser|
-          browser.has_css?('head title', :text => 'Internal Server Error')
-        }
+        Kookaburra.configure do |c|
+          c.ui_driver_class = MyUIDriver
+          c.given_driver_class = MyGivenDriver
+          c.app_host = 'http://127.0.0.1:%d' % @rack_server_port
+          c.browser = Capybara::Session.new(:selenium)
+          c.server_error_detection do |browser|
+            browser.has_css?('head title', :text => 'Internal Server Error')
+          end
+        end
 
-        k = Kookaburra.new({
-          :ui_driver_class        => MyUIDriver,
-          :given_driver_class     => MyGivenDriver,
-          :app_host               => 'http://127.0.0.1:%d' % @rack_server_port,
-          :browser                => Capybara::Session.new(:selenium),
-          :server_error_detection => server_error_detection
-        })
+        extend Kookaburra::TestHelpers
 
-        k.given.a_user(:bob)
-        k.given.a_widget(:widget_a)
-        k.given.a_widget(:widget_b, :name => 'Foo')
+        given.a_user(:bob)
+        given.a_widget(:widget_a)
+        given.a_widget(:widget_b, :name => 'Foo')
 
-        k.ui.sign_in(:bob)
-        k.ui.view_widget_list
-        k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b)
+        ui.sign_in(:bob)
+        ui.view_widget_list
+        ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b)
 
-        k.ui.create_new_widget(:widget_c, :name => 'Bar')
-        k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c)
+        ui.create_new_widget(:widget_c, :name => 'Bar')
+        ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c)
 
-        k.ui.delete_widget(:widget_b)
-        k.ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_c)
+        ui.delete_widget(:widget_b)
+        ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_c)
       end
     end
   end

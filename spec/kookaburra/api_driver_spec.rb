@@ -1,7 +1,9 @@
 require 'kookaburra/api_driver'
 
 describe Kookaburra::APIDriver do
-  let(:api) { Kookaburra::APIDriver.new(:http_client => client) }
+  let(:configuration) { stub('Configuration', :app_host => 'http://example.com') }
+
+  let(:api) { Kookaburra::APIDriver.new(configuration, client) }
 
   let(:response) {
     stub('Patron::Response', :body => 'foo', :status => 200, :url => '/foo')
@@ -9,18 +11,18 @@ describe Kookaburra::APIDriver do
 
   let(:client) {
          mock('Patron::Session', :post => response, :get => response,
-         :put => response, :delete => response)
+         :put => response, :delete => response, :base_url= => nil)
   }
 
   describe '#initialize' do
     it 'instantiates a new http client if no :http_client option is passed' do
       Patron::Session.should_receive(:new).and_return(stub.as_null_object)
-      Kookaburra::APIDriver.new({})
+      Kookaburra::APIDriver.new(configuration)
     end
 
     it 'does not instantiate a new http client if an :http_client option is passed' do
       Patron::Session.should_receive(:new).never
-      Kookaburra::APIDriver.new(:http_client => stub.as_null_object)
+      Kookaburra::APIDriver.new(configuration, client)
     end
   end
 

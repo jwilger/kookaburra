@@ -2,52 +2,44 @@ require 'kookaburra/exceptions'
 require 'kookaburra/mental_model'
 require 'kookaburra/given_driver'
 require 'kookaburra/ui_driver'
+require 'kookaburra/configuration'
 
 # Kookaburra provides the top-level API that you will access in your test
 # implementation, namely the {#given}, {#ui}, and the {#get_data} methods.
 #
 # The Kookaburra object ensures that your GivenDriver and UIDriver share the
-# same state with regard to any fixture data that is created during your test
-# run. As such, it is important to ensure that a new instance of Kookaburra is
-# created for each individual test, otherwise you may wind up with test state
-# bleeding over from one test to the next. The {Kookaburra::TestHelpers} module
-# is intended to be mixed in to your testing context for this purpose.
+# same state with regard to any {Kookaburra::MentalModel} data that is created
+# during your test run. As such, it is important to ensure that a new instance
+# of Kookaburra is created for each individual test, otherwise you may wind up
+# with test state bleeding over from one test to the next. The
+# {Kookaburra::TestHelpers} module is intended to be mixed in to your testing
+# context for this purpose.
 #
 # @see Kookaburra::TestHelpers
 class Kookaburra
   class << self
-    # {Kookaburra::TestHelpers#k} uses the value stored here as the options
-    # argument to {Kookaburra#initialize}. See {Kookaburra#initialize} for the
-    # list of valid keys and their contents.
-    attr_accessor :configuration
-
+    # Stores the configuration object that is used by default when creating new
+    # instances of Kookaburra
+    #
+    # @return [Kookaburra::Configuration] return value is memoized
     def configuration
-      @configuration ||= {}
+      @configuration ||= Configuration.new
+    end
+
+    def configure(&blk)
+      blk.call(configuration)
     end
   end
 
   # Returns a new Kookaburra instance that wires together your application's
-  # APIDriver, GivenDriver, and UIDriver.
+  # GivenDriver and UIDriver with a shared {Kookaburra::MentalModel}.
   #
-  # @option options [Class] :given_driver_class Your
-  #   application's subclass of {Kookaburra::GivenDriver}
-  # @option options [Class] :ui_driver_class Your application's
-  #   subclass of {Kookaburra::UIDriver}
-  # @option options [Capybara::Session] :browser The browser driver
-  #   that Kookaburra will interact with to run the tests.
-  # @option options [String] :app_host The URL of your running application
-  #   server against which the tests will be run (e.g.
-  #   "http://my_app.example.com:12345")
-  # @option options [Proc] :server_error_detection A proc that will receive the
-  #   object passed in to the :browser option as an argument and must return
-  #   `true` if the server responded with an unexpected error or `false` if it
-  #   did not.
-  def initialize(options = {})
-    @given_driver_class     = options[:given_driver_class]
-    @ui_driver_class        = options[:ui_driver_class]
-    @browser                = options[:browser]
-    @app_host               = options[:app_host]
-    @server_error_detection = options[:server_error_detection]
+  # @param [Kookaburra::Configuration] configuration (Kookaburra.configuration)
+  def initialize(configuration = Kookaburra.configuration)
+    @configuration = configuration
+    @configuration.mental_model = MentalModel.new
+    @given_driver_class = configuration.given_driver_class
+    @ui_driver_class = configuration.ui_driver_class
   end
 
   # Returns an instance of your GivenDriver class configured to share test
@@ -55,7 +47,7 @@ class Kookaburra
   #
   # @return [Kookaburra::GivenDriver]
   def given
-    given_driver_class.new(:mental_model => mental_model, :app_host => @app_host)
+    @given ||= @given_driver_class.new(@configuration)
   end
 
   # Returns an instance of your UIDriver class configured to share test fixture
@@ -64,10 +56,7 @@ class Kookaburra
   #
   # @return [Kookaburra::UIDriver]
   def ui
-    ui_driver_class.new(:mental_model => mental_model,
-                        :browser => browser,
-                        :app_host => @app_host,
-                        :server_error_detection => @server_error_detection)
+    @ui ||= @ui_driver_class.new(@configuration)
   end
 
   # Returns a frozen copy of the specified {MentalModel::Collection}.
@@ -86,19 +75,6 @@ class Kookaburra
   #
   # @return [Kookaburra::MentalModel::Collection]
   def get_data(collection_name)
-    mental_model.send(collection_name).dup.freeze
-  end
-
-  private
-
-  extend DependencyAccessor
-  dependency_accessor :given_driver_class, :ui_driver_class
-
-  def mental_model
-    @mental_model ||= MentalModel.new
-  end
-
-  def browser
-    @browser ||= NullBrowser.new
+    @configuration.mental_model.send(collection_name).dup.freeze
   end
 end

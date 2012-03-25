@@ -4,17 +4,14 @@ require 'patron'
 
 class Kookaburra
   class APIDriver < SimpleDelegator
-    # Wraps `:http_client` in a `SimpleDelegator` that causes request methods to
+    # Wraps `http_client` in a `SimpleDelegator` that causes request methods to
     # either return the response body or raise an exception on an unexpected
     # response status code.
     #
-    # @option options [String] :app_host The root URL of your running
-    #   application (e.g. "http://my_app.example.com:12345")
-    # @option options [Patron::Session] :http_client (Patron::Session.new) The
-    #   object responsible for actually making HTTP calls to your application.
-    def initialize(options = {})
-      http_client = options[:http_client] || Patron::Session.new
-      http_client.base_url = options[:app_host] if options.has_key?(:app_host)
+    # @param [Kookaburra::Configuration] configuration
+    # @param [Patron::Session] http_client (Patron::Session.new)
+    def initialize(configuration, http_client = Patron::Session.new)
+      http_client.base_url = configuration.app_host
       super(http_client)
     end
 

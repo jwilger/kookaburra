@@ -59,7 +59,6 @@ class Kookaburra
   #
   #   ui.account_management.account_list.should be_visible
   class UIDriver
-    extend DependencyAccessor
     include Assertion
 
     class << self
@@ -71,7 +70,7 @@ class Kookaburra
       #   this component.
       def ui_component(component_name, component_class)
         define_method(component_name) do
-          component_class.new(options.slice(:browser, :server_error_detection, :app_host))
+          component_class.new(@configuration)
         end
       end
 
@@ -83,7 +82,7 @@ class Kookaburra
       #   this driver.
       def ui_driver(driver_name, driver_class)
         define_method(driver_name) do
-          driver_class.new(options.slice(:browser, :server_error_detection, :app_host, :mental_model))
+          driver_class.new(@configuration)
         end
       end
     end
@@ -91,29 +90,23 @@ class Kookaburra
     # It is unlikely that you would instantiate your UIDriver on your own; the
     # object is configured for you when you call {Kookaburra#ui}.
     #
-    # @option options [Capybara::Session] :browser Most likely a
-    #   `Capybara::Session` instance.
-    # @option options [Kookaburra::MentalModel] :mental_model
-    # @option options [String] :app_host The root URL of your running
-    #   application (e.g. "http://my_app.example.com:12345")
-    # @option options [Proc] :server_error_detection A lambda that is passed the
-    #   `:browser` object and should return `true` if the page indicates a server
-    #   error has occured
-    def initialize(options = {})
-      @options = options
-      @mental_model = options[:mental_model]
+    # @param [Kookaburra::Configuration] configuration (Kookaburra.configuration)
+    def initialize(configuration)
+      @configuration = configuration
     end
 
     protected
 
-    # Provides access to the options with which the object was initialized
-    attr_reader :options
+    # The configuration passed on initialization
+    # @return [Kookaburra::Configuration]
+    attr_reader :configuration
 
     # @attribute [r] address_bar
     # @return [Kookaburra::UIComponent::UIComponent::AddressBar]
     ui_component :address_bar, UIComponent::AddressBar
 
     # @attribute [r] mental_model
-    dependency_accessor :mental_model
+    # @return [Kookaburra::MentalModel]
+    delegate :mental_model, :to => :configuration
   end
 end

@@ -85,7 +85,7 @@ class Kookaburra
     #
     # @return [Kookaburra]
     def k
-      @k ||= Kookaburra.new(Kookaburra.configuration)
+      @k ||= Kookaburra.new
     end
 
     # @method given
