@@ -14,11 +14,12 @@ class Kookaburra
     #
     # Sets both the "Content-Type" and "Accept" headers to "application/json".
     #
-    # @option options [Kookaburra::APIDriver] :api_driver (Kookaburra::APIDriver.new)
+    # @param [Kookaburra::Configuration] configuration
+    # @param [Kookaburra::APIDriver] api_driver (Kookaburra::APIDriver.new)
     #   The APIDriver instance to be delegated to. Changing this is probably
     #   only useful for testing.
-    def initialize(options = {})
-      api_driver = options[:api_driver] || APIDriver.new(:app_host => options[:app_host])
+    def initialize(configuration, api_driver = nil)
+      api_driver = api_driver || APIDriver.new(configuration)
       api_driver.headers.merge!(
         'Content-Type' => 'application/json',
         'Accept' => 'application/json'

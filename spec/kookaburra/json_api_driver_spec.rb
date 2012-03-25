@@ -8,21 +8,27 @@ describe Kookaburra::JsonApiDriver do
          :delete => response, :headers => {})
   }
 
-  let(:json) { Kookaburra::JsonApiDriver.new(:api_driver => api) }
+  let(:configuration) {
+    stub('Configuration')
+  }
+
+  let(:json) { Kookaburra::JsonApiDriver.new(stub('Configuration'), api) }
 
   describe '#initialize' do
     it 'instantiates a new APIDriver if no :api_driver option is passed' do
-      Kookaburra::APIDriver.should_receive(:new).and_return(stub.as_null_object)
-      Kookaburra::JsonApiDriver.new({})
+      Kookaburra::APIDriver.should_receive(:new) \
+        .with(configuration) \
+        .and_return(api)
+      Kookaburra::JsonApiDriver.new(configuration)
     end
 
     it 'does not instantiate a new APIDriver if an :api_driver option is passed' do
       Kookaburra::APIDriver.should_receive(:new).never
-      Kookaburra::JsonApiDriver.new(:api_driver => stub.as_null_object)
+      Kookaburra::JsonApiDriver.new(configuration, api)
     end
 
     it 'sets appropriate headers for a JSON API request' do
-      Kookaburra::JsonApiDriver.new(:api_driver => api)
+      Kookaburra::JsonApiDriver.new(configuration, api)
       api.headers.should == {
         'Content-Type' => 'application/json',
         'Accept' => 'application/json'
@@ -31,9 +37,7 @@ describe Kookaburra::JsonApiDriver do
   end
 
   it 'delegates to a Kookaburra::APIDriver by default' do
-    delegate = stub('Kookaburra::APIDriver', :foo => :bar).as_null_object
-    Kookaburra::APIDriver.should_receive(:new).once.and_return(delegate)
-    json = Kookaburra::JsonApiDriver.new
+    api.stub!(:foo => :bar)
     json.foo.should == :bar
   end
 

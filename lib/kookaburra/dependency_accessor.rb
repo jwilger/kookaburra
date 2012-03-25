@@ -18,7 +18,10 @@ class Kookaburra
         instance_variable_get("@#{name}") or raise "No %s object was set on %s initialization." \
           % [name, [self.class.name, 'an Anonymous Class!!!'].reject(&:blank?).first]
       end
-      private name
+
+      define_method("#{name}=") do |value|
+        instance_variable_set("@#{name}", value)
+      end
     end
   end
 end

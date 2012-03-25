@@ -82,10 +82,10 @@ class Kookaburra
       #   the object passed in to the :browser option as an argument and must
       #   return `true` if the server responded with an unexpected error or
       #   `false` if it did not.
-      def initialize(options = {})
-        @browser = options[:browser]
-        @app_host = options[:app_host]
-        @server_error_detection = options[:server_error_detection]
+      def initialize(configuration)
+        @browser = configuration.browser
+        @app_host = configuration.app_host
+        @server_error_detection = configuration.server_error_detection
       end
 
       # If the UIComponent is sent a message it does not understand, it will
@@ -128,13 +128,8 @@ class Kookaburra
 
       protected
 
-      # This is the browser driver with which the UIComponent was initialized.
-      # 
-      # If no :browser option was specified in {#initialize}, it returns a
-      # default {Kookaburra::NullBrowser} instance.
-      def browser
-        @browser ||= NullBrowser.new
-      end
+      # The browser object from the initialized configuration
+      attr_reader :browser
 
       # @abstract
       # @return [String] the URL path that should be loaded in order to reach this component

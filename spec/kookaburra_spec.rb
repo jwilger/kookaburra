@@ -1,15 +1,19 @@
 require 'kookaburra'
 
 describe Kookaburra do
+  let(:configuration) {
+    OpenStruct.new
+  }
+
+  let(:k) { Kookaburra.new(configuration) }
+
   describe '#given' do
     it 'returns an instance of the configured GivenDriver' do
       my_given_driver_class = mock(Class)
-      my_given_driver_class.should_receive(:new) do |options|
-        options[:mental_model].should be_kind_of(Kookaburra::MentalModel)
-        :a_given_driver
-      end
-
-      k = Kookaburra.new(:given_driver_class => my_given_driver_class)
+      my_given_driver_class.should_receive(:new) \
+        .with(configuration) \
+        .and_return(:a_given_driver)
+      configuration.stub!(:given_driver_class => my_given_driver_class)
       k.given.should == :a_given_driver
     end
   end
@@ -17,51 +21,51 @@ describe Kookaburra do
   describe '#ui' do
     it 'returns an instance of the configured UIDriver' do
       my_ui_driver_class = mock(Class)
-      my_ui_driver_class.should_receive(:new) do |options|
-        options[:browser].should == :a_browser
-        options[:server_error_detection].should == :server_error_detection
-        :a_ui_driver
-      end
-      k = Kookaburra.new(:ui_driver_class => my_ui_driver_class,
-                         :browser => :a_browser,
-                         :server_error_detection => :server_error_detection)
+      my_ui_driver_class.should_receive(:new) \
+        .with(configuration) \
+        .and_return(:a_ui_driver)
+      configuration.stub!(:ui_driver_class => my_ui_driver_class)
       k.ui.should == :a_ui_driver
     end
   end
 
   describe '#get_data' do
     it 'returns a equivalent copy of the test data collection specified' do
-      k = Kookaburra.new
       foos = {:spam => 'ham'}
-      mental_model = stub(:foos => foos)
-      k.stub!(:mental_model => mental_model)
+      configuration.stub!(:mental_model => stub(:foos => foos))
       k.get_data(:foos).should == foos
     end
 
     it 'does not return the same object that is the test data collection' do
-      k = Kookaburra.new
       k.get_data(:foos).should_not === k.get_data(:foos)
     end
 
     it 'returns a frozen object' do
-      k = Kookaburra.new
       k.get_data(:foos).should be_frozen
     end
   end
 
   describe '.configuration' do
-    it 'returns the assigned value' do
-      begin
-        old_config = Kookaburra.configuration
-        Kookaburra.configuration = :test_configuration
-        Kookaburra.configuration.should == :test_configuration
-      ensure
-        Kookaburra.configuration = old_config
-      end
+    it 'returns a Kookaburra::Configuration instance' do
+      Kookaburra.configuration.should be_kind_of(Kookaburra::Configuration)
     end
 
-    it 'defaults to an empty hash' do
-      Kookaburra.configuration.should == {}
+    it 'always returns the same configuration' do
+      x = Kookaburra.configuration
+      y = Kookaburra.configuration
+      x.app_host = 'http://example.com'
+      y.app_host.should == 'http://example.com'
+    end
+  end
+
+  describe '.configure' do
+    it 'yields Kookaburra.configuration' do
+      configuration = mock('Kookaburra::Configuration')
+      configuration.should_receive(:foo=).with(:bar)
+      Kookaburra.stub!(:configuration => configuration)
+      Kookaburra.configure do |c|
+        c.foo = :bar
+      end
     end
   end
 end

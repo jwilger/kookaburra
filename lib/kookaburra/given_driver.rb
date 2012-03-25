@@ -7,15 +7,14 @@ class Kookaburra
   # comprised of several distinct API calls as well as access to Kookaburra's
   # test data store.
   #
-  # @abstract Subclass and implement your Given DSL. You must also provide an
-  #   implementation of #api that returns an instance of your APIDriver.
+  # @abstract Subclass and implement your Given DSL.
   #
   # @example GivenDriver subclass
   #   module MyApp
   #     module Kookaburra
   #       class GivenDriver < ::Kookaburra::GivenDriver
   #         def api
-  #           @api ||= APIDriver.new(:app_host => initialization_options[:app_host])
+  #           @api ||= APIDriver.new(configuration)
   #         end
   #
   #         def a_widget(name, attributes = {})
@@ -34,21 +33,19 @@ class Kookaburra
   #     end
   #   end
   class GivenDriver
-    extend DependencyAccessor
-
     # It is unlikely that you would call #initialize yourself; your GivenDriver
     # object is instantiated for you by {Kookaburra#given}.
     #
-    # @option options [Kookaburra::MentalModel] :mental_model the MentalModel
-    #   instance used by your tests
-    # @option options [String] :app_host The root URL of your running
-    #   application (e.g. "http://my_app.example.com:12345")
-    def initialize(options = {})
-      @initialization_options = options
-      @mental_model = options[:mental_model]
+    # @param [Kookaburra::Configuration] configuration
+    def initialize(configuration)
+      @configuration = configuration
     end
 
     protected
+
+    attr_reader :configuration
+
+    delegate :mental_model, :to => :configuration
 
     # Used to access your APIDriver in your own GivenDriver implementation
     #
@@ -59,18 +56,5 @@ class Kookaburra
     def api
       raise ConfigurationError, "You must implement #api in your subclass."
     end
-
-    # The full set of options passed in to {#initialize}
-    #
-    # Access is provided so that you can use these when instantiating your
-    # {APIDriver} in your {#api} implementation.
-    attr_reader :initialization_options
-
-    # A reference to the {Kookaburra::MentalModel} object that this GivenDriver
-    # instance was created with.
-    #
-    # @attribute [r]
-    # @return [Kookaburra::MentalModel]
-    dependency_accessor :mental_model
   end
 end
