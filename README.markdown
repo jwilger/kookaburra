@@ -52,17 +52,17 @@ For [RSpec] [RSpec] integration tests, just add the following to
     require 'my_app/kookaburra/given_driver'
     require 'my_app/kookaburra/ui_driver'
 
-    # :app_host below should be set to whatever the root URL of your running
+    # c.app_host below should be set to whatever the root URL of your running
     # application is.
-    Kookaburra.configuration = {
-      :given_driver_class => MyApp::Kookaburra::GivenDriver,
-      :ui_driver_class => MyApp::Kookaburra::UIDriver,
-      :app_host => 'http://my_app.example.com:1234',
-      :browser => Capybara,
-      :server_error_detection => { |browser|
+    Kookaburra.configure do |c|
+      c.given_driver_class = MyApp::Kookaburra::GivenDriver
+      c.ui_driver_class = MyApp::Kookaburra::UIDriver
+      c.app_host = 'http://my_app.example.com:1234'
+      c.browser = Capybara
+      c.server_error_detection { |browser|
         browser.has_css?('head title', :text => 'Internal Server Error')
       }
-    }
+    end
 
     RSpec.configure do |c|
       c.include(Kookaburra::TestHelpers, :type => :request)
@@ -76,17 +76,17 @@ For [Cucumber] [Cucumber], add the following to `features/support/kookaburra_set
     require 'my_app/kookaburra/given_driver'
     require 'my_app/kookaburra/ui_driver'
 
-    # :app_host below should be set to whatever the root URL of your running
+    # c.app_host below should be set to whatever the root URL of your running
     # application is.
-    Kookaburra.configuration = {
-      :given_driver_class => MyApp::Kookaburra::GivenDriver,
-      :ui_driver_class => MyApp::Kookaburra::UIDriver,
-      :app_host => 'http://my_app.example.com:1234',
-      :browser => Capybara,
-      :server_error_detection => { |browser|
+    Kookaburra.configure do |c|
+      c.given_driver_class = MyApp::Kookaburra::GivenDriver
+      c.ui_driver_class = MyApp::Kookaburra::UIDriver
+      c.app_host = 'http://my_app.example.com:1234'
+      c.browser = Capybara
+      c.server_error_detection { |browser|
         browser.has_css?('head title', :text => 'Internal Server Error')
       }
-    }
+    end
 
     World(Kookaburra::TestHelpers)
 
@@ -326,7 +326,7 @@ for your application:
     class MyApp::Kookaburra::GivenDriver < Kookaburra::GivenDriver
       # Specify the APIDriver to use
       def api
-        @api ||= MyApp::Kookaburra::APIDriver.new(:app_host => initialization_options[:app_host])
+        @api ||= MyApp::Kookaburra::APIDriver.new(configuration)
       end
 
       def existing_account(nickname)
@@ -394,8 +394,8 @@ within your subclass:
       ui_component :sign_in_screen, SignInScreen
 
       def sign_in(account_nickname)
-        account = test_data.accounts[account_nickname]
-        sign_in_screen.show
+        account = mental_model.accounts[account_nickname]
+        address_bar.go_to(sign_in_screen)
         sign_in_screen.submit_login(account['username'], account['password'])
       end
     end
