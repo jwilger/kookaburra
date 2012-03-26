@@ -52,6 +52,11 @@ describe Kookaburra::APIDriver do
         .should raise_error(Kookaburra::UnexpectedResponse,
                             "POST to /foo responded with 201 status, not 666 as expected\n\nfoo")
     end
+
+    it 'raises an ArgumentError with a useful message if no request path is specified' do
+      lambda { api.post(nil, 'bar') } \
+        .should raise_error(ArgumentError, "You must specify a request URL, but it was nil.")
+    end
   end
 
   describe '#put' do
@@ -75,6 +80,11 @@ describe Kookaburra::APIDriver do
       lambda { api.put('/foo', 'bar', :expected_response_status => 666) } \
         .should raise_error(Kookaburra::UnexpectedResponse,
                             "PUT to /foo responded with 200 status, not 666 as expected\n\nfoo")
+    end
+
+    it 'raises an ArgumentError with a useful message if no request path is specified' do
+      lambda { api.put(nil, 'bar') } \
+        .should raise_error(ArgumentError, "You must specify a request URL, but it was nil.")
     end
   end
 
@@ -100,6 +110,11 @@ describe Kookaburra::APIDriver do
         .should raise_error(Kookaburra::UnexpectedResponse,
                             "GET to /foo responded with 200 status, not 666 as expected\n\nfoo")
     end
+
+    it 'raises an ArgumentError with a useful message if no request path is specified' do
+      lambda { api.get(nil) } \
+        .should raise_error(ArgumentError, "You must specify a request URL, but it was nil.")
+    end
   end
 
   describe '#delete' do
@@ -123,6 +138,11 @@ describe Kookaburra::APIDriver do
       lambda { api.delete('/foo', :expected_response_status => 666) } \
         .should raise_error(Kookaburra::UnexpectedResponse,
                             "DELETE to /foo responded with 200 status, not 666 as expected\n\nfoo")
+    end
+
+    it 'raises an ArgumentError with a useful message if no request path is specified' do
+      lambda { api.delete(nil) } \
+        .should raise_error(ArgumentError, "You must specify a request URL, but it was nil.")
     end
   end
 end

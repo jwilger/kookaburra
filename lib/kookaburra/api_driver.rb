@@ -68,6 +68,9 @@ class Kookaburra
     def request(type, path, options = {}, data = nil)
       # don't send a data argument if it's not passed in, because some methods
       # on target object may not have the proper arity (i.e. #get and #delete).
+      if path.nil?
+        raise ArgumentError, "You must specify a request URL, but it was nil."
+      end
       args = [type, path, data, options].compact
       response = __getobj__.send(*args)
 
