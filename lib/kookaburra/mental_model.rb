@@ -51,6 +51,7 @@ class Kookaburra
     class Collection < SimpleDelegator
       # @param [String] name The name of the collection. Used to provide
       #   helpful error messages when unknown keys are accessed.
+      # @param [Hash] init_data Preloads specific data into the collection
       def initialize(name, init_data = nil)
         @name = name
         data = Hash.new do |hash, key|
