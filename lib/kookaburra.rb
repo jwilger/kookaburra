@@ -62,10 +62,7 @@ class Kookaburra
     @ui ||= @ui_driver_class.new(@configuration)
   end
 
-  # Returns a frozen copy of the specified {MentalModel::Collection}.
-  # However, this is neither a deep copy nor a deep freeze, so it is possible
-  # that you could modify data outside of your GivenDriver or UIDriver. Just
-  # don't do that. Trust me.
+  # Returns a deep-dup of the specified {MentalModel::Collection}.
   #
   # This access is provided so that you can reference the current mental model
   # within your test implementation and make assertions about the state
@@ -74,10 +71,10 @@ class Kookaburra
   # @example
   #   given.a_widget(:foo)
   #   ui.create_a_new_widget(:bar)
-  #   ui.widget_list.widgets.should == k.get_data(:widgets).slice(:foo, :bar)
+  #   ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:foo, :bar)
   #
   # @return [Kookaburra::MentalModel::Collection]
   def get_data(collection_name)
-    @configuration.mental_model.send(collection_name).dup.freeze
+    @configuration.mental_model.send(collection_name).dup
   end
 end
