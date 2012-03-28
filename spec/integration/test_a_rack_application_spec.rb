@@ -336,13 +336,13 @@ describe "testing a Rack application with Kookaburra" do
 
         ui.sign_in(:bob)
         ui.view_widget_list
-        ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b)
+        ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b)
 
         ui.create_new_widget(:widget_c, :name => 'Bar')
-        ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_b, :widget_c)
+        ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b, :widget_c)
 
         ui.delete_widget(:widget_b)
-        ui.widget_list.widgets.should == k.get_data(:widgets).slice(:widget_a, :widget_c)
+        ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_c)
       end
     end
   end
