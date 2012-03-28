@@ -15,4 +15,24 @@ describe Kookaburra::Configuration do
       subject.server_error_detection.should == block
     end
   end
+
+  describe '#app_host_uri' do
+    it 'returns a URI version of the #app_host attribute via URI.parse' do
+      URI.should_receive(:parse) \
+        .with('http://example.com') \
+        .and_return(:a_parsed_uri)
+      subject.app_host = 'http://example.com'
+      subject.app_host_uri.should == :a_parsed_uri
+    end
+
+    it 'changes if #app_host changes' do
+      URI.stub!(:parse) do |url|
+        url.to_sym
+      end
+      subject.app_host = 'http://example.com'
+      subject.app_host_uri.should == 'http://example.com'.to_sym
+      subject.app_host = 'http://foo.example.com'
+      subject.app_host_uri.should == 'http://foo.example.com'.to_sym
+    end
+  end
 end

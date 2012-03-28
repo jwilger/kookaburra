@@ -66,5 +66,16 @@ class Kookaburra
         @server_error_detection
       end
     end
+
+    # The parsed version of the {#app_host}
+    #
+    # This is useful if, for example, you are testing a multi-host application
+    # and need to change the hostname that will be accessed but want to keep the
+    # originally-specified port
+    #
+    # @return [URI] A URI object created from the {#app_host} string
+    def app_host_uri
+      URI.parse(app_host)
+    end
   end
 end
