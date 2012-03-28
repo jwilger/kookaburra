@@ -30,18 +30,12 @@ describe Kookaburra do
   end
 
   describe '#get_data' do
-    it 'returns a equivalent copy of the test data collection specified' do
-      foos = {:spam => 'ham'}
-      configuration.stub!(:mental_model => stub(:foos => foos))
-      k.get_data(:foos).should == foos
-    end
-
-    it 'does not return the same object that is the test data collection' do
-      k.get_data(:foos).should_not === k.get_data(:foos)
-    end
-
-    it 'returns a frozen object' do
-      k.get_data(:foos).should be_frozen
+    it 'returns a dup of the specified MentalModel::Collection' do
+      collection = stub('MentalModel::Collection')
+      collection.should_receive(:dup) \
+        .and_return(:mental_model_collection_dup)
+      configuration.stub!(:mental_model => stub(:foos => collection))
+      k.get_data(:foos).should == :mental_model_collection_dup
     end
   end
 

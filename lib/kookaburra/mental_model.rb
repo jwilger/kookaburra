@@ -1,5 +1,6 @@
 require 'delegate'
 require 'kookaburra/exceptions'
+require 'active_support/core_ext/hash'
 
 class Kookaburra
   # Each instance of {Kookaburra} has its own instance of MentalModel. This object
@@ -50,11 +51,12 @@ class Kookaburra
     class Collection < SimpleDelegator
       # @param [String] name The name of the collection. Used to provide
       #   helpful error messages when unknown keys are accessed.
-      def initialize(name)
+      def initialize(name, init_data = nil)
         @name = name
         data = Hash.new do |hash, key|
           raise UnknownKeyError, "Can't find mental_model.#{@name}[#{key.inspect}]. Did you forget to set it?"
         end
+        data.merge!(init_data) unless init_data.nil?
         super(data)
       end
 
@@ -103,6 +105,12 @@ class Kookaburra
       def delete_if(&block)
         move = lambda { |k,v| deleted[k] = v; true }
         super { |k,v| block.call(k,v) && move.call(k,v) }
+      end
+
+      def dup
+        new_data = {}.merge(self)
+        new_data = Marshal.load(Marshal.dump(new_data))
+        self.class.new(@name, new_data)
       end
     end
   end

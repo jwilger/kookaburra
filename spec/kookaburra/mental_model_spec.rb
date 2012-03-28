@@ -90,5 +90,27 @@ describe Kookaburra::MentalModel do
       lambda { collection[:foo] }.should \
         raise_error(Kookaburra::UnknownKeyError, "Can't find mental_model.widgets[:foo]. Did you forget to set it?")
     end
+
+    describe '#dup' do
+      it 'returns a different object' do
+        new_collection = collection.dup
+        new_collection.__id__.should_not === collection.__id__
+      end
+
+      it 'returns an object with equal values to the original' do
+        collection[:foo] = :bar
+        collection[:baz] = :bam
+        new_collection = collection.dup
+        new_collection[:foo].should == :bar
+        new_collection[:baz].should == :bam
+      end
+
+      it 'is a deep copy' do
+        collection[:foo] = {:bar => 'baz'}
+        new_collection = collection.dup
+        new_collection[:foo][:bar].should == 'baz'
+        new_collection[:foo][:bar].__id__.should_not === collection[:foo][:bar].__id__
+      end
+    end
   end
 end
