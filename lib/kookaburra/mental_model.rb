@@ -66,23 +66,6 @@ class Kookaburra
         self.object_id == other.object_id
       end
 
-      # Returns the values of multiple keys from the collection.
-      #
-      # Unlike the `Hash#slice` implementation provided by ActiveSupport, this
-      # method returns an array of the values rather than a Hash.
-      #
-      # @param keys a list of keys to fetch from the collection.
-      #
-      # @return [Array] the values matching the specified index keys
-      #
-      # @raise [Kookaburra::UnknownKeyError] if any of the specified keys have
-      #   not been set
-      def slice(*keys)
-        results = keys.map do |key|
-          self[key]
-        end
-      end
-
       # Deletes a key/value pair from the collection, and persists the deleted pair
       # in a subcollection.
       #

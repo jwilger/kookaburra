@@ -14,12 +14,21 @@ describe Kookaburra::MentalModel do
   describe Kookaburra::MentalModel::Collection do
     let(:collection) { Kookaburra::MentalModel::Collection.new('widgets') }
 
-    describe '#slice' do
+    describe '#values_at' do
       it 'returns an array of items matching the specified keys' do
         collection[:foo] = 'foo'
         collection[:bar] = 'bar'
         collection[:baz] = 'baz'
-        collection.slice(:foo, :baz).should == %w(foo baz)
+        collection.values_at(:foo, :baz).should == %w(foo baz)
+      end
+    end
+
+    describe '#slice' do
+      it 'returns a hash of items matching the specified keys' do
+        collection[:foo] = 'foo'
+        collection[:bar] = 'bar'
+        collection[:baz] = 'baz'
+        collection.slice(:foo, :baz).should == { :foo => 'foo', :baz => 'baz' }
       end
     end
 
