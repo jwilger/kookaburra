@@ -104,5 +104,15 @@ class Kookaburra
       mental_model = Kookaburra.configuration.mental_model # naughty
       MentalModel::Matcher.new(mental_model, collection_key)
     end
+
+    # Custom assertion for Test::Unit-style tests
+    # (really, anything that uses #assert(predicate, message = nil))
+    def assert_mental_model_of(collection_key, actual, message = nil)
+      matcher = match_mental_model_of(collection_key)
+      result = matcher.matches?(actual)
+      message ||= matcher.failure_message_for_should
+
+      assert result, message
+    end
   end
 end
