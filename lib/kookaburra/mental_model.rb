@@ -119,14 +119,12 @@ class Kookaburra
     # (The test_helpers.rb file provides a match function
     # for RSpec and a custom assertion for Test::Unit.)
     class Matcher
-      attr_reader :expected_items, :unexpected_items, :collection_key
-
       def initialize(mental_model, collection_key)
         @collection_key = collection_key
 
         mental_model.send(collection_key).tap do |collection|
-          @expected_items   = collection.values
-          @unexpected_items = collection.deleted.values
+          @expected   = collection
+          @unexpected = collection.deleted
         end
       end
 
@@ -177,6 +175,9 @@ class Kookaburra
       def clear_memoization!
         @expected_items_not_found = @unexpected_items_found = nil
       end
+
+      def expected_items;   @expected.values;   end
+      def unexpected_items; @unexpected.values; end
 
       def expected_items_not_found
         @expected_items_not_found ||= begin
