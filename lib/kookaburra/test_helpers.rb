@@ -1,4 +1,5 @@
 require 'kookaburra'
+require 'kookaburra/mental_model_matcher'
 require 'active_support/core_ext/module/delegation'
 
 class Kookaburra
@@ -96,5 +97,12 @@ class Kookaburra
     # @method ui
     # Delegates to {#k}
     delegate :ui, :to => :k
+
+    # RSpec-style custom matcher that compares a given array with
+    # the current state of one named collection in the mental model
+    def match_mental_model_of(collection_key)
+      mental_model = Kookaburra.configuration.mental_model # naughty
+      MentalModel::Matcher.new(mental_model, collection_key)
+    end
   end
 end
