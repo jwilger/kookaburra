@@ -81,6 +81,8 @@ EOF
       it "#matches? returns false" do
         matcher.matches?(target).should be_false
       end
+
+      it '#failure_message_for_should'
     end
 
     context "when the actual list is [bar] (foo missing, bar deleted)" do
@@ -89,6 +91,8 @@ EOF
       it "#matches? returns false" do
         matcher.matches?(target).should be_false
       end
+
+      it '#failure_message_for_should'
     end
 
     context "when the actual list is [foo, bar] (bar deleted)" do
@@ -97,6 +101,8 @@ EOF
       it "#matches? returns false" do
         matcher.matches?(target).should be_false
       end
+
+      it '#failure_message_for_should'
     end
 
     context "when the actual list is [foo] (foo expected)" do
@@ -114,5 +120,9 @@ EOF
         matcher.matches?(target).should be_true
       end
     end
+  end
+
+  describe "chaining methods for scoping" do
+    it "should have them"
   end
 end
