@@ -9,16 +9,22 @@ describe Kookaburra::MentalModel::Matcher do
     end
   end
 
-  def pp_array(array)
+  def self.pp_array(array)
     array = array.sort if array.all? { |e| e.respond_to?(:<=>) }
     array.inspect
+  end
+  def pp_array(array)
+    self.class.pp_array(array)
   end
 
   let(:matcher) { matcher_for(:widgets) }
 
-  let(:foo) { { :name => 'Foo', :type => 'widget' } }
-  let(:bar) { { :name => 'Bar', :type => 'widget' } }
-  let(:yak) { { :name => 'Yak', :type => 'widget' } }
+  def self.foo; { :name => 'Foo' } ; end
+  def self.bar; { :name => 'Bar' } ; end
+  def self.yak; { :name => 'Yak' } ; end
+  let(:foo) { self.class.foo }
+  let(:bar) { self.class.bar }
+  let(:yak) { self.class.yak }
 
   def self.it_matches
     it "matches" do
@@ -29,6 +35,26 @@ describe Kookaburra::MentalModel::Matcher do
   def self.it_doesnt_match
     it "doesn't match" do
       matcher.matches?(target).should be_false
+    end
+  end
+
+  def self.it_complains_about_missing(missing, options)
+    expected = options[:from]
+    it "complains about missing elements" do
+      msg = matcher.failure_message_for_should
+      msg.should include("expected widgets to match the user's mental model, but:"), "bad preface"
+      msg.should include("expected to be present:         #{pp_array(expected)}"),   "bad expected"
+      msg.should include("the missing elements were:      #{pp_array(missing)}"),    "bad missing"
+    end
+  end
+
+  def self.it_complains_about_extra(extra, options)
+    unexpected = options[:in]
+    it "complains about missing elements" do
+      msg = matcher.failure_message_for_should
+      msg.should include("expected widgets to match the user's mental model, but:"), "bad preface"
+      msg.should include("expected to not be present:     #{pp_array(unexpected)}"), "bad unexepected"
+      msg.should include("the unexpected extra elements:  #{pp_array(extra)}"),      "bad extra"
     end
   end
 
@@ -51,16 +77,8 @@ describe Kookaburra::MentalModel::Matcher do
 
     context "for [] (foo missing)" do
       let(:target) { [] }
-
       it_doesnt_match
-
-      it "complains about missing foo" do
-        matcher.failure_message_for_should.should == <<-EOF
-expected widgets to match the user's mental model, but:
-expected to be present:         #{pp_array([foo])}
-the missing elements were:      #{pp_array([foo])}
-EOF
-      end
+      it_complains_about_missing [foo], :from => [foo]
     end
 
     context "for [foo] (OK: exact match)" do
@@ -82,30 +100,14 @@ EOF
 
     context "for []" do
       let(:target) { [] }
-      
       it_doesnt_match
-
-      it 'complains about missing foo, bar' do
-        matcher.failure_message_for_should.should == <<-EOF
-expected widgets to match the user's mental model, but:
-expected to be present:         #{pp_array([foo, bar])}
-the missing elements were:      #{pp_array([foo, bar])}
-EOF
-      end
+      it_complains_about_missing [foo, bar], :from => [foo, bar]
     end
 
     context "for [foo] (bar missing)" do
       let(:target) { [foo] }
-      
       it_doesnt_match
-
-      it 'complains about missing foo' do
-        matcher.failure_message_for_should.should == <<-EOF
-expected widgets to match the user's mental model, but:
-expected to be present:         #{pp_array([foo, bar])}
-the missing elements were:      #{pp_array([bar])}
-EOF
-      end
+      it_complains_about_missing [bar], :from => [foo, bar]
     end
 
     context "for [foo, bar] (OK: exact match)" do
@@ -128,46 +130,21 @@ EOF
 
     context "for [] (foo missing)" do
       let(:target) { [] }
-
       it_doesnt_match
-
-      it 'complains about missing foo' do
-        matcher.failure_message_for_should.should == <<-EOF
-expected widgets to match the user's mental model, but:
-expected to be present:         #{pp_array([foo])}
-the missing elements were:      #{pp_array([foo])}
-EOF
-      end
+      it_complains_about_missing [foo], :from => [foo]
     end
 
     context "for [bar] (foo missing, bar deleted)" do
       let(:target) { [bar] }
-      
       it_doesnt_match
-
-      it 'complains about missing foo and extra bar' do
-        matcher.failure_message_for_should.should == <<-EOF
-expected widgets to match the user's mental model, but:
-expected to be present:         #{pp_array([foo])}
-the missing elements were:      #{pp_array([foo])}
-expected to not be present:     #{pp_array([bar])}
-the unexpected extra elements:  #{pp_array([bar])}
-EOF
-      end
+      it_complains_about_missing [foo], :from => [foo]
+      it_complains_about_extra [bar], :in => [bar]
     end
 
     context "for [foo, bar] (bar deleted)" do
       let(:target) { [foo, bar] }
-      
       it_doesnt_match
-
-      it 'complains about extra bar' do
-        matcher.failure_message_for_should.should == <<-EOF
-expected widgets to match the user's mental model, but:
-expected to not be present:     #{pp_array([bar])}
-the unexpected extra elements:  #{pp_array([bar])}
-EOF
-      end
+      it_complains_about_extra [bar], :in => [bar]
     end
 
     context "for [foo] (OK: foo expected, bar not found)" do
