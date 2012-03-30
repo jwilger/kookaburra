@@ -21,26 +21,26 @@ describe Kookaburra::MentalModel::Matcher do
   let(:yak) { { :name => 'Yak', :type => 'widget' } }
 
   def self.it_matches
-    it "matches (short form)" do
+    it "matches" do
       matcher.matches?(target).should be_true
     end
   end
 
-  context "expecting [];" do
-    context "for []" do
-      let(:target) { [] }
+  def self.it_doesnt_match
+    it "doesn't match" do
+      matcher.matches?(target).should be_false
+    end
+  end
 
-      it "matches when given an empty array" do
-        matcher.matches?(target).should be_true
-      end
+  context "expecting [];" do
+    context "for [] (OK)" do
+      let(:target) { [] }
+      it_matches
     end
 
     context "for [foo] (foo not in mental model)" do
       let(:target) { [foo] }
-
-      it "matches" do
-        matcher.matches?(target).should be_true
-      end
+      it_matches
     end
   end
 
@@ -52,9 +52,7 @@ describe Kookaburra::MentalModel::Matcher do
     context "for [] (foo missing)" do
       let(:target) { [] }
 
-      it 'does not match' do
-        matcher.matches?(target).should be_false
-      end
+      it_doesnt_match
 
       it "complains about missing foo" do
         matcher.failure_message_for_should.should == <<-EOF
@@ -65,20 +63,14 @@ EOF
       end
     end
 
-    context "for [foo] (OK)" do
+    context "for [foo] (OK: exact match)" do
       let(:target) { [foo] }
-
-      it "matches" do
-        matcher.matches?(target).should be_true
-      end
+      it_matches
     end
 
-    context "for [foo, bar] (bar not in mental model)" do
+    context "for [foo, bar] (OK: bar not in mental model)" do
       let(:target) { [foo, bar] }
-
-      it "matches" do
-        matcher.matches?(target).should be_true
-      end
+      it_matches
     end
   end
 
@@ -91,9 +83,7 @@ EOF
     context "for []" do
       let(:target) { [] }
       
-      it "does not match" do
-        matcher.matches?(target).should be_false
-      end
+      it_doesnt_match
 
       it 'complains about missing foo, bar' do
         matcher.failure_message_for_should.should == <<-EOF
@@ -104,36 +94,28 @@ EOF
       end
     end
 
-    context "for [bar] (foo missing)" do
-      let(:target) { [bar] }
+    context "for [foo] (bar missing)" do
+      let(:target) { [foo] }
       
-      it "does not match" do
-        matcher.matches?(target).should be_false
-      end
+      it_doesnt_match
 
       it 'complains about missing foo' do
         matcher.failure_message_for_should.should == <<-EOF
 expected widgets to match the user's mental model, but:
 expected to be present:         #{pp_array([foo, bar])}
-the missing elements were:      #{pp_array([foo])}
+the missing elements were:      #{pp_array([bar])}
 EOF
       end
     end
 
-    context "for [foo, bar] (OK)" do
+    context "for [foo, bar] (OK: exact match)" do
       let(:target) { [foo, bar] }
-      
-      it "does not match" do
-        matcher.matches?(target).should be_true
-      end
+      it_matches
     end
 
-    context "for [foo, bar, yak] (foo, bar expected; yak not in mental model)" do
+    context "for [foo, bar, yak] (OK: foo, bar expected; yak not in mental model)" do
       let(:target) { [foo, bar, yak] }
-      
-      it "matches" do
-        matcher.matches?(target).should be_true
-      end
+      it_matches
     end
   end
 
@@ -146,10 +128,8 @@ EOF
 
     context "for [] (foo missing)" do
       let(:target) { [] }
-      
-      it "does not match" do
-        matcher.matches?(target).should be_false
-      end
+
+      it_doesnt_match
 
       it 'complains about missing foo' do
         matcher.failure_message_for_should.should == <<-EOF
@@ -163,9 +143,7 @@ EOF
     context "for [bar] (foo missing, bar deleted)" do
       let(:target) { [bar] }
       
-      it "does not match" do
-        matcher.matches?(target).should be_false
-      end
+      it_doesnt_match
 
       it 'complains about missing foo and extra bar' do
         matcher.failure_message_for_should.should == <<-EOF
@@ -181,9 +159,7 @@ EOF
     context "for [foo, bar] (bar deleted)" do
       let(:target) { [foo, bar] }
       
-      it "does not match" do
-        matcher.matches?(target).should be_false
-      end
+      it_doesnt_match
 
       it 'complains about extra bar' do
         matcher.failure_message_for_should.should == <<-EOF
@@ -194,24 +170,14 @@ EOF
       end
     end
 
-    context "for [foo] (foo expected)" do
+    context "for [foo] (OK: foo expected, bar not found)" do
       let(:target) { [foo] }
-      
-      it "matches" do
-        matcher.matches?(target).should be_true
-      end
+      it_matches
     end
 
-    context "for [foo, yak] (foo expected; yak not in mental model)" do
+    context "for [foo, yak] (OK: foo expected; yak not in mental model)" do
       let(:target) { [foo, yak] }
-      
-      it "matches" do
-        matcher.matches?(target).should be_true
-      end
+      it_matches
     end
-  end
-
-  describe "chaining methods for scoping" do
-    it "should have them"
   end
 end
