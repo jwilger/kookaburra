@@ -60,4 +60,38 @@ describe Kookaburra::TestHelpers do
       ['BAR'].should_not match_mental_model_of(:widgets)
     end
   end
+
+  describe "#assert_mental_model_of" do
+    let(:mm) { Kookaburra.configuration.mental_model }
+
+    let(:test_case) {
+      Object.new.tap do |obj|
+        obj.extend Kookaburra::TestHelpers
+
+        def obj.assert(predicate, message)
+          predicate || message
+        end
+      end
+    }
+
+    before(:each) do
+      mm.widgets[:foo] = 'FOO'
+    end
+
+    it "does a positive assertion" do
+      result = test_case.assert_mental_model_of(:widgets, ['FOO'])
+      result.should be_true
+    end
+
+    it "does a negative assertion" do
+      result = test_case.assert_mental_model_of(:widgets, ['BAR'])
+      result.should =~ /expected widgets to match the user's mental model, but/
+    end
+
+    it "does a negative assertion with a custom message" do
+      psa = 'Put the razor down and step away!'
+      result = test_case.assert_mental_model_of(:widgets, ['YAK'], psa)
+      result.should == psa
+    end
+  end
 end
