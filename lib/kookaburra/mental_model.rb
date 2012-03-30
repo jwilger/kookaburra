@@ -130,6 +130,21 @@ class Kookaburra
         end
       end
 
+      # TODO: uncomment these as specs demand them
+      # def expecting_nothing
+      #   only
+      # end
+      #
+      # def only(*collection_keys)
+      #   collection_keys.map!(&:to_s)
+      #   keepers = @mental_model[:expected].slice(*collection_keys)
+      #   tossers = @mental_model[:expected].except(*collection_keys)
+      #
+      #   @mental_model[:expected] = keepers
+      #   @mental_model[:unexpected].merge! tossers
+      #   self
+      # end
+
       def matches?(actual)
         @actual = actual
         clear_memoization!
