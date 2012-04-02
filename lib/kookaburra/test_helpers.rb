@@ -110,7 +110,7 @@ class Kookaburra
     # (really, anything that uses #assert(predicate, message = nil))
     #
     # @see Kookaburra::MentalModel::Matcher
-    def assert_mental_model_of(collection_key, actual, message = nil)
+    def assert_mental_model_matches(collection_key, actual, message = nil)
       matcher = match_mental_model_of(collection_key)
       result = matcher.matches?(actual)
       return if !!result  # don't even bother
