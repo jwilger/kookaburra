@@ -1,5 +1,7 @@
 require 'kookaburra/mental_model_matcher'
 
+# Makes the specs themselves a bit less verbose. You should probably read the
+# specs first, though.
 module MentalModelMatcherMacros
   def self.included(receiver)
     receiver.extend ClassMethods
@@ -79,18 +81,6 @@ describe Kookaburra::MentalModel::Matcher do
   let(:bar) { self.class.bar }
   let(:yak) { self.class.yak }
 
-  context "when mental model is [];" do
-    context "for [] (OK)" do
-      let(:target) { [] }
-      it_matches
-    end
-
-    context "for [foo] (OK: foo ignored)" do
-      let(:target) { [foo] }
-      it_matches
-    end
-  end
-
   context "when mental model is [foo];" do
     before(:each) do
       mm.widgets[:foo] = foo
@@ -113,13 +103,25 @@ describe Kookaburra::MentalModel::Matcher do
     end
   end
 
+  context "when mental model is [];" do
+    context "for [] (OK)" do
+      let(:target) { [] }
+      it_matches
+    end
+
+    context "for [foo] (OK: foo ignored)" do
+      let(:target) { [foo] }
+      it_matches
+    end
+  end
+
   context "when mental model is [foo, bar];" do
     before(:each) do
       mm.widgets[:foo] = foo
       mm.widgets[:bar] = bar
     end
 
-    context "for []" do
+    context "for [] (foo, bar missing)" do
       let(:target) { [] }
       it_doesnt_match
       it_complains_about_missing [foo, bar], :expected => [foo, bar]
@@ -139,21 +141,6 @@ describe Kookaburra::MentalModel::Matcher do
     context "for [foo, bar, yak] (OK: foo, bar expected; yak ignored)" do
       let(:target) { [foo, bar, yak] }
       it_matches
-    end
-
-    context "when scoped to only(:foo)" do
-      let(:matcher) { matcher_for(:widgets).only(:foo) }
-
-      context "for [foo] (OK: bar excluded by scope)" do
-        let(:target) { [foo] }
-        it_matches
-      end
-
-      context "for [foo, bar] (bar excluded by scope)" do
-        let(:target) { [foo, bar] }
-        it_doesnt_match
-        it_complains_about_extra [bar], :unexpected => [bar]
-      end
     end
   end
 
@@ -195,6 +182,28 @@ describe Kookaburra::MentalModel::Matcher do
   end
 
   describe "postfix scoping methods" do
+    context "when mental model is [foo, bar];" do
+      before(:each) do
+        mm.widgets[:foo] = foo
+        mm.widgets[:bar] = bar
+      end
+
+      context "but scoped to .only(:foo)" do
+        let(:matcher) { matcher_for(:widgets).only(:foo) }
+
+        context "for [foo] (OK)" do
+          let(:target) { [foo] }
+          it_matches
+        end
+
+        context "for [foo, bar] (not expecting [bar])" do
+          let(:target) { [foo, bar] }
+          it_doesnt_match
+          it_complains_about_extra [bar], :unexpected => [bar]
+        end
+      end
+    end
+
     context "when mental model is [foo];" do
       before(:each) do
         mm.widgets[:foo] = foo
@@ -218,28 +227,6 @@ describe Kookaburra::MentalModel::Matcher do
           let(:target) { [foo, bar] }
           it_doesnt_match
           it_complains_about_extra [foo], :unexpected => [foo]
-        end
-      end
-    end
-
-    context "when mental model is [foo, bar];" do
-      before(:each) do
-        mm.widgets[:foo] = foo
-        mm.widgets[:bar] = bar
-      end
-
-      context "but scoped to .only(:foo)" do
-        let(:matcher) { matcher_for(:widgets).only(:foo) }
-
-        context "for [foo] (OK)" do
-          let(:target) { [foo] }
-          it_matches
-        end
-
-        context "for [foo, bar] (not expecting [bar])" do
-          let(:target) { [foo, bar] }
-          it_doesnt_match
-          it_complains_about_extra [bar], :unexpected => [bar]
         end
       end
     end
