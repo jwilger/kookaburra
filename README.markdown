@@ -165,29 +165,34 @@ your own UIComponents. This method exists to verify preconditions and provide
 more informative error messages; it is not intended to be used for test
 verifications.
 
+`Kookaburra::TestHelpers` provides a convenient way to make assertions about the
+mental model.  If you are using Test::Unit, see
+`Kookaburra::TestHelpers#assert_mental_model_of`; for RSpec, see
+`Kookaburra::TestHelpers#match_mental_model_of`.
+
 Given the Cucumber scenario above, here is how the test implementation layer
 might look:
 
     # step_definitions/various_steps.rb
 
     Given "I have an existing account" do
-      given.existing_account(:my_account)
+      given.existing_account
     end
 
     Given "I have previously specified default payment options" do
-      given.default_payment_options_specified_for(:my_account)
+      given.default_payment_options_specified
     end
 
     Given "I have previously specified default shipping options" do
-      given.default_shipping_options_specified_for(:my_account)
+      given.default_shipping_options_specified
     end
 
     Given "I have an item in my shopping cart" do
-      given.an_item_in_my_shopping_cart(:my_account)
+      given.an_item_in_my_shopping_cart
     end
 
     When "I sign in to my account" do
-      ui.sign_in(:my_account)
+      ui.sign_in
     end
 
     When "I choose to check out" do
@@ -199,11 +204,13 @@ might look:
     end
 
     Then "I see that my default payment options will be used" do
-      ui.order_summary.payment_options.should == k.get_data(:default_payment_options)[:my_account]
+      ui.order_summary.payment_options.should match_mental_model_of(:default_payment_options)
+      # Or if you prefer Test::Unit style assertions...
+      # assert_mental_model_matches(:default_payment_options, ui.order_summary.payment_options)
     end
 
     Then "I see that my default shipping options will be used" do
-      ui.order_summary.shipping_options.should == k.get_data(:default_shipping_options)[:my_account]
+      ui.order_summary.shipping_options.should match_mental_model_of(:default_shipping_options)
     end
 
 The step definitions contain neither explicitly shared state (instance
@@ -281,17 +288,17 @@ share a `MentalModel` instance, which is available to both of them via their
 
 The `MentalModel` instance will return a `MentalModel::Collection` for any method
 called on the object. The `MentalModel::Collection` object behaves like a `Hash`
-for the most part, however it will raise a `Kookaburra::UnknownKeyError` if you
+for the most part; however, it will raise a `Kookaburra::UnknownKeyError` if you
 try to access a key that has not yet been assigned a value.
 
 Deletions (via `#delete` or `#delete_if`) will actually remove the key/value
-pair from the collection, but add it to a subcollection (available at
+pair from the collection, but add it to a sub-collection (available at
 `MentalModel::Collection#deleted`). This reflects the fact that the user's
 mental model of the dataset would also include any intentional exceptions -
-the user will, for example,  want to verify that an item they deleted does
+the user will, for example, want to verify that an item they deleted does
 not appear to be available in the system.
 
-Here's a quick example of MentalModel behavor:
+Here's an example of MentalModel behavior:
 
     mental_model = MentalModel.new
 
