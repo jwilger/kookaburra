@@ -100,12 +100,16 @@ class Kookaburra
 
     # RSpec-style custom matcher that compares a given array with
     # the current state of one named collection in the mental model
+    #
+    # @see Kookaburra::MentalModel::Matcher
     def match_mental_model_of(collection_key)
       MentalModel::Matcher.new(k.send(:__mental_model__), collection_key)
     end
 
     # Custom assertion for Test::Unit-style tests
     # (really, anything that uses #assert(predicate, message = nil))
+    #
+    # @see Kookaburra::MentalModel::Matcher
     def assert_mental_model_of(collection_key, actual, message = nil)
       matcher = match_mental_model_of(collection_key)
       result = matcher.matches?(actual)
