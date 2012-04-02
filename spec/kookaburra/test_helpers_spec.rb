@@ -41,18 +41,12 @@ describe Kookaburra::TestHelpers do
   end
 
   describe "methods related to the mental model" do
-    let(:mm) { Kookaburra.configuration.mental_model }
+    before(:each) do
+      mm = k.send(:__mental_model__)
+      mm.widgets[:foo] = 'FOO'
+    end
 
     describe "#match_mental_model_of" do
-      def sanity_check
-        match_mental_model_of(:widgets).should be_kind_of(Kookaburra::MentalModel::Matcher)
-      end
-
-      before(:each) do
-        sanity_check
-        mm.widgets[:foo] = 'FOO'
-      end
-
       it "does a positive match" do
         ['FOO'].should match_mental_model_of(:widgets)
       end
@@ -63,34 +57,24 @@ describe Kookaburra::TestHelpers do
     end
 
     describe "#assert_mental_model_of" do
-      let(:test_case) {
-        Object.new.tap do |obj|
-          obj.extend Kookaburra::TestHelpers
-
-          def obj.assert(predicate, message)
-            predicate || message
-          end
-        end
-      }
-
-      before(:each) do
-        mm.widgets[:foo] = 'FOO'
-      end
-
       it "does a positive assertion" do
-        result = test_case.assert_mental_model_of(:widgets, ['FOO'])
-        result.should be_true
+        actual = ['FOO']
+        actual.should match_mental_model_of(:widgets) # Sanity check
+        self.should_receive(:assert).never
+        self.assert_mental_model_of(:widgets, actual)
       end
 
       it "does a negative assertion" do
-        result = test_case.assert_mental_model_of(:widgets, ['BAR'])
-        result.should =~ /expected widgets to match the user's mental model, but/
+        actual = ['BAR']
+        self.should_receive(:assert).with(false, kind_of(String))
+        self.assert_mental_model_of(:widgets, actual)
       end
 
       it "does a negative assertion with a custom message" do
+        actual = ['YAK']
         psa = 'Put the razor down and step away!'
-        result = test_case.assert_mental_model_of(:widgets, ['YAK'], psa)
-        result.should == psa
+        self.should_receive(:assert).with(false, psa)
+        self.assert_mental_model_of(:widgets, actual, psa)
       end
     end
   end

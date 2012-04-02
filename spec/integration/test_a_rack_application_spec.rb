@@ -294,7 +294,7 @@ describe "testing a Rack application with Kookaburra" do
 
         def delete_widget(name)
           assert widget_list.visible?, "Widget list is not visible!"
-          widget_list.choose_to_delete_widget(mental_model.widgets[name])
+          widget_list.choose_to_delete_widget(mental_model.widgets.delete(name))
         end
       end
 
@@ -336,13 +336,24 @@ describe "testing a Rack application with Kookaburra" do
 
         ui.sign_in(:bob)
         ui.view_widget_list
+
+        # The following two lines are two different ways to shave the yak, but
+        # the second one does more to match against the full state of the mental
+        # model, provides better failure messages, and is shorter.
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b)
+        ui.widget_list.widgets.should match_mental_model_of(:widgets)
 
         ui.create_new_widget(:widget_c, :name => 'Bar')
+
+        # As above, these are equivalent, but the second line is preferred.
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b, :widget_c)
+        ui.widget_list.widgets.should match_mental_model_of(:widgets)
 
         ui.delete_widget(:widget_b)
+
+        # As above, these are equivalent, but the second line is preferred.
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_c)
+        ui.widget_list.widgets.should match_mental_model_of(:widgets)
       end
     end
   end
