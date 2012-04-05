@@ -28,27 +28,58 @@ as well as which driver to use for running the tests (currently only tested with
 Kookaburra is designed to run tests agains a remote web server (although that
 server could be running on the same machine, it doesn't need to be), and it is
 the responsibility of the test implementation to ensure that the server is
-running. Take a look at Kookaburra's own integration specs for one example of
-how to achieve this for a [Rack-based] [Rack] application. (Note that you cannot
-easily start the application server in a separate thread. Because Ruby uses
-green threads, the HTTP library used in the APIDriver will block while making
-its requests and prevent the application server thread from responding.)
+running. 
 
 The fact that Kookaburra runs against a remote server means that *it is not
 limited to testing only Ruby web applications*. As long as your application
 exposes a web-service API for use by the GivenDriver and an HTML user interface
 for use by the UIDriver, you can use Kookaburra to test it. Also, as long as
 you're careful with both your application and test designs, you're not limited
-to running your tests only in an isolated testing environment; you could run the
-same test suite you use for development against your production systems and even
-repurpose your Kookaburra-based tests for load-testing and similar applications.
+to running your tests only in an isolated testing environment; you could run
+the same test suite you use for development against your staging or production
+systems.
+
+### Testing an Application Running Locally ###
+
+The fact that Kookaburra is designed to support running tests against a remote
+server does not, of course, mean that the application cannot be running locally.
+It is possible to have your test suite manage the process of starting and
+stopping your server for you. Examples of how to do so with a Rack application
+are presented below, but you should be able to take the same basic approach with
+other types of application servers.
+
+Although Capybara is capable of starting a Rack application server on its own,
+the default setup only starts the server up on-demand when you call a method
+that requires the browser to interact with the web application. Because the
+APIDriver layer does not use Capybara, it is necessary to manage the server
+process on your own. Otherwise the server would not be guaranteed to be running
+when you call the APIDriver methods (particularly as these often appear in
+"Given" statements that are run before you start interacting with the web
+browser.)
+
+Keep in mind that, even if your server is capable of being started up in another
+thread within the same Ruby process that is executing your test suite, you will
+want to avoid doing so unless you are using a Ruby interpreter that supports
+native threads. Otherwise, when the APIDriver makes an HTTP call to your
+application's API, it will block while waiting for a response, thus preventing
+your application from being able to respond to that request and resulting in a
+timeout error in your tests.
 
 ### RSpec ###
 
-For [RSpec] [RSpec] integration tests, just add the following to
-`spec/support/kookaburra_setup.rb`:
+The following examples depict how you might configure RSpec to run tests against
+an already running application server (e.g. a remote staging site) and a Rack
+application server that is managed by the test suite.
+
+#### Testing an already running server ####
+
+If you are running your tests against an already running server, you can simply
+add the following to `spec/support/kookaburra_setup.rb`:
 
     require 'kookaburra/test_helpers'
+
+    # Change these to the files that define your custom GivenDriver and UIDriver
+    # implementations.
     require 'my_app/kookaburra/given_driver'
     require 'my_app/kookaburra/ui_driver'
 
@@ -58,7 +89,43 @@ For [RSpec] [RSpec] integration tests, just add the following to
       c.given_driver_class = MyApp::Kookaburra::GivenDriver
       c.ui_driver_class = MyApp::Kookaburra::UIDriver
       c.app_host = 'http://my_app.example.com:1234'
-      c.browser = Capybara
+      c.browser = Capybara::Session.new(:selenium)
+      c.server_error_detection { |browser|
+        browser.has_css?('head title', :text => 'Internal Server Error')
+      }
+    end
+
+    RSpec.configure do |c|
+      # Makes the #k, #given and #ui methods available to your specs
+      # (See section on test implementation below)
+      c.include(Kookaburra::TestHelpers, :type => :request)
+    end
+
+#### Managing startup and shutdown of a Rack application server ####
+
+While developing, it can be helpful to run your integration specs against a
+locally-running server that is managed by your test suite. The setup is similar
+to that in the previous section, but it adds before and after hooks to launch
+and shut down a Rack application server. Just add the following to
+`spec/support/kookaburra_setup.rb`:
+
+    require 'kookaburra/test_helpers'
+    require 'thwait'
+
+    # Change these to the files that define your custom GivenDriver and UIDriver
+    # implementations.
+    require 'my_app/kookaburra/given_driver'
+    require 'my_app/kookaburra/ui_driver'
+
+    APP_PORT = ENV['APP_PORT'] || 3009
+
+    # c.app_host below should be set to whatever the root URL of your running
+    # application is.
+    Kookaburra.configure do |c|
+      c.given_driver_class = MyApp::Kookaburra::GivenDriver
+      c.ui_driver_class = MyApp::Kookaburra::UIDriver
+      c.app_host = 'http://localhost:%d' % APP_PORT
+      c.browser = Capybara::Session.new(:selenium)
       c.server_error_detection { |browser|
         browser.has_css?('head title', :text => 'Internal Server Error')
       }
@@ -66,13 +133,51 @@ For [RSpec] [RSpec] integration tests, just add the following to
 
     RSpec.configure do |c|
       c.include(Kookaburra::TestHelpers, :type => :request)
+
+      # Start the application server prior to running a group of integration
+      # specs. `MyApplication` below should be replaced with the object that
+      # implements the Rack `#call` interface for your application. For a Rails
+      # app, this would be along the lines of `MyAppName::Application`.
+      c.before(:all, :type => :request) do
+        # Run the server process in a forked process, and get a handle on that
+        # process, so that it can be shut down after the tests run.
+        @rack_server_pid = fork do
+          Capybara.server_port = APP_PORT
+          Capybara::Server.new(MyApplication).boot
+
+          # This ensures that this forked process keeps running, because the
+          # actual server is started in a thread by Capybara.
+          ThreadsWait.all_waits(Thread.list)
+        end
+
+        # Give the server a chance to start up in the forked process. You may
+        # need to adjust this depending on how long your application takes to
+        # start up.
+        sleep 1
+      end
+
+      # After the tests run, kill the server process. 
+      c.after(:all, :type => :request) do
+        Process.kill(9, @rack_server_pid)
+        Process.wait
+      end
     end
 
 ### Cucumber ###
 
-For [Cucumber] [Cucumber], add the following to `features/support/kookaburra_setup.rb`:
+The following examples depict how you might configure [Cucumber] [Cucumber] to
+run tests against an already running application server (e.g. a remote staging
+site) and a Rack application server that is managed by the test suite.
+
+#### Testing an already running server ####
+
+If you are running your tests against an already running server, you can simply
+add the following to `features/support/kookaburra_setup.rb`:
 
     require 'kookaburra/test_helpers'
+
+    # Change these to the files that define your custom GivenDriver and UIDriver
+    # implementations.
     require 'my_app/kookaburra/given_driver'
     require 'my_app/kookaburra/ui_driver'
 
@@ -82,7 +187,7 @@ For [Cucumber] [Cucumber], add the following to `features/support/kookaburra_set
       c.given_driver_class = MyApp::Kookaburra::GivenDriver
       c.ui_driver_class = MyApp::Kookaburra::UIDriver
       c.app_host = 'http://my_app.example.com:1234'
-      c.browser = Capybara
+      c.browser = Capybara::Session.new(:selenium)
       c.server_error_detection { |browser|
         browser.has_css?('head title', :text => 'Internal Server Error')
       }
@@ -90,8 +195,63 @@ For [Cucumber] [Cucumber], add the following to `features/support/kookaburra_set
 
     World(Kookaburra::TestHelpers)
 
-This will cause the #k, #given and #ui methods will be available in your
-Cucumber step definitions.
+#### Managing startup and shutdown of a Rack application server ####
+
+While developing, it can be helpful to run your acceptance tests against a
+locally-running server that is managed by your test suite. The setup is similar
+to that in the previous section, but it adds before and after hooks to launch
+and shut down a Rack application server. Just add the following to
+`features/support/kookaburra_setup.rb`:
+
+    require 'kookaburra/test_helpers'
+    require 'thwait'
+
+    # Change these to the files that define your custom GivenDriver and UIDriver
+    # implementations.
+    require 'my_app/kookaburra/given_driver'
+    require 'my_app/kookaburra/ui_driver'
+
+    APP_PORT = ENV['APP_PORT'] || 3009
+
+    # c.app_host below should be set to whatever the root URL of your running
+    # application is.
+    Kookaburra.configure do |c|
+      c.given_driver_class = MyApp::Kookaburra::GivenDriver
+      c.ui_driver_class = MyApp::Kookaburra::UIDriver
+      c.app_host = 'http://localhost:%d' % APP_PORT
+      c.browser = Capybara::Session.new(:selenium)
+      c.server_error_detection { |browser|
+        browser.has_css?('head title', :text => 'Internal Server Error')
+      }
+    end
+
+    World(Kookaburra::TestHelpers)
+
+    # Start the application server prior to running a group of integration
+    # specs. `MyApplication` below should be replaced with the object that
+    # implements the Rack `#call` interface for your application. For a Rails
+    # app, this would be along the lines of `MyAppName::Application`.
+    # Runs the server process in a forked process, and get a handle on that
+    # process, so that it can be shut down after the tests run.
+    @rack_server_pid = fork do
+      Capybara.server_port = APP_PORT
+      Capybara::Server.new(MyApplication).boot
+
+      # This ensures that this forked process keeps running, because the
+      # actual server is started in a thread by Capybara.
+      ThreadsWait.all_waits(Thread.list)
+    end
+
+    # Give the server a chance to start up in the forked process. You may
+    # need to adjust this depending on how long your application takes to
+    # start up.
+    sleep 1
+
+    # After the tests run, kill the server process. 
+    at_exit do
+      Process.kill(9, @rack_server_pid)
+      Process.wait
+    end
 
 ## Defining Your Testing DSL ##
 

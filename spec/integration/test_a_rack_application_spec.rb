@@ -1,11 +1,15 @@
 require 'kookaburra/test_helpers'
 require 'kookaburra/json_api_driver'
 require 'capybara'
+require 'thwait'
 
 # These are required for the Rack app used for testing
 require 'sinatra/base'
 require 'active_support/json'
 require 'active_support/hash_with_indifferent_access'
+
+# The server port that the application server will attach to
+APP_PORT = ENV['APP_PORT'] || 3009
 
 describe "testing a Rack application with Kookaburra" do
   describe "with an HTML interface" do
@@ -299,15 +303,10 @@ describe "testing a Rack application with Kookaburra" do
       end
 
       before(:all) do
-        @rack_server_port = 3339
         @rack_server_pid = fork do
-          Rack::Server.start(
-            :app => JsonApiApp.new,
-            :server => :webrick,
-            :Host => '127.0.0.1',
-            :Port => @rack_server_port,
-            :environment => 'production'
-          )
+          Capybara.server_port = APP_PORT
+          Capybara::Server.new(JsonApiApp.new).boot
+          ThreadsWait.all_waits(Thread.list)
         end
         sleep 1 # Give the server a chance to start up.
       end
@@ -321,7 +320,7 @@ describe "testing a Rack application with Kookaburra" do
         Kookaburra.configure do |c|
           c.ui_driver_class = MyUIDriver
           c.given_driver_class = MyGivenDriver
-          c.app_host = 'http://127.0.0.1:%d' % @rack_server_port
+          c.app_host = 'http://127.0.0.1:%d' % APP_PORT
           c.browser = Capybara::Session.new(:selenium)
           c.server_error_detection do |browser|
             browser.has_css?('head title', :text => 'Internal Server Error')
