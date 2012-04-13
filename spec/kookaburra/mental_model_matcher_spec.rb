@@ -26,7 +26,10 @@ module MentalModelMatcherMacros
     end
 
     def from_line
-      '(line %d)' % caller(2).first.split(':').last
+      #puts '#' * 80
+      #puts "it is: '#{caller(2).first.split(':').inspect}'"
+      #puts '#' * 81
+      '(line %d)' % caller(2).first.split(':')[1]
     end
 
     def it_complains_about_missing(missing, options)
