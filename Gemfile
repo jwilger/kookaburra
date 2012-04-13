@@ -12,7 +12,6 @@ group :development do
   gem 'yard'
   gem 'redcarpet', '~> 1.0' # used to format documentation
   gem 'jeweler'
-  gem 'rcov'
   gem 'reek'
   gem 'sinatra'
 end
