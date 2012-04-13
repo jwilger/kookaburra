@@ -32,12 +32,6 @@ task :default => :spec
 desc 'Run specs'
 RSpec::Core::RakeTask.new
 
-desc "Generate code coverage"
-RSpec::Core::RakeTask.new(:coverage) do |t|
-  t.rcov = true
-  t.rcov_opts = ['--exclude', 'spec']
-end
-
 require 'reek/rake/task'
 Reek::Rake::Task.new do |t|
   t.fail_on_error = true
@@ -47,3 +41,13 @@ end
 
 require 'yard'
 YARD::Rake::YardocTask.new
+
+desc "Run rake on all supported rubies"
+task :all_rubies do
+  rubies = %w[ruby-1.9.3 ruby-1.9.2 ree-1.8.7 ruby-1.8.7]
+  rubies.each do |ruby_version|
+    puts "Testing with #{ruby_version}"
+    system "rvm #{ruby_version}@kookaburra do rake" \
+      or raise "Failed to run rake with #{ruby_version}!"
+  end
+end
