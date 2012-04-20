@@ -149,7 +149,7 @@ class Kookaburra
       #   function returns true
       def detect_server_error!
         if @server_error_detection.try(:call, browser)
-          raise UnexpectedResponse, "Your server error detection function detected a server error. Looks like your applications is busted. :-("
+          raise UnexpectedResponse.new, "Your server error detection function detected a server error. Looks like your application is busted. :-("
         end
       end
     end

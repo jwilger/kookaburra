@@ -89,7 +89,8 @@ describe Kookaburra::UIDriver::UIComponent do
       component.stub!(:component_locator => '#my_component')
       component.stub!(:component_locator => '#my_component')
       lambda { component.visible? } \
-        .should raise_error(Kookaburra::UnexpectedResponse)
+        .should raise_error(Kookaburra::UnexpectedResponse) { |error|
+          error.status_code.should be_nil }
     end
   end
 
