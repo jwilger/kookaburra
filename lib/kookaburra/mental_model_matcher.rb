@@ -1,4 +1,5 @@
 require 'kookaburra/mental_model'
+require 'capybara/util/timeout'
 
 class Kookaburra
   class MentalModel
@@ -7,8 +8,20 @@ class Kookaburra
     # @see Kookaburra::TestHelpers#match_mental_model_of
     # @see Kookaburra::TestHelpers#assert_mental_model_of
     class Matcher
-      def initialize(mental_model, collection_key)
+      # Creates a new matcher for the given MentalModel on the given
+      # collection_key.
+      #
+      # @param [MentalModel] mental_model The MentalModel instance to
+      #   request the expected collection from.
+      # @param collection_key The name of the collection that contains
+      #   the expected elements.
+      # @param [Integer] wait_for The number of seconds during which to
+      #   continually retry failures, before reporting the failure. Not
+      #   used when comparing against an array (see #matches?).
+      # @return [self]
+      def initialize(mental_model, collection_key, wait_for = 2)
         @collection_key = collection_key
+        @wait_for = wait_for
 
         mental_model.send(collection_key).tap do |collection|
           @expected   = collection.dup
@@ -78,17 +91,62 @@ class Kookaburra
         only
       end
 
+      # Specifies the method to try calling on "actual," which is expected to
+      # return the observed result for comparison against the mental model.
+      #
+      # @param [Symbol] method The method to call on "actual"
+      # @return [self]
+      def using(collection_method)
+        @collection_method = collection_method
+        self
+      end
+
       # The result contains everything that was expected to be found and nothing
       # that was unexpected.
       #
+      # The MentalModel::Matcher can be used with two types of objects.
+      #
+      # 1) If the matcher is called on an Array, a direct comparison will be
+      # done between the Array and the MentalModel collection (after any
+      # specified scoping or mapping methods have) been applied.
+      #
+      # 2) If the matcher is called on an object that responds to the
+      # collection_method (which defaults to the collection_key but can be
+      # overridden with "#using"), the result of actual#collection_method will
+      # be used for the comparison.
+      #
+      # When using method #2, if the match is unsuccessful, failure won't be
+      # reported immediately; instead, the comparison will be retried
+      # continuously for the number of seconds specified by wait_for (see
+      # "#initialize").  This is the recommended usage, and is useful for taking
+      # into account possible rendering delays.
+      #
       # (Part of the RSpec protocol for custom matchers.)
       #
-      # @param [Array] actual This is the data observed that you are attempting
-      #   to match against the mental model.
+      # @param [Array, #collection_method] actual This is the data observed
+      #   (or an object that returns the data observed when called with
+      #   collection_method) that you you are attempting to match against the
+      #   mental model.
       # @return Boolean
       def matches?(actual)
-        @actual = actual
-        expected_items_not_found.empty? && unexpected_items_found.empty?
+        @collection_method ||= @collection_key
+        @proc_for_actual = if actual.respond_to?(@collection_method.to_sym)
+          proc { actual.send(@collection_method.to_sym) }
+        else
+          @wait_for = 0
+          proc { actual }
+        end
+        if @wait_for > 0
+          Capybara.timeout(@wait_for) do
+            begin
+              check_expectations
+            rescue Capybara::TimeoutError
+              false
+            end
+          end
+        else
+          check_expectations
+        end
       end
 
       # Message to be printed when observed reality does not conform to
@@ -141,6 +199,11 @@ class Kookaburra
       def unexpected_items_found
         unexpected_items_not_found = difference_between_arrays(unexpected_items, @actual)
         difference_between_arrays(unexpected_items, unexpected_items_not_found)
+      end
+
+      def check_expectations
+        @actual = @proc_for_actual.call
+        expected_items_not_found.empty? && unexpected_items_found.empty?
       end
 
       # (Swiped from RSpec's array matcher)

@@ -144,11 +144,19 @@ describe "testing a Rack application with Kookaburra" do
           content << <<-EOF
                 <ul>
           EOF
+          #
+          # Note that we're simulating a rendering delay for the "name" attribute
+          # of the widgets.  They're being placed into a temporary data-attribute
+          # and then, 300ms later (see the setTimeout below), the value in that
+          # attribute is moved to the text content of the element, where it's to
+          # be expected.  This is being done so we can test that the matcher won't
+          # fail immediately, and that it will retry for a period of time.
+          #
           @@widgets.each do |w|
             content << <<-EOF
                   <li class="widget_summary">
                     <span class="id">#{w[:id]}</span>
-                    <span class="name">#{w[:name]}</span>
+                    <span class="name" data-name="#{w[:name]}"></span>
                     <form id="delete_#{w[:id]}" action="/widgets/#{w[:id]}" method="POST">
                       <button type="submit" value="Delete" />
                     </form>
@@ -159,6 +167,14 @@ describe "testing a Rack application with Kookaburra" do
                 </ul>
                 <a href="/widgets/new">New Widget</a>
               </div>
+              <script>
+                setTimeout(function(){
+                  nameElements = document.querySelectorAll('.widget_summary .name');
+                  for (i = 0; i < nameElements.length; i++) {
+                    nameElements[i].innerHTML = nameElements[i].getAttribute('data-name');
+                  }
+                }, 300);
+              </script>
             </body>
           </html>
           EOF
@@ -336,23 +352,43 @@ describe "testing a Rack application with Kookaburra" do
         ui.sign_in(:bob)
         ui.view_widget_list
 
-        # The following two lines are two different ways to shave the yak, but
-        # the second one does more to match against the full state of the mental
-        # model, provides better failure messages, and is shorter.
+        # We're going to test presence of the expected elements in two ways here.
+        # They're both similar, but the first technique (match_mental_model_of)
+        # does more to match against the full state of the mental model, provides
+        # better failure messages, and is shorter.  Also, the simple method of
+        # testing for equality of arrays will fail if there are any extraneous
+        # widgets in the list, while the MentalModelMatcher technique will take
+        # into account what is expected and what is explicitly not expected (through
+        # deletion); this is important in the case of a multi-client testing server.
+        # Finally, the array equality method will fail if the items are presented in
+        # a different order, which is usually irrelevant; this can be corrected for
+        # by using the unfortunately-named `=~` matcher.
+
+        # First we'll use the MentalModelMatcher; this is important because the
+        # MentalModelMatcher will actually wait until a given timeout (using
+        # Capybara's timeout) before failing, if items are not found.  Since
+        # we're simulating a rendering delay in the widget index, a direct
+        # comparison of arrays would outright fail without artificially delaying
+        # within the test (e.g. using `sleep`).
+        ui.widget_list.should match_mental_model_of(:widgets)
+
+        # Now that we know the rendering is done (since match_mental_model_of
+        # waited until it found them), we can compare the arrays.
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b)
-        ui.widget_list.widgets.should match_mental_model_of(:widgets)
 
         ui.create_new_widget(:widget_c, :name => 'Bar')
 
-        # As above, these are equivalent, but the second line is preferred.
+        # As above, these are mostly equivalent in this simple case, but the
+        # match_mental_model_of technique is preferred.
+        ui.widget_list.should match_mental_model_of(:widgets)
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b, :widget_c)
-        ui.widget_list.widgets.should match_mental_model_of(:widgets)
 
         ui.delete_widget(:widget_b)
 
-        # As above, these are equivalent, but the second line is preferred.
+        # As above, these are mostly equivalent in this simple case, but the
+        # match_mental_model_of technique is preferred.
+        ui.widget_list.should match_mental_model_of(:widgets)
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_c)
-        ui.widget_list.widgets.should match_mental_model_of(:widgets)
       end
     end
   end

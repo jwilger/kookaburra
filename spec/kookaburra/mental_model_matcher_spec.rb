@@ -308,4 +308,23 @@ describe Kookaburra::MentalModel::Matcher do
       end
     end
   end
+  describe "when target responds to collection_method" do
+    context "when mental model is [foo, bar];" do
+      before(:each) do
+        mm.widgets[:foo] = foo
+        mm.widgets[:bar] = bar
+      end
+
+      context "and target responds to collection_key" do
+        let(:target) { double(:widgets => [foo, bar]) }
+        it_matches
+      end
+
+      context "and target responds to specified collection_method" do
+        let(:matcher) { matcher_for(:widgets).using(:relevant_widgets) }
+        let(:target) { double(:relevant_widgets => [foo, bar]) }
+        it_matches
+      end
+    end
+  end
 end
