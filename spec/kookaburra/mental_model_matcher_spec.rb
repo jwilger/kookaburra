@@ -60,9 +60,7 @@ module MentalModelMatcherMacros
   end
 
   def matcher_for(collection_key)
-    Kookaburra::MentalModel::Matcher.new(mm, collection_key).tap do |m|
-      m.matches?(target)
-    end
+    Kookaburra::MentalModel::Matcher.new(mm, collection_key)
   end
 
   def pp_array(array)
@@ -75,7 +73,7 @@ describe Kookaburra::MentalModel::Matcher do
 
   let(:mm) { Kookaburra::MentalModel.new }
   let(:matcher) { matcher_for(:widgets) }
-  let(:failure_msg) { matcher.failure_message_for_should }
+  let(:failure_msg) { matcher.matches?(target); matcher.failure_message_for_should }
 
   def self.foo; 'FOO' ; end
   def self.bar; 'BAR' ; end
@@ -184,6 +182,52 @@ describe Kookaburra::MentalModel::Matcher do
     end
   end
 
+  describe "postfix presentation methods" do
+    context "when mental model is two 3-element arrays" do
+      before(:each) do
+        mm.widgets[:the_foos] = ['f1', 'f2', 'f3']
+        mm.widgets[:the_bars] = ['b1', 'b2', 'b3']
+      end
+
+      context "but .mapped_by a block that selects only 2 of the elements" do
+        let(:matcher) { matcher_for(:widgets).mapped_by { |v| v[1,2] } }
+
+        context "for [['f2', 'f3'], ['b2', 'b3']] (OK)" do
+          let(:target) { [['f2', 'f3'], ['b2', 'b3']] }
+          it_matches
+        end
+
+        context "for [['f1', 'f2', 'f3'], ['b1', 'b2', 'b3']] (foos and bars missing)" do
+          let(:target) { [@foos, @bars] }
+          it_doesnt_match
+          it_complains_about_missing [['f2', 'f3'], ['b2', 'b3']], :expected => [['f2', 'f3'], ['b2', 'b3']]
+        end
+      end
+    end
+
+    context "when mental model is ['radish', 'pickle'];" do
+      before(:each) do
+        mm.widgets[:radish] = 'radish'
+        mm.widgets[:pickle] = 'pickle'
+      end
+
+      context "but .mapped_by a block that upcases the elements" do
+        let(:matcher) { matcher_for(:widgets).mapped_by { |v| v.upcase } }
+
+        context "for ['RADISH', 'PICKLE'] (OK)" do
+          let(:target) { ['RADISH', 'PICKLE'] }
+          it_matches
+        end
+
+        context "for ['radish', 'pickle'] (RADISH and PICKLE missing)" do
+          let(:target) { ['radish', 'pickle'] }
+          it_doesnt_match
+          it_complains_about_missing ['RADISH', 'PICKLE'], :expected => ['RADISH', 'PICKLE']
+        end
+      end
+    end
+  end
+
   describe "postfix scoping methods" do
     context "when mental model is [foo, bar];" do
       before(:each) do
@@ -203,6 +247,36 @@ describe Kookaburra::MentalModel::Matcher do
           let(:target) { [foo, bar] }
           it_doesnt_match
           it_complains_about_extra [bar], :unexpected => [bar]
+        end
+
+        it "doesn't modify the deleted collection" do
+          Kookaburra::MentalModel::Matcher.new(mm, :widgets).only(:foo)
+          mm.widgets.deleted.should be_empty
+        end
+      end
+
+      context "but scoped by .where with a block that doesn't like foo" do
+        let(:matcher) { matcher_for(:widgets).where { |v| v != foo } }
+
+        context "for [bar] (OK)" do
+          let(:target) { [bar] }
+          it_matches
+        end
+
+        context "for [foo, bar] (not expecting [foo])" do
+          let(:target) { [foo, bar] }
+          it_doesnt_match
+          it_complains_about_extra [foo], :unexpected => [foo]
+        end
+      end
+
+      context "but scoped by .where with an invalid block" do
+        let(:matcher) { matcher_for(:widgets).where { |a, b| true } }
+        let(:target) { [] }
+
+        it "raises an error" do
+          lambda { matcher.matches?(target) }.should raise_error(
+            "Block supplied to #where must take one argument (the value)")
         end
       end
     end
@@ -231,6 +305,25 @@ describe Kookaburra::MentalModel::Matcher do
           it_doesnt_match
           it_complains_about_extra [foo], :unexpected => [foo]
         end
+      end
+    end
+  end
+  describe "when target responds to collection_method" do
+    context "when mental model is [foo, bar];" do
+      before(:each) do
+        mm.widgets[:foo] = foo
+        mm.widgets[:bar] = bar
+      end
+
+      context "and target responds to collection_key" do
+        let(:target) { double(:widgets => [foo, bar]) }
+        it_matches
+      end
+
+      context "and target responds to specified collection_method" do
+        let(:matcher) { matcher_for(:widgets).using(:relevant_widgets) }
+        let(:target) { double(:relevant_widgets => [foo, bar]) }
+        it_matches
       end
     end
   end
