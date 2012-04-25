@@ -50,7 +50,8 @@ describe Kookaburra::APIDriver do
     it 'raises an UnexpectedResponse if the response status is not the specified status' do
       lambda { api.post('/foo', 'bar', :expected_response_status => 666) } \
         .should raise_error(Kookaburra::UnexpectedResponse,
-                            "POST to /foo responded with 201 status, not 666 as expected\n\nfoo")
+                            "POST to /foo responded with 201 status, not 666 as expected\n\nfoo") { |error| 
+                              error.status_code.should == 201 }
     end
 
     it 'raises an ArgumentError with a useful message if no request path is specified' do
@@ -79,7 +80,8 @@ describe Kookaburra::APIDriver do
     it 'raises an UnexpectedResponse if the response status is not the specified status' do
       lambda { api.put('/foo', 'bar', :expected_response_status => 666) } \
         .should raise_error(Kookaburra::UnexpectedResponse,
-                            "PUT to /foo responded with 200 status, not 666 as expected\n\nfoo")
+                            "PUT to /foo responded with 200 status, not 666 as expected\n\nfoo") { |error| 
+                              error.status_code.should == 200 }
     end
 
     it 'raises an ArgumentError with a useful message if no request path is specified' do
@@ -108,7 +110,8 @@ describe Kookaburra::APIDriver do
     it 'raises an UnexpectedResponse if the response status is not the specified status' do
       lambda { api.get('/foo', :expected_response_status => 666) } \
         .should raise_error(Kookaburra::UnexpectedResponse,
-                            "GET to /foo responded with 200 status, not 666 as expected\n\nfoo")
+                            "GET to /foo responded with 200 status, not 666 as expected\n\nfoo") { |error| 
+                              error.status_code.should == 200 }
     end
 
     it 'raises an ArgumentError with a useful message if no request path is specified' do
@@ -137,7 +140,8 @@ describe Kookaburra::APIDriver do
     it 'raises an UnexpectedResponse if the response status is not the specified status' do
       lambda { api.delete('/foo', :expected_response_status => 666) } \
         .should raise_error(Kookaburra::UnexpectedResponse,
-                            "DELETE to /foo responded with 200 status, not 666 as expected\n\nfoo")
+                            "DELETE to /foo responded with 200 status, not 666 as expected\n\nfoo") { |error| 
+                              error.status_code.should == 200 }
     end
 
     it 'raises an ArgumentError with a useful message if no request path is specified' do

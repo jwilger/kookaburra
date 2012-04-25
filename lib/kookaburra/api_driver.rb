@@ -82,7 +82,7 @@ class Kookaburra
       verb, default_status = verb_map[request_type]
       expected_status = options[:expected_response_status] || default_status
       unless expected_status == response.status
-        raise UnexpectedResponse, "#{verb} to #{response.url} responded with " \
+        raise UnexpectedResponse.new(response.status), "#{verb} to #{response.url} responded with " \
           + "#{response.status} status, not #{expected_status} as expected\n\n" \
           + response.body
       end
