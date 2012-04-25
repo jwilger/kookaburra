@@ -4,7 +4,13 @@ class Kookaburra
   # @private
   class ConfigurationError < StandardError; end
   # @private
-  class UnexpectedResponse < RuntimeError; end
+  class UnexpectedResponse < RuntimeError
+    attr_reader :status_code
+
+    def initialize(status_code = nil)
+      @status_code = status_code
+    end
+  end
   # @private
   class AssertionFailed < RuntimeError; end
   # @private
