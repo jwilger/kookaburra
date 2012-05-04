@@ -98,8 +98,40 @@ class Kookaburra
     # Delegates to {#k}
     delegate :ui, :to => :k
 
-    # RSpec-style custom matcher that compares a given array with
-    # the current state of one named collection in the mental model
+    # RSpec-style custom matcher that compares an observed result with
+    # the current state of one named collection in the mental model.
+    #
+    # This matcher can be used in two different ways.
+    #
+    # 1) If the matcher is called on an Array, a direct comparison will be
+    # done between the Array and the MentalModel collection (after any
+    # specified scoping or mapping methods have) been applied.
+    #
+    # 2) If the matcher is called on an object that responds to the
+    # collection_method (which defaults to the collection_key but can be
+    # overridden with "#using"), the result of actual#collection_method will
+    # be used for the comparison.
+    #
+    # When using method #2, if the match is unsuccessful, failure won't be
+    # reported immediately; instead, the comparison will be retried
+    # continuously for the number of seconds specified by wait_for (see
+    # "#initialize").  This is the recommended usage, and is useful for taking
+    # into account possible rendering delays.
+    #
+    # @example Comparing against an array
+    #   mental_model.widgets = { :foo => foo, :bar => bar }
+    #   [foo, bar].should match_mental_model_of(:widgets)
+    # @example Comparing against an object that responds to the collection_key
+    #   mental_model.widgets = { :foo => foo, :bar => bar }
+    #   widget_index.widgets = [foo, bar]
+    #   widget_index.should match_mental_model_of(:widgets)
+    # @example Comparing against an object that responds to an alternate key
+    #   mental_model.widgets = { :foo => foo, :bar => bar }
+    #   widget_index.visible_widgets = [foo, bar]
+    #   widget_index.should match_mental_model_of(:widgets).using(:visible_widgets)
+    #
+    # @param [Symbol] collection_key The key of the collection on the
+    #   mental model that represents the observed result we want.
     #
     # @see Kookaburra::MentalModel::Matcher
     def match_mental_model_of(collection_key)
@@ -109,9 +141,26 @@ class Kookaburra
     # Custom assertion for Test::Unit-style tests
     # (really, anything that uses #assert(predicate, message = nil))
     #
+    # This is essentially a wrapper of match_mental_model_of.
+    #
+    # @param [Symbol] collection_key The key of the collection on the
+    #   mental model that represents the observed result we want.
+    # @param [Array, #collection_method] actual This is the data observed
+    #   (or an object that returns the data observed when called with
+    #   collection_method) that you you are attempting to match against the
+    #   mental model.
+    # @param [message] message Message to return in case of failure; if not
+    #   specified, will return message describing differences between expected
+    #   and actual.
+    # @param [options] options Hash of scoping/filtering blocks to call on
+    #   matcher (for limiting collection data to compare against) before
+    #   attempting match.  See the Matcher for details.
     # @see Kookaburra::MentalModel::Matcher
-    def assert_mental_model_matches(collection_key, actual, message = nil)
+    def assert_mental_model_matches(collection_key, actual, message = nil, options = {})
       matcher = match_mental_model_of(collection_key)
+      options.each_pair do |key, val|
+        matcher = matcher.send(key.to_sym, &val)
+      end
       result = matcher.matches?(actual)
       return if !!result  # don't even bother
 
