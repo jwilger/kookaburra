@@ -11,11 +11,12 @@ class Kookaburra
 
     private
 
-    # TODO: refactor me to not look like shit, please
     def define_dependency_accessor(name)
       define_method(name) do
+        class_name = self.class.name
+        class_name.sub!(/^$/, 'an Anonymous Class!!!')
         instance_variable_get("@#{name}") or raise "No %s object was set on %s initialization." \
-          % [name, [self.class.name, 'an Anonymous Class!!!'].reject{ |s| s == ""}.first]
+          % [name, class_name]
       end
 
       define_method("#{name}=") do |value|
