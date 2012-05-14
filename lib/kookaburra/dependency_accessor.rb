@@ -1,5 +1,3 @@
-require 'active_support/core_ext/string'
-
 class Kookaburra
   # @private
   module DependencyAccessor
@@ -13,10 +11,11 @@ class Kookaburra
 
     private
 
+    # TODO: refactor me to not look like shit, please
     def define_dependency_accessor(name)
       define_method(name) do
         instance_variable_get("@#{name}") or raise "No %s object was set on %s initialization." \
-          % [name, [self.class.name, 'an Anonymous Class!!!'].reject(&:blank?).first]
+          % [name, [self.class.name, 'an Anonymous Class!!!'].reject{ |s| s == ""}.first]
       end
 
       define_method("#{name}=") do |value|

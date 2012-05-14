@@ -28,7 +28,10 @@ class Kookaburra
       # @return [self]
       def only(*collection_keys)
         keepers = @expected.slice(*collection_keys)
-        tossers = @expected.except(*collection_keys)
+
+        # TODO: Reimplement this as MentalModel::Collection#except
+        # (corollary of #slice, apparently)
+        tossers = @expected.slice(*(@expected.keys - collection_keys))
 
         @expected = keepers
         @unexpected.merge! tossers
@@ -64,11 +67,11 @@ class Kookaburra
       # @return String
       def failure_message_for_should
         message = "expected #{@collection_key} to match the user's mental model, but:\n"
-        if expected_items_not_found.present?
+        unless expected_items_not_found.empty?
           message += "expected to be present:         #{pp_array(expected_items)}\n"
           message += "the missing elements were:      #{pp_array(expected_items_not_found)}\n"
         end
-        if unexpected_items_found.present?
+        unless unexpected_items_found.empty?
           message += "expected to not be present:     #{pp_array(unexpected_items)}\n"
           message += "the unexpected extra elements:  #{pp_array(unexpected_items_found)}\n"
         end

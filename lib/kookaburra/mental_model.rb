@@ -1,6 +1,5 @@
 require 'delegate'
 require 'kookaburra/exceptions'
-require 'active_support/core_ext/hash'
 
 class Kookaburra
   # Each instance of {Kookaburra} has its own instance of MentalModel. This object
@@ -67,6 +66,13 @@ class Kookaburra
       # @return [Boolean]
       def ===(other)
         self.object_id == other.object_id
+      end
+
+      def slice(*keys)
+        data = keys.inject({}) { |memo, key|
+          memo[key] = self[key]
+          memo
+        }
       end
 
       # Deletes a key/value pair from the collection, and persists the deleted pair

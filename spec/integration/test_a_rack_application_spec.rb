@@ -5,8 +5,7 @@ require 'thwait'
 
 # These are required for the Rack app used for testing
 require 'sinatra/base'
-require 'active_support/json'
-require 'active_support/hash_with_indifferent_access'
+require 'json'
 
 # The server port that the application server will attach to
 APP_PORT = ENV['APP_PORT'] || 3009
@@ -24,7 +23,7 @@ describe "testing a Rack application with Kookaburra" do
 
         def parse_json_req_body
           request.body.rewind
-          ActiveSupport::JSON.decode(request.body.read).symbolize_keys
+          JSON.parse(request.body.read, :symbolize_names => true)
         end
 
         post '/users' do
@@ -104,7 +103,7 @@ describe "testing a Rack application with Kookaburra" do
           widget_data = if request.media_type == 'application/json'
                           parse_json_req_body
                         else
-                          params.symbolize_keys.slice(:name)
+                          {:name => params['name']}
                         end
           widget_data[:id] = `uuidgen`.strip
           @@widgets << widget_data
