@@ -28,10 +28,7 @@ class Kookaburra
       # @return [self]
       def only(*collection_keys)
         keepers = @expected.slice(*collection_keys)
-
-        # TODO: Reimplement this as MentalModel::Collection#except
-        # (corollary of #slice, apparently)
-        tossers = @expected.slice(*(@expected.keys - collection_keys))
+        tossers = @expected.except(*collection_keys)
 
         @expected = keepers
         @unexpected.merge! tossers

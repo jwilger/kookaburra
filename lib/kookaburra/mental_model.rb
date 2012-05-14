@@ -75,6 +75,10 @@ class Kookaburra
         }
       end
 
+      def except(*keys)
+        slice(*(self.keys - keys))
+      end
+
       # Deletes a key/value pair from the collection, and persists the deleted pair
       # in a subcollection.
       #
