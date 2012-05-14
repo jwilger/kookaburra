@@ -53,7 +53,7 @@ class Kookaburra
       # @return Boolean
       def matches?(actual)
         @actual = actual
-        expected_items_not_found.empty? && unexpected_items_found.empty?
+        expected_items_found? && !unexpected_items_found?
       end
 
       # Message to be printed when observed reality does not conform to
@@ -64,13 +64,13 @@ class Kookaburra
       # @return String
       def failure_message_for_should
         message = "expected #{@collection_key} to match the user's mental model, but:\n"
-        unless expected_items_not_found.empty?
+        unless expected_items_found?
           message += "expected to be present:         #{pp_array(expected_items)}\n"
-          message += "the missing elements were:      #{pp_array(expected_items_not_found)}\n"
+          message += "the missing elements were:      #{pp_array(expected_items_that_were_not_found)}\n"
         end
-        unless unexpected_items_found.empty?
+        if unexpected_items_found?
           message += "expected to not be present:     #{pp_array(unexpected_items)}\n"
-          message += "the unexpected extra elements:  #{pp_array(unexpected_items_found)}\n"
+          message += "the unexpected extra elements:  #{pp_array(unexpected_items_that_were_found)}\n"
         end
         message
       end
@@ -99,13 +99,21 @@ class Kookaburra
       def expected_items;   @expected.values;   end
       def unexpected_items; @unexpected.values; end
 
-      def expected_items_not_found
+      def expected_items_that_were_not_found
         difference_between_arrays(expected_items, @actual)
       end
 
-      def unexpected_items_found
+      def unexpected_items_that_were_found
         unexpected_items_not_found = difference_between_arrays(unexpected_items, @actual)
         difference_between_arrays(unexpected_items, unexpected_items_not_found)
+      end
+
+      def expected_items_found?
+        expected_items_that_were_not_found.empty?
+      end
+
+      def unexpected_items_found?
+        !unexpected_items_that_were_found.empty?
       end
 
       # (Swiped from RSpec's array matcher)
