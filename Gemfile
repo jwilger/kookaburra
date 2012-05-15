@@ -1,6 +1,5 @@
 source 'http://rubygems.org'
 
-gem 'i18n'
 gem 'patron'
 gem 'json_pure'
 
