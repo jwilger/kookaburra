@@ -1,6 +1,6 @@
-require 'kookaburra/api_driver'
 require 'delegate'
-require 'active_support/json'
+require 'json'
+require 'kookaburra/api_driver'
 
 class Kookaburra
   # Delegates all methods (by default) to and instance of
@@ -55,11 +55,11 @@ class Kookaburra
     end
 
     def encode(data)
-      ActiveSupport::JSON.encode(data) unless data.nil?
+      JSON.dump(data) unless data.nil?
     end
 
     def decode(data)
-      ActiveSupport::JSON.decode(data)
+      JSON.parse(data)
     end
   end
 end

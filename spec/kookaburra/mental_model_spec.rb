@@ -24,11 +24,21 @@ describe Kookaburra::MentalModel do
     end
 
     describe '#slice' do
-      it 'returns a hash of items matching the specified keys' do
+      it 'returns a hash of items from the collection that match the specified keys' do
         collection[:foo] = 'foo'
         collection[:bar] = 'bar'
         collection[:baz] = 'baz'
-        collection.slice(:foo, :baz).should == { :foo => 'foo', :baz => 'baz' }
+        collection.slice(:foo, :baz).should == {:foo => 'foo', :baz => 'baz'}
+      end
+    end
+
+    describe '#except' do
+      it 'returns a hash of items from the collection that do not match the specified keys' do
+        collection[:foo] = 'foo'
+        collection[:bar] = 'bar'
+        collection[:baz] = 'baz'
+        collection[:yak] = 'yak'
+        collection.except(:foo, :baz).should == {:bar => 'bar', :yak => 'yak'}
       end
     end
 

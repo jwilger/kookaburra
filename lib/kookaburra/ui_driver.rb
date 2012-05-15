@@ -1,5 +1,4 @@
-require 'active_support/core_ext/hash'
-require 'active_support/core_ext/module/delegation'
+require 'forwardable'
 require 'kookaburra/assertion'
 require 'kookaburra/ui_driver/ui_component'
 require 'kookaburra/ui_driver/ui_component/address_bar'
@@ -60,6 +59,7 @@ class Kookaburra
   #   ui.account_management.account_list.should be_visible
   class UIDriver
     include Assertion
+    extend Forwardable
 
     class << self
       # Tells the UIDriver about your {UIComponent} subclasses.
@@ -112,6 +112,8 @@ class Kookaburra
 
     # @attribute [r] mental_model
     # @return [Kookaburra::MentalModel]
-    delegate :mental_model, :to => :@configuration
+    def_delegator :configuration, :mental_model
+
+    attr_reader :configuration
   end
 end

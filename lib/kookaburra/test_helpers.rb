@@ -1,6 +1,6 @@
+require 'forwardable'
 require 'kookaburra'
 require 'kookaburra/mental_model_matcher'
-require 'active_support/core_ext/module/delegation'
 
 class Kookaburra
   # This module is intended to be mixed in to your testing context to provide
@@ -81,6 +81,8 @@ class Kookaburra
   #     ui.widget_list.widgets.should == k.get_data(:widgets).slice(widgets)
   #   end
   module TestHelpers
+    extend Forwardable
+
     # The {Kookaburra} instance to be used by your tests. It gets configured
     # using the options set in {Kookaburra.configuration}, and the result is
     # memoized.
@@ -92,11 +94,11 @@ class Kookaburra
 
     # @method given
     # Delegates to {#k}
-    delegate :given, :to => :k
+    def_delegator :k, :given
 
     # @method ui
     # Delegates to {#k}
-    delegate :ui, :to => :k
+    def_delegator :k, :ui
 
     # RSpec-style custom matcher that compares a given array with
     # the current state of one named collection in the mental model

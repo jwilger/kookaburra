@@ -1,6 +1,5 @@
 require 'kookaburra/exceptions'
 require 'kookaburra/assertion'
-require 'active_support/core_ext/object/try'
 
 class Kookaburra
   class UIDriver
@@ -148,7 +147,8 @@ class Kookaburra
       # @raise [UnexpectedResponse] raised if the server error detection
       #   function returns true
       def detect_server_error!
-        if @server_error_detection.try(:call, browser)
+        return if @server_error_detection.nil?
+        if @server_error_detection.call(browser)
           raise UnexpectedResponse, "Your server error detection function detected a server error. Looks like your applications is busted. :-("
         end
       end
