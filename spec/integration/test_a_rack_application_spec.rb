@@ -7,8 +7,17 @@ require 'thwait'
 require 'sinatra/base'
 require 'json'
 
-# The server port that the application server will attach to
-APP_PORT = ENV['APP_PORT'] || 3009
+# You'd think there would be a better way to do this, but if there is, I
+# can't find it.
+def find_available_port
+  server = TCPServer.new('127.0.0.1', 0)
+  server.addr[1]
+ensure
+  server.close if server
+end
+
+# The server port to which the application server will attach
+APP_PORT = find_available_port
 
 describe "testing a Rack application with Kookaburra" do
   describe "with an HTML interface" do
