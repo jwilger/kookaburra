@@ -1,6 +1,5 @@
 require 'delegate'
 require 'kookaburra/exceptions'
-require 'active_support/core_ext/hash'
 
 class Kookaburra
   # Each instance of {Kookaburra} has its own instance of MentalModel. This object
@@ -67,6 +66,33 @@ class Kookaburra
       # @return [Boolean]
       def ===(other)
         self.object_id == other.object_id
+      end
+
+      # Returns a new hash that contains key/value pairs for the
+      # specified keys with values copied from this collection.
+      #
+      # @note This is semantically the same as `Hash#slice` as provided
+      #   by `ActiveSupport::CoreExt::Hash`
+      # @param [Object] *keys The keys that should be copied from the
+      #   collection
+      # @return [Hash] The resulting keys/values from the collection
+      def slice(*keys)
+        data = keys.inject({}) { |memo, key|
+          memo[key] = self[key]
+          memo
+        }
+      end
+
+      # Returns a new hash that contains every key/value from this
+      # collection *except* for the specified keys
+      #
+      # @note This is semantically the same as `Hash#except` as provided
+      #   by `ActiveSupport::CoreExt::Hash`
+      # @param [Object] *keys The keys that should *not* be copied from
+      #   the collection
+      # @return [Hash] The resulting keys/values from the collection
+      def except(*keys)
+        slice(*(self.keys - keys))
       end
 
       # Deletes a key/value pair from the collection, and persists the deleted pair
