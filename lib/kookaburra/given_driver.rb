@@ -1,4 +1,4 @@
-require 'active_support/core_ext/module/delegation'
+require 'forwardable'
 
 class Kookaburra
   # Your GivenDriver subclass is used to define your testing DSL for setting up
@@ -33,6 +33,8 @@ class Kookaburra
   #     end
   #   end
   class GivenDriver
+    extend Forwardable
+
     # It is unlikely that you would call #initialize yourself; your GivenDriver
     # object is instantiated for you by {Kookaburra#given}.
     #
@@ -48,7 +50,7 @@ class Kookaburra
     # Access to the shared {Kookaburra::MentalModel} instance
     #
     # @attribute [rw] mental_model
-    delegate :mental_model, :to => :configuration
+    def_delegator :configuration, :mental_model
 
     # Used to access your APIDriver in your own GivenDriver implementation
     #

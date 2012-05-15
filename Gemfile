@@ -1,8 +1,8 @@
 source 'http://rubygems.org'
 
 gem 'i18n'
-gem 'activesupport', '>= 3.0'
 gem 'patron'
+gem 'json_pure'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
