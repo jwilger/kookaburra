@@ -79,22 +79,13 @@ class Kookaburra
     end
 
     def check_response_status!(request_type, response, options)
-      verb, default_status = verb_map[request_type]
-      expected_status = options[:expected_response_status] || default_status
-      unless expected_status == response.status
+      verb = request_type.to_s.upcase
+      expected_status = options[:expected_response_status] || (200..299)
+      unless expected_status === response.status
         raise UnexpectedResponse, "#{verb} to #{response.url} responded with " \
           + "#{response.status} status, not #{expected_status} as expected\n\n" \
           + response.body
       end
-    end
-
-    def verb_map 
-      {
-        :get => ['GET', 200],
-        :post => ['POST', 201],
-        :put => ['PUT', 200],
-        :delete => ['DELETE', 200]
-      }
     end
   end
 end
