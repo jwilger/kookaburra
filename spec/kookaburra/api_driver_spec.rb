@@ -53,6 +53,17 @@ describe Kookaburra::APIDriver do
                             "POST to /foo responded with 201 status, not 666 as expected\n\nfoo")
     end
 
+    it 'is OK by default with a response status of 201' do
+      lambda { api.post('/foo', 'bar') } \
+        .should_not raise_error(Kookaburra::UnexpectedResponse)
+    end
+
+    it 'is OK by default with a response status of 200' do
+      response.stub!(:status => 200)
+      lambda { api.post('/foo', 'bar') } \
+        .should_not raise_error(Kookaburra::UnexpectedResponse)
+    end
+
     it 'raises an ArgumentError with a useful message if no request path is specified' do
       lambda { api.post(nil, 'bar') } \
         .should raise_error(ArgumentError, "You must specify a request URL, but it was nil.")
