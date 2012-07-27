@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.25.0"
+  s.version = "0.26.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["John Wilger", "Sam Livingston-Gray", "Ravi Gadad"]
-  s.date = "2012-07-08"
+  s.date = "2012-07-27"
   s.description = "Cucumber + Capybara = Kookaburra? It made sense at the time."
   s.email = "johnwilger@gmail.com"
   s.extra_rdoc_files = [
@@ -40,6 +40,7 @@ Gem::Specification.new do |s|
     "lib/kookaburra/mental_model_matcher.rb",
     "lib/kookaburra/test_helpers.rb",
     "lib/kookaburra/ui_driver.rb",
+    "lib/kookaburra/ui_driver/has_ui_components.rb",
     "lib/kookaburra/ui_driver/ui_component.rb",
     "lib/kookaburra/ui_driver/ui_component/address_bar.rb",
     "spec/integration/test_a_rack_application_spec.rb",
@@ -53,6 +54,7 @@ Gem::Specification.new do |s|
     "spec/kookaburra/ui_driver/ui_component_spec.rb",
     "spec/kookaburra/ui_driver_spec.rb",
     "spec/kookaburra_spec.rb",
+    "spec/support/shared_examples/it_can_have_ui_components.rb",
     "spec/support/shared_examples/it_can_make_assertions.rb",
     "spec/support/shared_examples/it_has_a_dependency_accessor.rb"
   ]
@@ -75,6 +77,7 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<jeweler>, [">= 0"])
       s.add_development_dependency(%q<reek>, [">= 0"])
       s.add_development_dependency(%q<sinatra>, [">= 0"])
+      s.add_development_dependency(%q<find_a_port>, [">= 1.0.1"])
     else
       s.add_dependency(%q<patron>, [">= 0"])
       s.add_dependency(%q<json_pure>, [">= 0"])
@@ -85,6 +88,7 @@ Gem::Specification.new do |s|
       s.add_dependency(%q<jeweler>, [">= 0"])
       s.add_dependency(%q<reek>, [">= 0"])
       s.add_dependency(%q<sinatra>, [">= 0"])
+      s.add_dependency(%q<find_a_port>, [">= 1.0.1"])
     end
   else
     s.add_dependency(%q<patron>, [">= 0"])
@@ -96,6 +100,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<jeweler>, [">= 0"])
     s.add_dependency(%q<reek>, [">= 0"])
     s.add_dependency(%q<sinatra>, [">= 0"])
+    s.add_dependency(%q<find_a_port>, [">= 1.0.1"])
   end
 end
 
