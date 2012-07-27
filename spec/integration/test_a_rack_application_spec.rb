@@ -226,7 +226,33 @@ describe "testing a Rack application with Kookaburra" do
         end
       end
 
+      class WidgetDataContainer
+        def initialize(element)
+          @element = element
+        end
+
+        def to_hash
+          {
+            'id' => @element.find('.id').text,
+            'name' => @element.find('.name').text
+          }
+        end
+      end
+
+      class LastWidgetCreated < Kookaburra::UIDriver::UIComponent
+        def component_locator
+          @options[:component_locator]
+        end
+
+        def data
+          raise "Foo" unless visible?
+          WidgetDataContainer.new(self).to_hash
+        end
+      end
+
       class WidgetList < Kookaburra::UIDriver::UIComponent
+        ui_component :last_widget_created, LastWidgetCreated, :component_locator => '#widget_list .last_widget.created'
+
         def component_path
           '/widgets'
         end
@@ -237,13 +263,8 @@ describe "testing a Rack application with Kookaburra" do
 
         def widgets
           all('.widget_summary').map do |el|
-            extract_widget_data(el)
+            WidgetDataContainer.new(el).to_hash
           end
-        end
-
-        def last_widget_created
-          element = find('.last_widget.created')
-          extract_widget_data(element)
         end
 
         def choose_to_create_new_widget
@@ -252,15 +273,6 @@ describe "testing a Rack application with Kookaburra" do
 
         def choose_to_delete_widget(widget_data)
           find("#delete_#{widget_data['id']}").click_button('Delete')
-        end
-
-        private
-
-        def extract_widget_data(element)
-          {
-            'id' => element.find('.id').text,
-            'name' => element.find('.name').text
-          }
         end
       end
 
@@ -293,7 +305,7 @@ describe "testing a Rack application with Kookaburra" do
           assert widget_list.visible?, "Widget list is not visible!"
           widget_list.choose_to_create_new_widget
           widget_form.submit('name' => 'My Widget')
-          mental_model.widgets[name] = widget_list.last_widget_created
+          mental_model.widgets[name] = widget_list.last_widget_created.data
         end
 
         def delete_widget(name)
@@ -343,6 +355,7 @@ describe "testing a Rack application with Kookaburra" do
         ui.widget_list.widgets.should match_mental_model_of(:widgets)
 
         ui.create_new_widget(:widget_c, :name => 'Bar')
+
 
         # As above, these are equivalent, but the second line is preferred.
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b, :widget_c)

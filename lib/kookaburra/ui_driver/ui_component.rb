@@ -1,5 +1,6 @@
 require 'kookaburra/exceptions'
 require 'kookaburra/assertion'
+require 'kookaburra/ui_driver/has_ui_components'
 
 class Kookaburra
   class UIDriver
@@ -67,6 +68,15 @@ class Kookaburra
     #   override the {#component_path} method.
     class UIComponent
       include Assertion
+      extend HasUIComponents
+
+      # The {Kookaburra::Configuration} with which the component
+      # instance was instantiated.
+      attr_reader :configuration
+
+      # The options Hash with which the component instance was
+      # instantiated.
+      attr_reader :options
 
       # New UIComponent instances are typically created for you by your
       # {Kookaburra::UIDriver} instance.
@@ -74,7 +84,11 @@ class Kookaburra
       # @see Kookaburra::UIDriver.ui_component
       #
       # @param [Kookaburra::Configuration] configuration
-      def initialize(configuration)
+      # @param [Hash] options An options hash that can be used to
+      #   further configure a `UIComponent`'s behavior.
+      def initialize(configuration, options = {})
+        @configuration = configuration
+        @options = options
         @browser = configuration.browser
         @app_host = configuration.app_host
         @server_error_detection = configuration.server_error_detection

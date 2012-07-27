@@ -1,5 +1,6 @@
 require 'forwardable'
 require 'kookaburra/assertion'
+require 'kookaburra/ui_driver/has_ui_components'
 require 'kookaburra/ui_driver/ui_component'
 require 'kookaburra/ui_driver/ui_component/address_bar'
 
@@ -60,20 +61,9 @@ class Kookaburra
   class UIDriver
     include Assertion
     extend Forwardable
+    extend HasUIComponents
 
     class << self
-      # Tells the UIDriver about your {UIComponent} subclasses.
-      #
-      # @param [Symbol] component_name Will create an instance method of this
-      #   name that returns an instance of the component_class
-      # @param [Class] component_class The {UIComponent} subclass that defines
-      #   this component.
-      def ui_component(component_name, component_class)
-        define_method(component_name) do
-          component_class.new(@configuration)
-        end
-      end
-
       # Tells the UIDriver about sub-drivers (other {UIDriver} subclasses).
       #
       # @param [Symbol] driver_name Will create an instance method of this
