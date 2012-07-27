@@ -2,22 +2,14 @@ require 'kookaburra/test_helpers'
 require 'kookaburra/json_api_driver'
 require 'capybara'
 require 'thwait'
+require 'find_a_port'
 
 # These are required for the Rack app used for testing
 require 'sinatra/base'
 require 'json'
 
-# You'd think there would be a better way to do this, but if there is, I
-# can't find it.
-def find_available_port
-  server = TCPServer.new('127.0.0.1', 0)
-  server.addr[1]
-ensure
-  server.close if server
-end
-
 # The server port to which the application server will attach
-APP_PORT = find_available_port
+APP_PORT = FindAPort.available_port
 
 describe "testing a Rack application with Kookaburra" do
   describe "with an HTML interface" do

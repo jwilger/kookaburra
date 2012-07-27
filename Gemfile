@@ -13,4 +13,5 @@ group :development do
   gem 'jeweler'
   gem 'reek'
   gem 'sinatra'
+  gem 'find_a_port', '>= 1.0.1'
 end
