@@ -1,9 +1,12 @@
 require 'kookaburra/ui_driver/ui_component'
 require 'support/shared_examples/it_can_make_assertions'
+require 'support/shared_examples/it_can_have_ui_components'
 
 describe Kookaburra::UIDriver::UIComponent do
   let(:configuration) { stub('Configuration', :browser => nil, :app_host => nil, :server_error_detection => nil) }
   let(:component) { Kookaburra::UIDriver::UIComponent.new(configuration) }
+
+  it_behaves_like :it_can_have_ui_components, Kookaburra::UIDriver::UIComponent
 
   describe '#respond_to?' do
     let(:component) do
