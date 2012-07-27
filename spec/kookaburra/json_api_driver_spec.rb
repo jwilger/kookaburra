@@ -50,7 +50,7 @@ describe Kookaburra::JsonApiDriver do
     end
 
     it 'returns the JSON-decoded response body' do
-      json.post('/foo', 'bar').should == {'foo' => 'bar'}
+      json.post('/foo', :bar => :baz).should == {'foo' => 'bar'}
     end
   end
 
@@ -63,7 +63,7 @@ describe Kookaburra::JsonApiDriver do
     end
 
     it 'returns the JSON-decoded response body' do
-      json.put('/foo', 'bar').should == {'foo' => 'bar'}
+      json.put('/foo', :bar => :baz).should == {'foo' => 'bar'}
     end
   end
 
