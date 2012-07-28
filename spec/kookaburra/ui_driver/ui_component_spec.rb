@@ -8,58 +8,6 @@ describe Kookaburra::UIDriver::UIComponent do
 
   it_behaves_like :it_can_have_ui_components, Kookaburra::UIDriver::UIComponent
 
-  describe '#respond_to?' do
-    let(:component) do
-      klass = Class.new(Kookaburra::UIDriver::UIComponent) do
-        def foo
-        end
-      end
-      klass.new(configuration)
-    end
-
-    it 'returns true if the UIComponent defines the specified method' do
-      component.respond_to?(:foo).should == true
-    end
-
-    it 'returns true if the #browser defines the specified method' do
-      browser = stub('Browser Driver', :respond_to? => true)
-      component.stub!(:browser => browser)
-      component.respond_to?(:a_very_unlikely_method_name).should == true
-    end
-
-    it 'returns false if neither the UIComponent nor the #browser define the specified method' do
-      browser = stub('Browser Driver', :respond_to? => false)
-      component.stub!(:browser => browser)
-      component.respond_to?(:a_very_unlikely_method_name).should == false
-    end
-  end
-
-  describe '#method_missing' do
-    context 'the component says it responds to the method' do
-      it 'scopes the method call within the component_locator and forwards to #browser' do
-        browser = mock('Browser Driver')
-        browser.should_receive(:some_browser_method) \
-          .with(:arguments) \
-          .and_return(:answer_from_browser)
-        browser.should_receive(:within) do |scope, &block|
-          scope.should == '#my_component'
-          block.call(browser)
-        end
-        configuration.stub!(:browser => browser)
-        component.stub!(:component_locator => '#my_component')
-        component.some_browser_method(:arguments).should == :answer_from_browser
-      end
-    end
-
-    context 'the component says it does not respond to the method' do
-      it 'raises a NoMethodError' do
-        component.stub!(:respond_to? => false)
-        lambda { component.no_such_method } \
-          .should raise_error(NoMethodError)
-      end
-    end
-  end
-
   describe '#visible?' do
     it 'returns true if the component_locator is found in the DOM and is visible' do
       browser = mock('Browser Driver')
@@ -67,7 +15,9 @@ describe Kookaburra::UIDriver::UIComponent do
         .with('#my_component', :visible) \
         .and_return(true)
       configuration.stub!(:browser => browser)
-      component.stub!(:component_locator => '#my_component')
+      def component.component_locator
+        '#my_component'
+      end
       component.visible?.should == true
     end
 
@@ -78,7 +28,9 @@ describe Kookaburra::UIDriver::UIComponent do
         false
       }
       configuration.stub!(:server_error_detection => server_error_detection)
-      component.stub!(:component_locator => '#my_component')
+      def component.component_locator
+        '#my_component'
+      end
       component.visible?.should == false
     end
 
@@ -89,8 +41,9 @@ describe Kookaburra::UIDriver::UIComponent do
         true
       }
       configuration.stub!(:server_error_detection => server_error_detection)
-      component.stub!(:component_locator => '#my_component')
-      component.stub!(:component_locator => '#my_component')
+      def component.component_locator
+        '#my_component'
+      end
       lambda { component.visible? } \
         .should raise_error(Kookaburra::UnexpectedResponse)
     end
@@ -99,7 +52,9 @@ describe Kookaburra::UIDriver::UIComponent do
   describe '#url' do
     it 'returns the app_host + #component_path' do
       configuration.stub!(:app_host => 'http://my.example.com')
-      component.stub!(:component_path => '/foo/bar')
+      def component.component_path
+        '/foo/bar'
+      end
       component.url.should == 'http://my.example.com/foo/bar'
     end
   end
