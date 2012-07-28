@@ -1,6 +1,8 @@
+require 'delegate'
 require 'kookaburra/exceptions'
 require 'kookaburra/assertion'
 require 'kookaburra/ui_driver/has_ui_components'
+require 'kookaburra/ui_driver/scoped_browser'
 
 class Kookaburra
   class UIDriver
@@ -59,14 +61,13 @@ class Kookaburra
     #   end
     #
     # Note that the "browser operation" methods such as `#fill_in` and
-    # `#click_button` are forwarded to the {#browser} object (see
-    # {#method_missing}) and are automatically scoped to the component's DOM
-    # element.    
+    # `#click_button` are delegated to a {ScopedBrowser} and are
+    # automatically scoped to the component's DOM element.    
     #
     # @abstract Subclass and implement (at least) {#component_locator}. Unless
     #   you override the default implementation of {#url}, you must also
     #   override the {#component_path} method.
-    class UIComponent
+    class UIComponent < SimpleDelegator
       include Assertion
       extend HasUIComponents
 
@@ -92,28 +93,8 @@ class Kookaburra
         @browser = configuration.browser
         @app_host = configuration.app_host
         @server_error_detection = configuration.server_error_detection
-      end
-
-      # If the UIComponent is sent a message it does not understand, it will
-      # forward that message on to its {#browser} but wrap the call in a block
-      # provided to the the browser's `#within` method. This provides convenient
-      # access to the browser driver's DSL, automatically scoped to this
-      # component.
-      def method_missing(name, *args, &block)
-        if respond_to?(name)
-          browser.within(component_locator) do
-            browser.send(name, *args, &block)
-          end
-        else
-          super
-        end
-      end
-
-      # @private
-      # (Not really private, but YARD seemingly lacks RDoc's :nodoc tag, and the
-      # semantics here don't differ from Object#respond_to?)
-      def respond_to?(name)
-        super || browser.respond_to?(name)
+        scoped_browser = ScopedBrowser.new(@browser, lambda { component_locator })
+        super(scoped_browser)
       end
 
       # Is the component's element found on the page and is it considered

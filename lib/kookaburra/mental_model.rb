@@ -73,8 +73,8 @@ class Kookaburra
       #
       # @note This is semantically the same as `Hash#slice` as provided
       #   by `ActiveSupport::CoreExt::Hash`
-      # @param [Object] *keys The keys that should be copied from the
-      #   collection
+      # @param [Object] keys The list of keys that should be copied from
+      #   the collection
       # @return [Hash] The resulting keys/values from the collection
       def slice(*keys)
         data = keys.inject({}) { |memo, key|
@@ -88,8 +88,8 @@ class Kookaburra
       #
       # @note This is semantically the same as `Hash#except` as provided
       #   by `ActiveSupport::CoreExt::Hash`
-      # @param [Object] *keys The keys that should *not* be copied from
-      #   the collection
+      # @param [Object] keys The list of keys that should *not* be
+      #   copied from the collection
       # @return [Hash] The resulting keys/values from the collection
       def except(*keys)
         slice(*(self.keys - keys))
