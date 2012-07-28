@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "kookaburra"
-  s.version = "0.26.0"
+  s.version = "0.26.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["John Wilger", "Sam Livingston-Gray", "Ravi Gadad"]
-  s.date = "2012-07-27"
+  s.date = "2012-07-28"
   s.description = "Cucumber + Capybara = Kookaburra? It made sense at the time."
   s.email = "johnwilger@gmail.com"
   s.extra_rdoc_files = [
@@ -41,6 +41,7 @@ Gem::Specification.new do |s|
     "lib/kookaburra/test_helpers.rb",
     "lib/kookaburra/ui_driver.rb",
     "lib/kookaburra/ui_driver/has_ui_components.rb",
+    "lib/kookaburra/ui_driver/scoped_browser.rb",
     "lib/kookaburra/ui_driver/ui_component.rb",
     "lib/kookaburra/ui_driver/ui_component/address_bar.rb",
     "spec/integration/test_a_rack_application_spec.rb",
@@ -50,6 +51,7 @@ Gem::Specification.new do |s|
     "spec/kookaburra/mental_model_matcher_spec.rb",
     "spec/kookaburra/mental_model_spec.rb",
     "spec/kookaburra/test_helpers_spec.rb",
+    "spec/kookaburra/ui_driver/scoped_browser_spec.rb",
     "spec/kookaburra/ui_driver/ui_component/address_bar_spec.rb",
     "spec/kookaburra/ui_driver/ui_component_spec.rb",
     "spec/kookaburra/ui_driver_spec.rb",
