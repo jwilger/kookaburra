@@ -64,6 +64,12 @@ class Kookaburra
     # `#click_button` are delegated to a {ScopedBrowser} and are
     # automatically scoped to the component's DOM element.    
     #
+    # @note Even though a `UIComponent` should respond to all of the
+    #   methods on the browser (i.e. all of the Capybara DSL methods),
+    #   for some reason call to `#select` get routed to `Kernel#select`.
+    #   You can get around this by calling it as `self.select`. See
+    #   https://gist.github.com/3192103 for an example of this behavior.
+    #
     # @abstract Subclass and implement (at least) {#component_locator}. Unless
     #   you override the default implementation of {#url}, you must also
     #   override the {#component_path} method.
