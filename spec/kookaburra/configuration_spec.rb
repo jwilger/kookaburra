@@ -7,6 +7,7 @@ describe Kookaburra::Configuration do
   it_behaves_like :it_has_a_dependency_accessor, :browser
   it_behaves_like :it_has_a_dependency_accessor, :app_host
   it_behaves_like :it_has_a_dependency_accessor, :mental_model
+  it_behaves_like :it_has_a_dependency_accessor, :logger
 
   describe '#server_error_detection' do
     it 'returns the block that it was last given' do

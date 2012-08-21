@@ -104,6 +104,10 @@ class Kookaburra
     # @return [Kookaburra::MentalModel]
     def_delegator :configuration, :mental_model
 
+    # @attribute [r] logger
+    # @return [Object]
+    def_delegator :configuration, :logger
+
     attr_reader :configuration
   end
 end
