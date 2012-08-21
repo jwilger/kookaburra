@@ -47,6 +47,13 @@ class Kookaburra
     #   without it having been set
     dependency_accessor :mental_model
 
+    # This is the logger to which Kookaburra will send various messages
+    # about its operation. This would generally be used to allow
+    # UIDriver subclasses to provide detailed failure information.
+    #
+    # @attribute [rw] logger
+    dependency_accessor :logger
+
     # Specify a function that can be used to determine if a server error has
     # occured within your application.
     #
