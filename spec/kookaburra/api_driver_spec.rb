@@ -26,6 +26,37 @@ describe Kookaburra::APIDriver do
     end
   end
 
+  shared_examples_for 'an input data encoder' do |request_method|
+    let(:api) {
+      klass = Class.new(Kookaburra::APIDriver) do
+        encode_with { |data| :some_encoded_data }
+      end
+      klass.new(configuration, client)
+    }
+
+    it "encodes input to #{request_method} requests" do
+      client.should_receive(request_method) do |_, data, _|
+        data.should == :some_encoded_data
+        response
+      end
+
+      api.send(request_method, '/foo', :ruby_data)
+    end
+  end
+
+  shared_examples_for 'a response body decoder' do |request_method|
+    let(:api) {
+      klass = Class.new(Kookaburra::APIDriver) do
+        decode_with { |data| :some_decoded_data }
+      end
+      klass.new(configuration, client)
+    }
+
+    it "decodes response bodies from #{request_method} requests" do
+      api.send(request_method, '/foo', {}).should == :some_decoded_data
+    end
+  end
+
   describe '#post' do
     before(:each) do
       response.stub!(:status => 201)
@@ -40,6 +71,9 @@ describe Kookaburra::APIDriver do
     it 'returns the response body' do
       api.post('/foo', 'bar').should == 'foo'
     end
+
+    it_behaves_like 'an input data encoder', :post
+    it_behaves_like 'a response body decoder', :post
 
     it 'does not raise an UnexpectedResponse if the response status matches the specified expectation' do
       response.stub!(:status => 666)
@@ -81,6 +115,9 @@ describe Kookaburra::APIDriver do
       api.put('/foo', 'bar').should == 'foo'
     end
 
+    it_behaves_like 'an input data encoder', :put
+    it_behaves_like 'a response body decoder', :put
+
     it 'does not raise an UnexpectedResponse if the response status matches the specified expectation' do
       response.stub!(:status => 666)
       lambda { api.put('/foo', 'bar', :expected_response_status => 666) } \
@@ -110,6 +147,8 @@ describe Kookaburra::APIDriver do
       api.get('/foo').should == 'foo'
     end
 
+    it_behaves_like 'a response body decoder', :get
+
     it 'does not raise an UnexpectedResponse if the response status matches the specified expectation' do
       response.stub!(:status => 666)
       lambda { api.get('/foo', :expected_response_status => 666) } \
@@ -138,6 +177,8 @@ describe Kookaburra::APIDriver do
     it 'returns the response body' do
       api.delete('/foo').should == 'foo'
     end
+
+    it_behaves_like 'a response body decoder', :delete
 
     it 'does not raise an UnexpectedResponse if the response status matches the specified expectation' do
       response.stub!(:status => 666)

@@ -1,5 +1,5 @@
 require 'kookaburra/test_helpers'
-require 'kookaburra/json_api_driver'
+require 'kookaburra/api_driver'
 require 'capybara'
 require 'thwait'
 require 'find_a_port'
@@ -182,7 +182,12 @@ describe "testing a Rack application with Kookaburra" do
         end
       end
 
-      class MyAPIDriver < Kookaburra::JsonApiDriver
+      class MyAPIDriver < Kookaburra::APIDriver
+        encode_with { |data| JSON.dump(data) }
+        decode_with { |data| JSON.parse(data) }
+        header 'Content-Type', 'application/json'
+        header 'Accept', 'application/json'
+
         def create_user(user_data)
           post '/users', user_data
         end
