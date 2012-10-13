@@ -5,7 +5,7 @@ class Kookaburra
   # test preconditions. Unlike {Kookaburra::APIDriver}, which is meant to be a
   # simple mapping to your application's API, a method in the GivenDriver may be
   # comprised of several distinct API calls as well as access to Kookaburra's
-  # test data store.
+  # test data store via `#mental_model`.
   #
   # @abstract Subclass and implement your Given DSL.
   #
