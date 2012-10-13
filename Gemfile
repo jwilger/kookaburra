@@ -8,10 +8,10 @@ group :development do
   gem 'rspec'
   gem 'capybara'
   gem 'yard'
-  gem 'redcarpet', '~> 1.0' # used to format documentation
+  gem 'redcarpet' # used by yard to format documentation, but not a dependency as far as the yard gem is concerned
   gem 'jeweler'
   gem 'reek'
   gem 'sinatra'
-  gem 'find_a_port', '>= 1.0.1'
+  gem 'find_a_port'
   gem 'json'
 end
