@@ -111,13 +111,14 @@ and shut down a Rack application server. Just add the following to
 
     require 'kookaburra/test_helpers'
     require 'thwait'
+    require 'find_a_port' # from the find_a_port gem
 
     # Change these to the files that define your custom GivenDriver and UIDriver
     # implementations.
     require 'my_app/kookaburra/given_driver'
     require 'my_app/kookaburra/ui_driver'
 
-    APP_PORT = ENV['APP_PORT'] || 3009
+    APP_PORT = FindAPort.available_port
 
     # c.app_host below should be set to whatever the root URL of your running
     # application is.
@@ -205,13 +206,14 @@ and shut down a Rack application server. Just add the following to
 
     require 'kookaburra/test_helpers'
     require 'thwait'
+    require 'find_a_port' # from the find_a_port gem
 
     # Change these to the files that define your custom GivenDriver and UIDriver
     # implementations.
     require 'my_app/kookaburra/given_driver'
     require 'my_app/kookaburra/ui_driver'
 
-    APP_PORT = ENV['APP_PORT'] || 3009
+    APP_PORT = FindAPort.available_port
 
     # c.app_host below should be set to whatever the root URL of your running
     # application is.
