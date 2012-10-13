@@ -21,7 +21,6 @@ GEM
       rake
       rdoc
     json (1.7.4)
-    json_pure (1.7.4)
     libwebsocket (0.1.5)
       addressable
     mime-types (1.19)
@@ -80,7 +79,7 @@ DEPENDENCIES
   capybara
   find_a_port (>= 1.0.1)
   jeweler
-  json_pure
+  json
   patron
   redcarpet (~> 1.0)
   reek
