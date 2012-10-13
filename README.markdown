@@ -521,32 +521,32 @@ rather than driving a web browser.
 
 #### API Driver ####
 
-The `Kookaburra::APIDriver` is used to interact with an application's external
-web services API. You tell Kookaburra about your API by creating a subclass of
-`Kookaburra::APIDriver` for your application. Because different applications may
-implement different types of APIs, Kookaburra will provide more than one base
-APIDriver class. At the moment, only a JSON API is supported via
-`Kookaburra::JsonApiDriver`:
+The `Kookaburra::APIDriver` is used to interact with an application's
+external web services API. You tell Kookaburra about your API by
+creating a subclass of `Kookaburra::APIDriver` for your application,
+specifying how requests should be encoded and decoded, and specifying
+any headers that should be present on every request.
 
     # lib/my_app/kookaburra/api_driver.rb
 
-    class MyApp::Kookaburra::APIDriver < Kookaburra::JsonApiDriver
+    class MyApp::Kookaburra::APIDriver < Kookaburra::APIDriver
+      encode_with { |data| JSON.dump(data) }
+      decode_with { |data| JSON.parse(data) }
+      header 'Content-Type', 'application/json'
+      header 'Accept', 'application/json'
+
       def create_account(account_data)
-        post '/api/v1/accounts', account_data
+        post '/api/accounts', account_data
       end
 
       def get_account(id)
-        get '/api/v1/accounts/%d' % id
+        get '/api/accounts/%d' % id
       end
     end
 
-Regardless of the type of APIDriver, the content of your application's APIDriver
-should consist mainly of mappings between discrete actions and HTTP requests to
-the specified URL paths. Each driver will implement `#post`, `#get`, `#put` and
-`#delete` in such a way that any Ruby data structure provided as parameters will
-be appropriately translated to the API's required data format, and any response
-body from the API request will be translated into a Ruby data structure and
-returned.
+The content of your application's APIDriver should consist mainly of
+mappings between discrete actions and HTTP requests to the specified URL
+paths.
 
 #### UI Driver ####
 

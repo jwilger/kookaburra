@@ -4,6 +4,74 @@ require 'patron'
 
 class Kookaburra
   class APIDriver < SimpleDelegator
+    class << self
+      # Encode input data
+      #
+      # Input data for `#post` and `#put` are processed through this
+      # block prior to being transmitted.
+      #
+      # @yieldparam data [Object] the data object as passed into the
+      #             call to `APIDriver#post` or `APIDriver#put`
+      #
+      # @yieldreturn [String] The string that will be used as the body
+      #              of the request
+      #
+      # @example
+      #   require 'json'
+      #
+      #   class MyAPIDriver < Kookaburra::APIDriver
+      #     encode_with { |data| JSON.dump(data) }
+      #     # ...
+      #   end
+      def encode_with(&block)
+        define_method(:encode, &block)
+      end
+
+      # Decode response bodies
+      #
+      # All response bodies will be processed through this block prior
+      # to being returned.
+      #
+      # @yieldparam data [String] the response body returned by the
+      #             server
+      #
+      # @yieldreturn [Object] whatever type of object you want the data
+      #              to be parsed to
+      #
+      # @example
+      #   require 'json'
+      #
+      #   class MyAPIDriver < Kookaburra::APIDriver
+      #     decode_with { |data| JSON.parse(data) }
+      #     # ...
+      #   end
+      def decode_with(&block)
+        define_method(:decode, &block)
+      end
+
+      # Sets an HTTP header that will be added to every request
+      #
+      # @param [String] name
+      # @param [String] value
+      #
+      # @example
+      #   class MyAPIDriver < Kookaburra::APIDriver
+      #     header 'Content-Type', 'application/json'
+      #     header 'Accept', 'application/json'
+      #     # ...
+      #   end
+      def header(name, value)
+        headers[name] = value
+      end
+
+      # @private
+      #
+      # Used to access the headers in `APIDriver#initialize`
+      def headers
+        @headers ||= {}
+      end
+    end
+
     # Wraps `http_client` in a `SimpleDelegator` that causes request methods to
     # either return the response body or raise an exception on an unexpected
     # response status code.
@@ -12,6 +80,8 @@ class Kookaburra
     # @param [Patron::Session] http_client
     def initialize(configuration, http_client = Patron::Session.new)
       http_client.base_url = configuration.app_host
+      headers = self.class.headers
+      http_client.headers.merge!(self.class.headers) if headers.any?
       super(http_client)
     end
 
@@ -71,11 +141,12 @@ class Kookaburra
       if path.nil?
         raise ArgumentError, "You must specify a request URL, but it was nil."
       end
+      data = data.nil? ? nil : encode(data)
       args = [type, path, data, options].compact
       response = __getobj__.send(*args)
 
       check_response_status!(type, response, options)
-      response.body
+      decode(response.body)
     end
 
     def check_response_status!(request_type, response, options)
@@ -87,5 +158,10 @@ class Kookaburra
           + response.body
       end
     end
+
+    def encode(data)
+      data
+    end
+    alias :decode :encode
   end
 end
