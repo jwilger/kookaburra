@@ -1,7 +1,6 @@
 source 'http://rubygems.org'
 
 gem 'patron'
-gem 'json_pure'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
@@ -14,4 +13,5 @@ group :development do
   gem 'reek'
   gem 'sinatra'
   gem 'find_a_port', '>= 1.0.1'
+  gem 'json'
 end
