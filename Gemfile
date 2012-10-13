@@ -1,6 +1,6 @@
 source 'http://rubygems.org'
 
-gem 'patron'
+gem 'rest-client'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
