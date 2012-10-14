@@ -3,6 +3,11 @@
 Kookaburra is a framework for implementing the [Window Driver] [Window Driver] pattern in
 order to keep acceptance tests maintainable.
 
+## Requirements ##
+
+Requires Ruby 1.9. Tested with both MRI and JRUBY (not that you must run
+JRuby in 1.9 compatability mode.)
+
 ## Installation ##
 
 Kookaburra is available as a Rubygem and [published on Rubygems.org] [Kookaburra Gem],
