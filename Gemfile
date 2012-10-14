@@ -5,7 +5,7 @@ gem 'rest-client'
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
 group :development do
-  gem 'jruby-openssl'
+  gem 'jruby-openssl', :platforms => :jruby
   gem 'rspec'
   gem 'capybara'
   gem 'yard'
