@@ -29,8 +29,25 @@ require 'rspec/core/rake_task'
 
 task :default => :spec
 
-desc 'Run specs'
-RSpec::Core::RakeTask.new
+# TODO: figure out how to get rake task working under JRuby and rbenv
+if defined?(JRUBY_VERSION) && ENV['RBENV_VERSION']
+  desc 'Run specs'
+  task :spec do
+    msg = <<-EOM
+    ********************************************************************************
+    * You appear to be running under JRuby and using rbenv.
+    *
+    * For some reason the `rake spec` command isn't working correctly in
+    * these circumstances. However, you should be able to just run the
+    * `rspec` command directly.
+    ********************************************************************************
+    EOM
+    raise msg
+  end
+else
+  desc 'Run specs'
+  RSpec::Core::RakeTask.new
+end
 
 require 'reek/rake/task'
 Reek::Rake::Task.new do |t|
