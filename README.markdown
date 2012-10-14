@@ -142,6 +142,10 @@ and shut down a Rack application server. Just add the following to
       c.before(:all, :type => :request) do
         # Run the server process in a forked process, and get a handle on that
         # process, so that it can be shut down after the tests run.
+        #
+        # Note that you cannot fork under JRuby and will need to use a thread.
+        # See `spec/integration/test_a_rack_application_spec.rb` for an
+        # example.
         @rack_server_pid = fork do
           Capybara.server_port = APP_PORT
           Capybara::Server.new(MyApplication).boot
@@ -229,12 +233,16 @@ and shut down a Rack application server. Just add the following to
 
     World(Kookaburra::TestHelpers)
 
-    # Start the application server prior to running a group of integration
-    # specs. `MyApplication` below should be replaced with the object that
+    # Start the application server prior to running the tests.
+    # `MyApplication` below should be replaced with the object that
     # implements the Rack `#call` interface for your application. For a Rails
     # app, this would be along the lines of `MyAppName::Application`.
     # Runs the server process in a forked process, and get a handle on that
     # process, so that it can be shut down after the tests run.
+    #
+    # Note that you cannot fork under JRuby and will need to use a thread.
+    # See `spec/integration/test_a_rack_application_spec.rb` for an
+    # example.
     @rack_server_pid = fork do
       Capybara.server_port = APP_PORT
       Capybara::Server.new(MyApplication).boot
