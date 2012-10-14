@@ -8,7 +8,7 @@ group :development do
   gem 'rspec'
   gem 'capybara'
   gem 'yard'
-  gem 'redcarpet' # used by yard to format documentation, but not a dependency as far as the yard gem is concerned
+  gem 'kramdown' # used by yard to format documentation, but not a dependency as far as the yard gem is concerned
   gem 'jeweler'
   gem 'reek'
   gem 'sinatra'
