@@ -3,6 +3,11 @@
 Kookaburra is a framework for implementing the [Window Driver] [Window Driver] pattern in
 order to keep acceptance tests maintainable.
 
+## Requirements ##
+
+Requires Ruby 1.9. Tested with both MRI and JRUBY (not that you must run
+JRuby in 1.9 compatability mode.)
+
 ## Installation ##
 
 Kookaburra is available as a Rubygem and [published on Rubygems.org] [Kookaburra Gem],
@@ -142,6 +147,10 @@ and shut down a Rack application server. Just add the following to
       c.before(:all, :type => :request) do
         # Run the server process in a forked process, and get a handle on that
         # process, so that it can be shut down after the tests run.
+        #
+        # Note that you cannot fork under JRuby and will need to use a thread.
+        # See `spec/integration/test_a_rack_application_spec.rb` for an
+        # example.
         @rack_server_pid = fork do
           Capybara.server_port = APP_PORT
           Capybara::Server.new(MyApplication).boot
@@ -229,12 +238,16 @@ and shut down a Rack application server. Just add the following to
 
     World(Kookaburra::TestHelpers)
 
-    # Start the application server prior to running a group of integration
-    # specs. `MyApplication` below should be replaced with the object that
+    # Start the application server prior to running the tests.
+    # `MyApplication` below should be replaced with the object that
     # implements the Rack `#call` interface for your application. For a Rails
     # app, this would be along the lines of `MyAppName::Application`.
     # Runs the server process in a forked process, and get a handle on that
     # process, so that it can be shut down after the tests run.
+    #
+    # Note that you cannot fork under JRuby and will need to use a thread.
+    # See `spec/integration/test_a_rack_application_spec.rb` for an
+    # example.
     @rack_server_pid = fork do
       Capybara.server_port = APP_PORT
       Capybara::Server.new(MyApplication).boot
@@ -625,12 +638,13 @@ You describe the various user interface components by sub-classing
 ### The Application Driver Layer ###
 
 `Kookaburra::APIDriver`, `Kookaburra::UIDriver` and
-`Kookaburra::UIDriver::UIComponent` rely on the Application Driver layer to
-interact with your application. In the case of the `APIDriver`, Kookaburra uses
-the [Patron] [Patron] library to send HTTP requests to your application. The
-`UIDriver` and `UIComponent` rely on whatever is passed to `Kookaburra.new` as
-the `:browser` option. Presently, we have only used Capybara as the application
-driver for Kookaburra.
+`Kookaburra::UIDriver::UIComponent` rely on the Application Driver layer
+to interact with your application. In the case of the `APIDriver`,
+Kookaburra uses the [RestClient] [RestClient] library to send HTTP
+requests to your application. The `UIDriver` and `UIComponent` rely on
+whatever is passed to `Kookaburra.new` as the `:browser` option.
+Presently, we have only used Capybara as the application driver for
+Kookaburra.
 
 It's possible that something other than Capybara could be passed in, as long as
 that something presented the same API. In reality, using something other than
@@ -666,4 +680,4 @@ further details.
 [RSpec]: http://rspec.info "RSpec.info: home"
 [Cucumber]: http://cukes.info/ "Cucumber - Making BDD fun"
 [Pull Request]: https://github.com/projectdx/kookaburra/pull/new/master "Send a pull request - GitHub"
-[Patron]: https://github.com/toland/patron "toland/patron"
+[RestClient]: https://github.com/archiloque/rest-client "archiloque/rest-client -GitHub"

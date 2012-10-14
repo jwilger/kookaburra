@@ -1,58 +1,71 @@
+require 'restclient'
 require 'kookaburra/exceptions'
-require 'delegate'
-require 'patron'
 
 class Kookaburra
-  class APIDriver < SimpleDelegator
+  # Communicate with a Web Services API
+  #
+  # You will create a subclass of `APIDriver` in your testing
+  # implementation to be used with you subclass of
+  # `Kookaburra::GivenDriver`. While the `GivenDriver` implements the
+  # "business domain" DSL for setting up your application state, the
+  # `APIDriver` maps discreet operations to your application's web
+  # service API and can (optionally) handle encoding input data and
+  # decoding response bodies to and from your preferred serialization
+  # format.
+  class APIDriver
     class << self
-      # Encode input data
+      # Serializes input data
       #
-      # Input data for `#post` and `#put` are processed through this
-      # block prior to being transmitted.
+      # If specified, any input data provided to `APIDriver#post`,
+      # `APIDriver#put` or `APIDriver#request` will be processed through
+      # this function prior to being sent to the HTTP server.
       #
-      # @yieldparam data [Object] the data object as passed into the
-      #             call to `APIDriver#post` or `APIDriver#put`
-      #
-      # @yieldreturn [String] The string that will be used as the body
-      #              of the request
+      # @yieldparam data [Object] The data parameter that was passed to
+      #             the request method
+      # @yieldreturn [String] The text to be used as the request body
       #
       # @example
-      #   require 'json'
-      #
       #   class MyAPIDriver < Kookaburra::APIDriver
       #     encode_with { |data| JSON.dump(data) }
       #     # ...
       #   end
       def encode_with(&block)
-        define_method(:encode, &block)
+        define_method(:encode) do |data|
+          return if data.nil?
+          block.call(data)
+        end
       end
 
-      # Decode response bodies
+      # Deserialize response body
       #
-      # All response bodies will be processed through this block prior
+      # If specified, the response bodies of all requests made using
+      # this `APIDriver` will be processed through this function prior
       # to being returned.
       #
-      # @yieldparam data [String] the response body returned by the
+      # @yieldparam data [String] The response body sent by the HTTP
       #             server
       #
-      # @yieldreturn [Object] whatever type of object you want the data
-      #              to be parsed to
+      # @yieldreturn [Object] The result of parsing the response body
+      #              through this function
       #
       # @example
-      #   require 'json'
-      #
       #   class MyAPIDriver < Kookaburra::APIDriver
       #     decode_with { |data| JSON.parse(data) }
       #     # ...
       #   end
       def decode_with(&block)
-        define_method(:decode, &block)
+        define_method(:decode) do |data|
+          block.call(data)
+        end
       end
 
-      # Sets an HTTP header that will be added to every request
+      # Set custom HTTP headers
       #
-      # @param [String] name
-      # @param [String] value
+      # Can be called multiple times to set HTTP headers that will be
+      # provided with every request made by the `APIDriver`.
+      #
+      # @param [String] name The name of the header, e.g. 'Content-Type'
+      # @param [String] value The value to which the header is set
       #
       # @example
       #   class MyAPIDriver < Kookaburra::APIDriver
@@ -64,104 +77,129 @@ class Kookaburra
         headers[name] = value
       end
 
-      # @private
+      # Used to retrieve the list of headers within the instance. Not
+      # intended to be used elsewhere.
       #
-      # Used to access the headers in `APIDriver#initialize`
+      # @private
       def headers
         @headers ||= {}
       end
     end
 
-    # Wraps `http_client` in a `SimpleDelegator` that causes request methods to
-    # either return the response body or raise an exception on an unexpected
-    # response status code.
+    # Create a new `APIDriver` instance
     #
     # @param [Kookaburra::Configuration] configuration
-    # @param [Patron::Session] http_client
-    def initialize(configuration, http_client = Patron::Session.new)
-      http_client.base_url = configuration.app_host
-      headers = self.class.headers
-      http_client.headers.merge!(self.class.headers) if headers.any?
-      super(http_client)
+    # @param [RestClient] http_client (optional) Generally only
+    #        overriden when testing Kookaburra itself
+    def initialize(configuration, http_client = RestClient)
+      @configuration = configuration
+      @http_client = http_client
     end
 
-    # Makes a POST request via the `:http_client`
+    # Convenience method to make a POST request
     #
-    # @param [String] path The path to request (e.g. "/foo")
-    # @param [Hash, String] data The post data. If a Hash is provided, it will
-    #   be converted to an 'application/x-www-form-urlencoded' post body.
-    # @option options [Integer] :expected_response_status (201) The HTTP status
-    #   code that you expect the server to respond with.
-    # @raise [Kookaburra::UnexpectedResponse] raised if the HTTP status of the
-    #   response does not match the `:expected_response_status`
-    def post(path, data, options = {})
-      request(:post, path, options, data)
+    # @see APIDriver#request
+    def post(path, data)
+      request(:post, path, data)
     end
 
-    # Makes a PUT request via the `:http_client`
+    # Convenience method to make a PUT request
     #
-    # @param [String] path The path to request (e.g. "/foo")
-    # @param [Hash, String] data The post data. If a Hash is provided, it will
-    #   be converted to an 'application/x-www-form-urlencoded' post body.
-    # @option options [Integer] :expected_response_status (201) The HTTP status
-    #   code that you expect the server to respond with.
-    # @raise [Kookaburra::UnexpectedResponse] raised if the HTTP status of the
-    #   response does not match the `:expected_response_status`
-    def put(path, data, options = {})
-      request(:put, path, options, data)
+    # @see APIDriver#request
+    def put(path, data)
+      request(:put, path, data)
     end
 
-    # Makes a GET request via the `:http_client`
+    # Convenience method to make a GET request
     #
-    # @param [String] path The path to request (e.g. "/foo")
-    # @option options [Integer] :expected_response_status (201) The HTTP status
-    #   code that you expect the server to respond with.
-    # @raise [Kookaburra::UnexpectedResponse] raised if the HTTP status of the
-    #   response does not match the `:expected_response_status`
-    def get(path, options = {})
-      request(:get, path, options)
+    # @see APIDriver#request
+    def get(path)
+      request(:get, path)
     end
 
-    # Makes a DELETE request via the `:http_client`
+    # Convenience method to make a DELETE request
     #
-    # @param [String] path The path to request (e.g. "/foo")
-    # @option options [Integer] :expected_response_status (201) The HTTP status
-    #   code that you expect the server to respond with.
-    # @raise [Kookaburra::UnexpectedResponse] raised if the HTTP status of the
-    #   response does not match the `:expected_response_status`
-    def delete(path, options = {})
-      request(:delete, path, options)
+    # @see APIDriver#request
+    def delete(path)
+      request(:delete, path)
+    end
+
+    # Make an HTTP request
+    #
+    # If you need to make a request other than the typical GET, POST,
+    # PUT and DELETE, you can use this method directly.
+    #
+    # This *will* follow redirects when the server's response code is in
+    # the 3XX range. If the response is a 303, the request will be
+    # transformed into a GET request.
+    #
+    # @see APIDriver.encode_with
+    # @see APIDriver.decode_with
+    # @see APIDriver.header
+    # @see APIDriver#get
+    # @see APIDriver#post
+    # @see APIDriver#put
+    # @see APIDriver#delete
+    #
+    # @param [Symbol] method The HTTP verb to use with the request
+    # @param [String] path The path to request. Will be joined with the
+    #        `Kookaburra::Configuration#app_host` setting to build the
+    #        URL unless a full URL is specified here.
+    # @param [Object] data The data to be posted in the request body. If
+    #        an encoder was specified, this can be any type of object as
+    #        long as the encoder can serialize it into a String. If no
+    #        encoder was specified, then this can be one of:
+    #
+    #        * a String - will be passed as is
+    #        * a Hash - will be encoded as normal HTTP form params
+    #        * a Hash containing references to one or more Files - will
+    #          set the content type to multipart/form-data
+    #
+    # @return [Object] The response body returned by the server. If a
+    #         decoder was specified, this will return the result of
+    #         parsing the response body through the decoder function.
+    #
+    # @raise [Kookaburra::UnexpectedResponse] Raised if the HTTP
+    #        response received is not in the 2XX-3XX range.
+    def request(method, path, data = nil)
+      data = encode(data)
+      response = @http_client.send(method, url_for(path), *[data, headers].compact)
+      decode(response.body)
+    rescue RestClient::Exception => e
+      raise_unexpected_response(e)
     end
 
     private
 
-    def request(type, path, options = {}, data = nil)
-      # don't send a data argument if it's not passed in, because some methods
-      # on target object may not have the proper arity (i.e. #get and #delete).
-      if path.nil?
-        raise ArgumentError, "You must specify a request URL, but it was nil."
-      end
-      data = data.nil? ? nil : encode(data)
-      args = [type, path, data, options].compact
-      response = __getobj__.send(*args)
-
-      check_response_status!(type, response, options)
-      decode(response.body)
+    def headers
+      self.class.headers
     end
 
-    def check_response_status!(request_type, response, options)
-      verb = request_type.to_s.upcase
-      expected_status = options[:expected_response_status] || (200..299)
-      unless expected_status === response.status
-        raise UnexpectedResponse, "#{verb} to #{response.url} responded with " \
-          + "#{response.status} status, not #{expected_status} as expected\n\n" \
-          + response.body
-      end
+    def url_for(path)
+      URI.join(base_url, path).to_s
+    end
+
+    def base_url
+      @configuration.app_host
     end
 
     def encode(data)
       data
     end
-    alias :decode :encode
+
+    def decode(data)
+      data
+    end
+
+    def raise_unexpected_response(exception)
+      message = <<-END
+      Unexpected response from server: #{exception.message}
+
+      #{exception.http_body}
+      END
+      new_exception = UnexpectedResponse.new(message)
+      new_exception.set_backtrace(exception.backtrace)
+      raise new_exception
+    end
   end
 end
