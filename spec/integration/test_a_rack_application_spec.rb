@@ -320,17 +320,29 @@ describe "testing a Rack application with Kookaburra" do
       end
 
       before(:all) do
-        @rack_server_pid = fork do
+        start_server = lambda {
           Capybara.server_port = APP_PORT
           Capybara::Server.new(JsonApiApp.new).boot
           ThreadsWait.all_waits(Thread.list)
+        }
+        if defined?(JRUBY_VERSION)
+          # Can't `fork` in JRuby. This doesn't provide the state
+          # isolation that you get with forking (AFAIK, I'm no JVM
+          # expert, though), but it lets the tests run and pass.
+          Thread.new { start_server.call }
+        else
+          @rack_server_pid = fork do
+            start_server.call
+          end
         end
         sleep 1 # Give the server a chance to start up.
       end
 
       after(:all) do
-        Process.kill(9, @rack_server_pid)
-        Process.wait
+        unless defined?(JRUBY_VERSION)
+          Process.kill(9, @rack_server_pid)
+          Process.wait
+        end
       end
 
       it "runs the tests against the app" do

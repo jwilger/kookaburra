@@ -84,6 +84,7 @@ DEPENDENCIES
   capybara
   find_a_port
   jeweler
+  jruby-openssl
   json
   kramdown
   reek
