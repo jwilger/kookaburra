@@ -5,7 +5,7 @@ order to keep acceptance tests maintainable.
 
 ## Requirements ##
 
-Requires Ruby 1.9. Tested with both MRI and JRUBY (not that you must run
+Requires Ruby 1.9. Tested with both MRI and JRuby (note that you must run
 JRuby in 1.9 compatability mode.)
 
 ## Installation ##
