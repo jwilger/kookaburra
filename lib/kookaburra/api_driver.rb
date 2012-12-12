@@ -100,21 +100,21 @@ class Kookaburra
     # Convenience method to make a POST request
     #
     # @see APIDriver#request
-    def post(path, data)
+    def post(path, data = {})
       request(:post, path, data)
     end
 
     # Convenience method to make a PUT request
     #
     # @see APIDriver#request
-    def put(path, data)
+    def put(path, data = {})
       request(:put, path, data)
     end
 
     # Convenience method to make a GET request
     #
     # @see APIDriver#request
-    def get(path, data = nil)
+    def get(path, data = {})
       path = add_querystring_to_path(path, data)
       request(:get, path)
     end
@@ -122,7 +122,7 @@ class Kookaburra
     # Convenience method to make a DELETE request
     #
     # @see APIDriver#request
-    def delete(path, data = nil)
+    def delete(path, data = {})
       path = add_querystring_to_path(path, data)
       request(:delete, path)
     end
@@ -175,7 +175,7 @@ class Kookaburra
     private
 
     def add_querystring_to_path(path, data)
-      return path if data.nil?
+      return path if data.nil? || data == {}
       "#{path}?#{data.to_query}"
     end
 

@@ -13,55 +13,19 @@ describe Kookaburra::APIDriver do
 
   let(:client) { stub('RestClient') }
 
-  it 'sends POST requests to the server and returns the response body' do
-    client.should_receive(:post).with(url_for('/foo'), 'bar', {}) \
-      .and_return(response)
-    api.post('/foo', 'bar').should == 'foo'
-  end
-
-  it 'sends PUT requests to the server and returns the response body' do
-    client.should_receive(:put).with(url_for('/foo'), 'bar', {}) \
-      .and_return(response)
-    api.put('/foo', 'bar').should == 'foo'
-  end
-
-  it 'sends GET requests to the server and returns the response body' do
-    client.should_receive(:get).with(url_for('/foo'), {}) \
-      .and_return(response)
-    api.get('/foo').should == 'foo'
-  end
-
-  it 'adds data as querystirng params to GET requests' do
-    client.should_receive(:get).with(url_for('/foo?bar=baz&yak=shaved'), {}) \
-      .and_return(response)
-    api.get('/foo', bar: 'baz', yak: 'shaved')
-  end
-
-  it 'sends DELETE requests to the server and returns the response body' do
-    client.should_receive(:delete).with(url_for('/foo'), {}) \
-      .and_return(response)
-    api.delete('/foo').should == 'foo'
-  end
-
-  it 'adds data as querystirng params to DELETE requests' do
-    client.should_receive(:delete).with(url_for('/foo?bar=baz&yak=shaved'), {}) \
-      .and_return(response)
-    api.delete('/foo', bar: 'baz', yak: 'shaved')
-  end
-
   shared_examples_for 'any type of HTTP request' do |http_verb|
     before(:each) do
       client.stub!(http_verb => response)
     end
 
     it 'returns the response body' do
-      api.request(http_verb, '/foo', 'bar').should == 'foo'
+      api.send(http_verb, '/foo').should == 'foo'
     end
 
     it 'raises an UnexpectedResponse if the request is not successful' do
       response.stub!(code: 500)
       client.stub!(http_verb).and_raise(RestClient::Exception.new(response))
-      lambda { api.request(http_verb, '/foo') } \
+      lambda { api.send(http_verb, '/foo') } \
         .should raise_error(Kookaburra::UnexpectedResponse)
     end
 
@@ -75,26 +39,14 @@ describe Kookaburra::APIDriver do
       }
 
       it "sets headers on requests" do
-        client.should_receive(http_verb).with(url_for('/foo'), {}, 'Header-Foo' => 'Baz', 'Header-Bar' => 'Bam')
-        api.request(http_verb, '/foo', {})
-      end
-    end
-
-    context 'when a custom encoder is specified' do
-      let(:api) {
-        klass = Class.new(Kookaburra::APIDriver) do
-          encode_with { |data| :some_encoded_data }
-        end
-        klass.new(configuration, client)
-      }
-
-      it "encodes input to requests" do
-        client.should_receive(http_verb) do |_, data, _|
-          data.should == :some_encoded_data
+        # Some HTTP verb methods pass data, some don't, and their arity
+        # is different
+        client.should_receive(http_verb) do |path, data_or_headers, headers|
+          headers ||= data_or_headers
+          expect(headers).to eq('Header-Foo' => 'Baz', 'Header-Bar' => 'Bam')
           response
         end
-
-        api.request(http_verb, '/foo', :ruby_data)
+        api.send(http_verb, '/foo')
       end
     end
 
@@ -107,7 +59,43 @@ describe Kookaburra::APIDriver do
       }
 
       it "decodes response bodies from requests" do
-        api.request(http_verb, '/foo').should == :some_decoded_data
+        api.send(http_verb, '/foo').should == :some_decoded_data
+      end
+    end
+  end
+
+  shared_examples_for 'it encodes request data' do |http_verb|
+    context "(#{http_verb})" do
+      before(:each) do
+        client.stub!(http_verb => response)
+      end
+
+      context 'when a custom encoder is specified' do
+        let(:api) {
+          klass = Class.new(Kookaburra::APIDriver) do
+          encode_with { |data| :some_encoded_data }
+          end
+        klass.new(configuration, client)
+        }
+
+        it "encodes input to requests" do
+          client.should_receive(http_verb) do |_, data, _|
+            data.should == :some_encoded_data
+            response
+          end
+
+          api.send(http_verb, '/foo')
+        end
+      end
+    end
+  end
+
+  shared_examples_for 'it encodes data as a querystring' do |http_verb|
+    context "(#{http_verb})" do
+      it 'adds data as querystirng params' do
+        client.should_receive(http_verb).with(url_for('/foo?bar=baz&yak=shaved'), {}) \
+          .and_return(response)
+        api.send(http_verb, '/foo', bar: 'baz', yak: 'shaved')
       end
     end
   end
@@ -116,4 +104,10 @@ describe Kookaburra::APIDriver do
   it_behaves_like 'any type of HTTP request', :post
   it_behaves_like 'any type of HTTP request', :put
   it_behaves_like 'any type of HTTP request', :delete
+
+  it_behaves_like 'it encodes data as a querystring', :get
+  it_behaves_like 'it encodes data as a querystring', :delete
+
+  it_behaves_like 'it encodes request data', :post
+  it_behaves_like 'it encodes request data', :put
 end
