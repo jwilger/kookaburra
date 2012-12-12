@@ -31,10 +31,22 @@ describe Kookaburra::APIDriver do
     api.get('/foo').should == 'foo'
   end
 
+  it 'adds data as querystirng params to GET requests' do
+    client.should_receive(:get).with(url_for('/foo?bar=baz&yak=shaved'), {}) \
+      .and_return(response)
+    api.get('/foo', bar: 'baz', yak: 'shaved')
+  end
+
   it 'sends DELETE requests to the server and returns the response body' do
     client.should_receive(:delete).with(url_for('/foo'), {}) \
       .and_return(response)
     api.delete('/foo').should == 'foo'
+  end
+
+  it 'adds data as querystirng params to DELETE requests' do
+    client.should_receive(:delete).with(url_for('/foo?bar=baz&yak=shaved'), {}) \
+      .and_return(response)
+    api.delete('/foo', bar: 'baz', yak: 'shaved')
   end
 
   shared_examples_for 'any type of HTTP request' do |http_verb|
