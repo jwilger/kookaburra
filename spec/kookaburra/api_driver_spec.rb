@@ -37,19 +37,19 @@ describe Kookaburra::APIDriver do
     api.delete('/foo').should == 'foo'
   end
 
-  describe 'any type of HTTP request' do
+  shared_examples_for 'any type of HTTP request' do |http_verb|
     before(:each) do
-      client.stub!(:http_verb => response)
+      client.stub!(http_verb => response)
     end
 
     it 'returns the response body' do
-      api.request(:http_verb, '/foo', 'bar').should == 'foo'
+      api.request(http_verb, '/foo', 'bar').should == 'foo'
     end
 
     it 'raises an UnexpectedResponse if the request is not successful' do
       response.stub!(code: 500)
-      client.stub!(:http_verb).and_raise(RestClient::Exception.new(response))
-      lambda { api.request(:http_verb, '/foo') } \
+      client.stub!(http_verb).and_raise(RestClient::Exception.new(response))
+      lambda { api.request(http_verb, '/foo') } \
         .should raise_error(Kookaburra::UnexpectedResponse)
     end
 
@@ -63,8 +63,8 @@ describe Kookaburra::APIDriver do
       }
 
       it "sets headers on requests" do
-        client.should_receive(:http_verb).with(url_for('/foo'), {}, 'Header-Foo' => 'Baz', 'Header-Bar' => 'Bam')
-        api.request(:http_verb, '/foo', {})
+        client.should_receive(http_verb).with(url_for('/foo'), {}, 'Header-Foo' => 'Baz', 'Header-Bar' => 'Bam')
+        api.request(http_verb, '/foo', {})
       end
     end
 
@@ -77,12 +77,12 @@ describe Kookaburra::APIDriver do
       }
 
       it "encodes input to requests" do
-        client.should_receive(:http_verb) do |_, data, _|
+        client.should_receive(http_verb) do |_, data, _|
           data.should == :some_encoded_data
           response
         end
 
-        api.request(:http_verb, '/foo', :ruby_data)
+        api.request(http_verb, '/foo', :ruby_data)
       end
     end
 
@@ -95,8 +95,13 @@ describe Kookaburra::APIDriver do
       }
 
       it "decodes response bodies from requests" do
-        api.request(:http_verb, '/foo').should == :some_decoded_data
+        api.request(http_verb, '/foo').should == :some_decoded_data
       end
     end
   end
+
+  it_behaves_like 'any type of HTTP request', :get
+  it_behaves_like 'any type of HTTP request', :post
+  it_behaves_like 'any type of HTTP request', :put
+  it_behaves_like 'any type of HTTP request', :delete
 end
