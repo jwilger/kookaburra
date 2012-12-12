@@ -1,4 +1,5 @@
 require 'restclient'
+require 'active_support/core_ext/object/to_query'
 require 'kookaburra/exceptions'
 
 class Kookaburra
@@ -113,14 +114,16 @@ class Kookaburra
     # Convenience method to make a GET request
     #
     # @see APIDriver#request
-    def get(path)
+    def get(path, data = nil)
+      path = add_querystring_to_path(path, data)
       request(:get, path)
     end
 
     # Convenience method to make a DELETE request
     #
     # @see APIDriver#request
-    def delete(path)
+    def delete(path, data = nil)
+      path = add_querystring_to_path(path, data)
       request(:delete, path)
     end
 
@@ -170,6 +173,11 @@ class Kookaburra
     end
 
     private
+
+    def add_querystring_to_path(path, data)
+      return path if data.nil?
+      "#{path}?#{data.to_query}"
+    end
 
     def headers
       self.class.headers
