@@ -100,31 +100,31 @@ class Kookaburra
     # Convenience method to make a POST request
     #
     # @see APIDriver#request
-    def post(path, data = {})
-      request(:post, path, data)
+    def post(path, data = nil, headers = {})
+      request(:post, path, data, headers)
     end
 
     # Convenience method to make a PUT request
     #
     # @see APIDriver#request
-    def put(path, data = {})
-      request(:put, path, data)
+    def put(path, data = nil, headers = {})
+      request(:put, path, data, headers)
     end
 
     # Convenience method to make a GET request
     #
     # @see APIDriver#request
-    def get(path, data = {})
+    def get(path, data = nil, headers = {})
       path = add_querystring_to_path(path, data)
-      request(:get, path)
+      request(:get, path, nil, headers)
     end
 
     # Convenience method to make a DELETE request
     #
     # @see APIDriver#request
-    def delete(path, data = {})
+    def delete(path, data = nil, headers = {})
       path = add_querystring_to_path(path, data)
-      request(:delete, path)
+      request(:delete, path, nil, headers)
     end
 
     # Make an HTTP request
@@ -164,8 +164,9 @@ class Kookaburra
     #
     # @raise [Kookaburra::UnexpectedResponse] Raised if the HTTP
     #        response received is not in the 2XX-3XX range.
-    def request(method, path, data = nil)
+    def request(method, path, data, headers)
       data = encode(data)
+      headers = global_headers.merge(headers)
       response = @http_client.send(method, url_for(path), *[data, headers].compact)
       decode(response.body)
     rescue RestClient::Exception => e
@@ -179,7 +180,7 @@ class Kookaburra
       "#{path}?#{data.to_query}"
     end
 
-    def headers
+    def global_headers
       self.class.headers
     end
 
