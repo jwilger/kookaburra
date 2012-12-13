@@ -14,52 +14,101 @@ describe Kookaburra::APIDriver do
   let(:client) { stub('RestClient') }
 
   shared_examples_for 'any type of HTTP request' do |http_verb|
-    before(:each) do
-      client.stub!(http_verb => response)
-    end
+    context "(#{http_verb})" do
+      before(:each) do
+        client.stub!(http_verb => response)
+      end
 
-    it 'returns the response body' do
-      api.send(http_verb, '/foo').should == 'foo'
-    end
+      it 'returns the response body' do
+        api.send(http_verb, '/foo').should == 'foo'
+      end
 
-    it 'raises an UnexpectedResponse if the request is not successful' do
-      response.stub!(code: 500)
-      client.stub!(http_verb).and_raise(RestClient::Exception.new(response))
-      lambda { api.send(http_verb, '/foo') } \
-        .should raise_error(Kookaburra::UnexpectedResponse)
-    end
+      it 'raises an UnexpectedResponse if the request is not successful' do
+        response.stub!(code: 500)
+        client.stub!(http_verb).and_raise(RestClient::Exception.new(response))
+        lambda { api.send(http_verb, '/foo') } \
+          .should raise_error(Kookaburra::UnexpectedResponse)
+      end
 
-    context 'when custom headers are specified' do
-      let(:api) {
-        klass = Class.new(Kookaburra::APIDriver) do
-          header 'Header-Foo', 'Baz'
-          header 'Header-Bar', 'Bam'
-        end
-        klass.new(configuration, client)
-      }
-
-      it "sets headers on requests" do
+      let(:expect_client_to_receive_headers) { ->(expected_headers) {
         # Some HTTP verb methods pass data, some don't, and their arity
         # is different
         client.should_receive(http_verb) do |path, data_or_headers, headers|
           headers ||= data_or_headers
-          expect(headers).to eq('Header-Foo' => 'Baz', 'Header-Bar' => 'Bam')
+          expect(headers).to eq(expected_headers)
           response
         end
-        api.send(http_verb, '/foo')
-      end
-    end
+      }}
 
-    context 'when a custom decoder is specified' do
-      let(:api) {
-        klass = Class.new(Kookaburra::APIDriver) do
-        decode_with { |data| :some_decoded_data }
+      context 'when custom global headers are specified' do
+        let(:api) {
+          klass = Class.new(Kookaburra::APIDriver) do
+            header 'Header-Foo', 'Baz'
+            header 'Header-Bar', 'Bam'
+          end
+          klass.new(configuration, client)
+        }
+
+        it "sets global headers on requests" do
+          expect_client_to_receive_headers.call('Header-Foo' => 'Baz', 'Header-Bar' => 'Bam')
+          api.send(http_verb, '/foo')
         end
-        klass.new(configuration, client)
-      }
 
-      it "decodes response bodies from requests" do
-        api.send(http_verb, '/foo').should == :some_decoded_data
+        context "and additional headers are specified on a single call" do
+          it 'sets both the global and additional headers on the request' do
+            expect_client_to_receive_headers.call('Header-Foo' => 'Baz', 'Header-Bar' => 'Bam', 'Yak' => 'Shaved')
+            api.send(http_verb, '/foo', nil, 'Yak' => 'Shaved')
+          end
+
+          it 'only sets the global headers on subsequent requests' do
+            api.send(http_verb, '/foo', nil, 'Yak' => 'Shaved')
+
+            expect_client_to_receive_headers.call('Header-Foo' => 'Baz', 'Header-Bar' => 'Bam')
+            api.send(http_verb, '/foo')
+          end
+        end
+
+        context 'and global header values are overriden by a single call' do
+          it 'uses the override value for the the request' do
+            expect_client_to_receive_headers.call('Header-Foo' => 'Baz', 'Header-Bar' => 'Yak')
+            api.send(http_verb, '/foo', nil, 'Header-Bar' => 'Yak')
+          end
+
+          it 'uses the global value for subsequent requests' do
+            api.send(http_verb, '/foo', nil, 'Header-Bar' => 'Yak')
+
+            expect_client_to_receive_headers.call('Header-Foo' => 'Baz', 'Header-Bar' => 'Bam')
+            api.send(http_verb, '/foo')
+          end
+        end
+      end
+
+      context 'when headers are specified' do
+        it 'sets the headers on the request' do
+          expected_headers = {'Foo' => 'Bar', 'Baz' => 'Bam'}
+          expect_client_to_receive_headers.call(expected_headers)
+          api.send(http_verb, '/foo', nil, expected_headers)
+        end
+
+        it 'does not set the headers on subsequent requests' do
+          api.send(http_verb, '/foo', nil, :foo => :bar)
+
+          expect_client_to_receive_headers.call({})
+          api.send(http_verb, '/foo')
+        end
+      end
+
+      context 'when a custom decoder is specified' do
+        let(:api) {
+          klass = Class.new(Kookaburra::APIDriver) do
+          decode_with { |data| :some_decoded_data }
+          end
+        klass.new(configuration, client)
+        }
+
+        it "decodes response bodies from requests" do
+          api.send(http_verb, '/foo').should == :some_decoded_data
+        end
       end
     end
   end
@@ -73,9 +122,12 @@ describe Kookaburra::APIDriver do
       context 'when a custom encoder is specified' do
         let(:api) {
           klass = Class.new(Kookaburra::APIDriver) do
-          encode_with { |data| :some_encoded_data }
+            encode_with { |data|
+              data.should == :some_ruby_data
+              :some_encoded_data
+            }
           end
-        klass.new(configuration, client)
+          klass.new(configuration, client)
         }
 
         it "encodes input to requests" do
@@ -84,7 +136,7 @@ describe Kookaburra::APIDriver do
             response
           end
 
-          api.send(http_verb, '/foo')
+          api.send(http_verb, '/foo', :some_ruby_data)
         end
       end
     end
