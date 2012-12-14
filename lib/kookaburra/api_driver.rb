@@ -1,5 +1,5 @@
 require 'restclient'
-require 'active_support/core_ext/object/to_query'
+require 'core_ext/object/to_query'
 require 'kookaburra/exceptions'
 
 class Kookaburra
