@@ -5,11 +5,11 @@ require 'kookaburra/exceptions'
 class Kookaburra
   # Communicate with a Web Services API
   #
-  # You will create a subclass of `APIDriver` in your testing
+  # You will create a subclass of {APIDriver} in your testing
   # implementation to be used with you subclass of
-  # `Kookaburra::GivenDriver`. While the `GivenDriver` implements the
+  # {Kookaburra::GivenDriver}. While the {GivenDriver} implements the
   # "business domain" DSL for setting up your application state, the
-  # `APIDriver` maps discreet operations to your application's web
+  # {APIDriver} maps discreet operations to your application's web
   # service API and can (optionally) handle encoding input data and
   # decoding response bodies to and from your preferred serialization
   # format.
@@ -17,8 +17,8 @@ class Kookaburra
     class << self
       # Serializes input data
       #
-      # If specified, any input data provided to `APIDriver#post`,
-      # `APIDriver#put` or `APIDriver#request` will be processed through
+      # If specified, any input data provided to {APIDriver#post},
+      # {APIDriver#put} or {APIDriver#request} will be processed through
       # this function prior to being sent to the HTTP server.
       #
       # @yieldparam data [Object] The data parameter that was passed to
@@ -40,7 +40,7 @@ class Kookaburra
       # Deserialize response body
       #
       # If specified, the response bodies of all requests made using
-      # this `APIDriver` will be processed through this function prior
+      # this {APIDriver} will be processed through this function prior
       # to being returned.
       #
       # @yieldparam data [String] The response body sent by the HTTP
@@ -63,7 +63,7 @@ class Kookaburra
       # Set custom HTTP headers
       #
       # Can be called multiple times to set HTTP headers that will be
-      # provided with every request made by the `APIDriver`.
+      # provided with every request made by the {APIDriver}.
       #
       # @param [String] name The name of the header, e.g. 'Content-Type'
       # @param [String] value The value to which the header is set
@@ -87,7 +87,7 @@ class Kookaburra
       end
     end
 
-    # Create a new `APIDriver` instance
+    # Create a new {APIDriver} instance
     #
     # @param [Kookaburra::Configuration] configuration
     # @param [RestClient] http_client (optional) Generally only
@@ -146,7 +146,7 @@ class Kookaburra
     #
     # @param [Symbol] method The HTTP verb to use with the request
     # @param [String] path The path to request. Will be joined with the
-    #        `Kookaburra::Configuration#app_host` setting to build the
+    #        {Kookaburra::Configuration#app_host} setting to build the
     #        URL unless a full URL is specified here.
     # @param [Object] data The data to be posted in the request body. If
     #        an encoder was specified, this can be any type of object as

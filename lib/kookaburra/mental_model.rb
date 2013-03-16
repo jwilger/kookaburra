@@ -32,7 +32,7 @@ class Kookaburra
       true
     end
 
-    # A MentalModel::Collection behaves much like a `Hash` object, with the
+    # A MentalModel::Collection behaves much like a {Hash} object, with the
     # exception that it will raise an {UnknownKeyError} rather than return nil
     # if you attempt to access a key that has not been set. The exception
     # attempts to provide a more helpful error message.
@@ -61,7 +61,7 @@ class Kookaburra
       end
 
       # Unlike a Hash, this object is only identical to another if the actual
-      # `#object_id` attributes match.
+      # {#object_id} attributes match.
       #
       # @return [Boolean]
       def ===(other)
@@ -71,8 +71,8 @@ class Kookaburra
       # Returns a new hash that contains key/value pairs for the
       # specified keys with values copied from this collection.
       #
-      # @note This is semantically the same as `Hash#slice` as provided
-      #   by `ActiveSupport::CoreExt::Hash`
+      # @note This is semantically the same as {Hash#slice} as provided
+      #   by {ActiveSupport::CoreExt::Hash}
       # @param [Object] keys The list of keys that should be copied from
       #   the collection
       # @return [Hash] The resulting keys/values from the collection
@@ -86,8 +86,8 @@ class Kookaburra
       # Returns a new hash that contains every key/value from this
       # collection *except* for the specified keys
       #
-      # @note This is semantically the same as `Hash#except` as provided
-      #   by `ActiveSupport::CoreExt::Hash`
+      # @note This is semantically the same as {Hash#except} as provided
+      #   by {ActiveSupport::CoreExt::Hash}
       # @param [Object] keys The list of keys that should *not* be
       #   copied from the collection
       # @return [Hash] The resulting keys/values from the collection
@@ -99,8 +99,8 @@ class Kookaburra
       # in a subcollection.
       #
       # Deleting a key/value pair from a collection on the MentalModel works just
-      # like `Hash#delete` but with a side effect - deleted members are added to
-      # a subcollection, accessible at `#deleted`.
+      # like {Hash#delete} but with a side effect - deleted members are added to
+      # a subcollection, accessible at {#deleted}.
       #
       # @param key the key to delete from the collection
       #
@@ -114,7 +114,7 @@ class Kookaburra
 
       # Finds or initializes, and returns, the subcollection of deleted items
       #
-      # Key/value pairs `#delete`d from a collection on the MentalModel will be added
+      # Key/value pairs {#delete}d from a collection on the MentalModel will be added
       # to this subcollection.
       #
       # @return [Kookaburra::MentalModel::Collection] the deleted items subcollection
@@ -125,8 +125,8 @@ class Kookaburra
       # Deletes key/value pairs from the collection for which the given block evaluates
       # to true, and persists all deleted pairs in a subcollection.
       #
-      # Works just like `Hash#delete_if` but with a side effect - deleted members are
-      # added to a subcollection, accessible at `#deleted`.
+      # Works just like {Hash#delete_if} but with a side effect - deleted members are
+      # added to a subcollection, accessible at {#deleted}.
       #
       # @return [Hash] the key/value pairs still remaining after the deletion
       def delete_if(&block)

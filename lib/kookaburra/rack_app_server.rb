@@ -4,12 +4,12 @@ require 'find_a_port'
 
 # Handles Starting/Stopping Rack Server for Tests
 #
-# `RackAppServer` is basically a wrapper around `Capybara::Server` that
+# {RackAppServer} is basically a wrapper around {Capybara::Server} that
 # makes it a bit easier to use Kookaburra with a Rack application (such
 # as Rails or Sinatra) when you want to run your tests locally against a
 # server that is only running for the duration of the tests. You simply
-# tell it how to get ahold of your Rack application (see `#initialize`)
-# and then call `#boot` before your tests run and `#shutdown` after your
+# tell it how to get ahold of your Rack application (see {#initialize})
+# and then call {#boot} before your tests run and {#shutdown} after your
 # tests run.
 #
 # @example using RSpec
@@ -34,8 +34,8 @@ class Kookaburra::RackAppServer
 
   # Sets up a new app server
   #
-  # @param startup_timeout [Integer] (10) The maximum number of seconds
-  #        to wait for the app server to respond
+  # @param startup_timeout [Integer] The maximum number of seconds to
+  #        wait for the app server to respond
   # @yieldreturn [#call] block must return a valid Rack application
   def initialize(startup_timeout=10, &rack_app_initializer)
     self.startup_timeout = startup_timeout
@@ -47,7 +47,7 @@ class Kookaburra::RackAppServer
   #
   # This will launch the server on a (detected to be) available port. It
   # will then monitor that port and only return once the app server is
-  # responding (or after a 10 second timeout).
+  # responding (or after the timeout period specified on {#initialize}).
   def boot
     if defined?(JRUBY_VERSION)
       thread_app_server
