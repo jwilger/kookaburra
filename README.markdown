@@ -115,22 +115,28 @@ and shut down a Rack application server. Just add the following to
 `spec/support/kookaburra_setup.rb`:
 
     require 'kookaburra/test_helpers'
-    require 'thwait'
-    require 'find_a_port' # from the find_a_port gem
+    require 'kookaburra/rack_app_server'
 
     # Change these to the files that define your custom GivenDriver and UIDriver
     # implementations.
     require 'my_app/kookaburra/given_driver'
     require 'my_app/kookaburra/ui_driver'
 
-    APP_PORT = FindAPort.available_port
+    # `MyApplication` below should be replaced with the object that
+    # implements the Rack `#call` interface for your application. For a
+    # Rails app, this would be along the lines of
+    # `MyAppName::Application`.
+    app_server = Kookaburra::RackAppServer.new do
+      require 'path/to/my_application'
+      MyApplication
+    end
 
-    # c.app_host below should be set to whatever the root URL of your running
-    # application is.
+    # c.app_host below should be set to whatever the root URL of your
+    # running application is.
     Kookaburra.configure do |c|
       c.given_driver_class = MyApp::Kookaburra::GivenDriver
       c.ui_driver_class = MyApp::Kookaburra::UIDriver
-      c.app_host = 'http://localhost:%d' % APP_PORT
+      c.app_host = 'http://localhost:%d' % app_server.port
       c.browser = Capybara::Session.new(:selenium)
       c.server_error_detection { |browser|
         browser.has_css?('head title', :text => 'Internal Server Error')
@@ -140,36 +146,12 @@ and shut down a Rack application server. Just add the following to
     RSpec.configure do |c|
       c.include(Kookaburra::TestHelpers, :type => :request)
 
-      # Start the application server prior to running a group of integration
-      # specs. `MyApplication` below should be replaced with the object that
-      # implements the Rack `#call` interface for your application. For a Rails
-      # app, this would be along the lines of `MyAppName::Application`.
       c.before(:all, :type => :request) do
-        # Run the server process in a forked process, and get a handle on that
-        # process, so that it can be shut down after the tests run.
-        #
-        # Note that you cannot fork under JRuby and will need to use a thread.
-        # See `spec/integration/test_a_rack_application_spec.rb` for an
-        # example.
-        @rack_server_pid = fork do
-          Capybara.server_port = APP_PORT
-          Capybara::Server.new(MyApplication).boot
-
-          # This ensures that this forked process keeps running, because the
-          # actual server is started in a thread by Capybara.
-          ThreadsWait.all_waits(Thread.list)
-        end
-
-        # Give the server a chance to start up in the forked process. You may
-        # need to adjust this depending on how long your application takes to
-        # start up.
-        sleep 1
+        app_server.boot
       end
 
-      # After the tests run, kill the server process. 
       c.after(:all, :type => :request) do
-        Process.kill(9, @rack_server_pid)
-        Process.wait
+        app_server.shutdown
       end
     end
 
@@ -214,22 +196,28 @@ and shut down a Rack application server. Just add the following to
 `features/support/kookaburra_setup.rb`:
 
     require 'kookaburra/test_helpers'
-    require 'thwait'
-    require 'find_a_port' # from the find_a_port gem
+    require 'kookaburra/rack_app_server'
 
     # Change these to the files that define your custom GivenDriver and UIDriver
     # implementations.
     require 'my_app/kookaburra/given_driver'
     require 'my_app/kookaburra/ui_driver'
 
-    APP_PORT = FindAPort.available_port
+    # `MyApplication` below should be replaced with the object that
+    # implements the Rack `#call` interface for your application. For a
+    # Rails app, this would be along the lines of
+    # `MyAppName::Application`.
+    app_server = Kookaburra::RackAppServer.new do
+      require 'path/to/my_application'
+      MyApplication
+    end
 
-    # c.app_host below should be set to whatever the root URL of your running
-    # application is.
+    # c.app_host below should be set to whatever the root URL of your
+    # running application is.
     Kookaburra.configure do |c|
       c.given_driver_class = MyApp::Kookaburra::GivenDriver
       c.ui_driver_class = MyApp::Kookaburra::UIDriver
-      c.app_host = 'http://localhost:%d' % APP_PORT
+      c.app_host = 'http://localhost:%d' % app_server.port
       c.browser = Capybara::Session.new(:selenium)
       c.server_error_detection { |browser|
         browser.has_css?('head title', :text => 'Internal Server Error')
@@ -238,34 +226,10 @@ and shut down a Rack application server. Just add the following to
 
     World(Kookaburra::TestHelpers)
 
-    # Start the application server prior to running the tests.
-    # `MyApplication` below should be replaced with the object that
-    # implements the Rack `#call` interface for your application. For a Rails
-    # app, this would be along the lines of `MyAppName::Application`.
-    # Runs the server process in a forked process, and get a handle on that
-    # process, so that it can be shut down after the tests run.
-    #
-    # Note that you cannot fork under JRuby and will need to use a thread.
-    # See `spec/integration/test_a_rack_application_spec.rb` for an
-    # example.
-    @rack_server_pid = fork do
-      Capybara.server_port = APP_PORT
-      Capybara::Server.new(MyApplication).boot
+    app_server.boot
 
-      # This ensures that this forked process keeps running, because the
-      # actual server is started in a thread by Capybara.
-      ThreadsWait.all_waits(Thread.list)
-    end
-
-    # Give the server a chance to start up in the forked process. You may
-    # need to adjust this depending on how long your application takes to
-    # start up.
-    sleep 1
-
-    # After the tests run, kill the server process. 
     at_exit do
-      Process.kill(9, @rack_server_pid)
-      Process.wait
+      app_server.shutdown
     end
 
 ## Defining Your Testing DSL ##
@@ -297,7 +261,7 @@ have the following scenario defined for an e-commerce application:
     Feature: Purchase Items in Cart
 
       Scenario: Using Existing Billing and Shipping Information
-        
+
         Given I have an existing account
         And I have previously specified default payment options
         And I have previously specified default shipping options

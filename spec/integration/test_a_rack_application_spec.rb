@@ -1,15 +1,11 @@
 require 'kookaburra/test_helpers'
 require 'kookaburra/api_driver'
+require 'kookaburra/rack_app_server'
 require 'capybara'
-require 'thwait'
-require 'find_a_port'
 
 # These are required for the Rack app used for testing
 require 'sinatra/base'
 require 'json'
-
-# The server port to which the application server will attach
-APP_PORT = FindAPort.available_port
 
 describe "testing a Rack application with Kookaburra" do
   describe "with an HTML interface" do
@@ -319,37 +315,23 @@ describe "testing a Rack application with Kookaburra" do
         end
       end
 
+      app_server = Kookaburra::RackAppServer.new do
+        JsonApiApp.new
+      end
+
       before(:all) do
-        start_server = lambda {
-          Capybara.server_port = APP_PORT
-          Capybara::Server.new(JsonApiApp.new).boot
-          ThreadsWait.all_waits(Thread.list)
-        }
-        if defined?(JRUBY_VERSION)
-          # Can't `fork` in JRuby. This doesn't provide the state
-          # isolation that you get with forking (AFAIK, I'm no JVM
-          # expert, though), but it lets the tests run and pass.
-          Thread.new { start_server.call }
-        else
-          @rack_server_pid = fork do
-            start_server.call
-          end
-        end
-        sleep 1 # Give the server a chance to start up.
+        app_server.boot
       end
 
       after(:all) do
-        unless defined?(JRUBY_VERSION)
-          Process.kill(9, @rack_server_pid)
-          Process.wait
-        end
+        app_server.shutdown
       end
 
       it "runs the tests against the app" do
         Kookaburra.configure do |c|
           c.ui_driver_class = MyUIDriver
           c.given_driver_class = MyGivenDriver
-          c.app_host = 'http://127.0.0.1:%d' % APP_PORT
+          c.app_host = 'http://127.0.0.1:%d' % app_server.port
           c.browser = Capybara::Session.new(:selenium)
           c.server_error_detection do |browser|
             browser.has_css?('head title', :text => 'Internal Server Error')
