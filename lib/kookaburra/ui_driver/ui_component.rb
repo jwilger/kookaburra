@@ -60,13 +60,13 @@ class Kookaburra
     #     end
     #   end
     #
-    # Note that the "browser operation" methods such as `#fill_in` and
-    # `#click_button` are delegated to a {ScopedBrowser} and are
-    # automatically scoped to the component's DOM element.    
+    # Note that the "browser operation" methods such as {#fill_in} and
+    # {#click_button} are delegated to a {ScopedBrowser} and are
+    # automatically scoped to the component's DOM element.
     #
-    # @note Even though a `UIComponent` should respond to all of the
+    # @note Even though a {UIComponent} should respond to all of the
     #   methods on the browser (i.e. all of the Capybara DSL methods),
-    #   for some reason call to `#select` get routed to `Kernel#select`.
+    #   for some reason call to {#select} get routed to {Kernel#select}.
     #   You can get around this by calling it as `self.select`. See
     #   https://gist.github.com/3192103 for an example of this behavior.
     #
@@ -92,7 +92,7 @@ class Kookaburra
       #
       # @param [Kookaburra::Configuration] configuration
       # @param [Hash] options An options hash that can be used to
-      #   further configure a `UIComponent`'s behavior.
+      #   further configure a {UIComponent}'s behavior.
       def initialize(configuration, options = {})
         @configuration = configuration
         @options = options

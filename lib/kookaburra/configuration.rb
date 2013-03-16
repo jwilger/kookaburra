@@ -23,7 +23,7 @@ class Kookaburra
 
     # This object is used by {Kookaburra::UIDriver::UIComponent} to interface
     # with the web browser. Typically it should be an instance of
-    # `Capybara::Session`
+    # {Capybara::Session}
     #
     # @attribute [rw] browser
     # @raise [Kookaburra::ConfigurationError] if you try to read this attribute
