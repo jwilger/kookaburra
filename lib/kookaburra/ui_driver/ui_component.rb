@@ -20,8 +20,9 @@ class Kookaburra
     #       '/signup'
     #     end
     #
+    #     # If it can't be inferred from the class name
     #     def component_locator
-    #       '#sign_up_form'
+    #       '#user-sign-up'
     #     end
     #
     #     def email
@@ -70,9 +71,10 @@ class Kookaburra
     #   You can get around this by calling it as `self.select`. See
     #   https://gist.github.com/3192103 for an example of this behavior.
     #
-    # @abstract Subclass and implement (at least) {#component_locator}. Unless
-    #   you override the default implementation of {#url}, you must also
-    #   override the {#component_path} method.
+    # @abstract Unless you override the default implementation of {#url}, you
+    #   must override the {#component_path} method if you want the component to
+    #   be navigable by the {Kookaburra::UIDriver::UIComponent::AddressBar}
+    #   component.
     class UIComponent < SimpleDelegator
       include Assertion
       extend HasUIComponents
@@ -132,12 +134,28 @@ class Kookaburra
         raise ConfigurationError, "You must define #{self.class.name}#component_path."
       end
 
-      # @abstract
-      # @return [String] the CSS3 selector that will find the element in the DOM
-      # @raise [Kookaburra::ConfigurationError] raised if you haven't provided
-      #   an implementation
+      # The CSS3 selector that will find the element in the DOM
+      #
+      # Defaults to a "#" followed by the snake-cased (underscored) version of
+      # the class name with '/' replaced by '-'. Override this method in your
+      # subclasses if you need a different CSS3 selector to find your component.
+      #
+      # @example
+      #   class My::Awesome::ComponentThingy < Kookaburra::UIDriver::UIComponent
+      #   end
+      #
+      #   x = My::Awesome::ComponentThingy.allocate
+      #   x.send(:component_locator)
+      #   #=> '#my-awesome-component_thingy'
+      #
+      # @return [String]
       def component_locator
-        raise ConfigurationError, "You must define #{self.class.name}#component_locator."
+        "#" + self.class.name.gsub(/::/, '/').
+          gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+          gsub(/([a-z\d])([A-Z])/,'\1_\2').
+          tr("-", "_").
+          gsub('/', '-').
+          downcase
       end
 
       # Runs the server error detection function specified in
