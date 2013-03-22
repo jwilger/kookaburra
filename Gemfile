@@ -15,4 +15,5 @@ group :development do
   gem 'sinatra'
   gem 'find_a_port'
   gem 'json'
+  gem 'uuid'
 end

@@ -2,6 +2,7 @@ require 'kookaburra/test_helpers'
 require 'kookaburra/api_driver'
 require 'kookaburra/rack_app_server'
 require 'capybara'
+require 'uuid'
 
 # These are required for the Rack app used for testing
 require 'sinatra/base'
@@ -102,7 +103,7 @@ describe "testing a Rack application with Kookaburra" do
                         else
                           {:name => params['name']}
                         end
-          widget_data[:id] = `uuidgen`.strip
+          widget_data[:id] = UUID.new.generate
           @@widgets << widget_data
           @@last_widget_created = widget_data
           if request.accept? 'text/html'
