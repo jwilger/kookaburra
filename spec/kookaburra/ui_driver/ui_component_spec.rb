@@ -68,9 +68,14 @@ describe Kookaburra::UIDriver::UIComponent do
     end
 
     describe '#component_locator' do
-      it 'must be defined by subclasses' do
-        lambda { component.send(:component_locator) } \
-          .should raise_error(Kookaburra::ConfigurationError)
+      it 'defaults to a string based on the class name' do
+        expected = "#" + component.class.name.gsub(/::/, '/').
+          gsub(/([A-Z]+)([A-Z][a-z])/,'\1_\2').
+          gsub(/([a-z\d])([A-Z])/,'\1_\2').
+          tr("-", "_").
+          gsub('/', '-').
+          downcase
+        expect(component.send(:component_locator)).to eq expected
       end
     end
 

@@ -217,9 +217,11 @@ describe "testing a Rack application with Kookaburra" do
           '/session/new'
         end
 
-        def component_locator
-          '#sign_in_screen'
-        end
+        # Use default component locator value
+        #
+        # def component_locator
+        #   '#sign_in_screen'
+        # end
 
         def sign_in(user_data)
           fill_in 'Email:', :with => user_data['email']
