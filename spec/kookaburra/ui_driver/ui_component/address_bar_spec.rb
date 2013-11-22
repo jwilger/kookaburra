@@ -8,8 +8,10 @@ describe Kookaburra::UIDriver::UIComponent::AddressBar do
       end
     }
 
+    let(:error_detector) { nil }
+
     let(:configuration) {
-      double('Configuration', :browser => browser, :app_host => nil, :server_error_detection => nil)
+      double('Configuration', :browser => browser, :app_host => nil, :server_error_detection => error_detector)
     }
 
     let(:address_bar) {
@@ -22,10 +24,19 @@ describe Kookaburra::UIDriver::UIComponent::AddressBar do
       end
     end
 
-    context 'when given a string' do
-      it 'causes the browser to navigate to the (presumably URL) string' do
+    context 'when given an addressable object' do
+      it "causes the browser to navigate to the object's #url" do
         addressable = double('addressable', :url => 'http://site.example.com')
         address_bar.go_to addressable
+      end
+    end
+
+    context "when a server error would be detected" do
+      let(:error_detector) { ->(browser) { true } }
+
+      it 'raises a Kookaburra::UnexpectedResponse' do
+        expect { address_bar.go_to 'http://site.example.com' } \
+          .to raise_error(Kookaburra::UnexpectedResponse)
       end
     end
   end
