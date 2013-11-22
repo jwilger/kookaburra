@@ -7,6 +7,7 @@ gem 'rest-client'
 group :development do
   gem 'jruby-openssl', :platforms => :jruby
   gem 'rspec'
+  gem 'selenium-webdriver'
   gem 'capybara'
   gem 'yard'
   gem 'kramdown' # used by yard to format documentation, but not a dependency as far as the yard gem is concerned

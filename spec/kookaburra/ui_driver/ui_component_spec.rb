@@ -3,18 +3,18 @@ require 'support/shared_examples/it_can_make_assertions'
 require 'support/shared_examples/it_can_have_ui_components'
 
 describe Kookaburra::UIDriver::UIComponent do
-  let(:configuration) { stub('Configuration', :browser => nil, :app_host => nil, :server_error_detection => nil) }
+  let(:configuration) { double('Configuration', :browser => nil, :app_host => nil, :server_error_detection => nil) }
   let(:component) { Kookaburra::UIDriver::UIComponent.new(configuration) }
 
   it_behaves_like :it_can_have_ui_components, Kookaburra::UIDriver::UIComponent
 
   describe '#visible?' do
     it 'returns true if the component_locator is found in the DOM and is visible' do
-      browser = mock('Browser Driver')
+      browser = double('Browser Driver')
       browser.should_receive(:has_css?) \
         .with('#my_component', :visible) \
         .and_return(true)
-      configuration.stub!(:browser => browser)
+      configuration.stub(:browser => browser)
       def component.component_locator
         '#my_component'
       end
@@ -22,12 +22,12 @@ describe Kookaburra::UIDriver::UIComponent do
     end
 
     it 'returns false if the component_locator id not found in the DOM' do
-      browser = stub('Browser Driver', :has_css? => false)
-      configuration.stub!(:browser => browser)
+      browser = double('Browser Driver', :has_css? => false)
+      configuration.stub(:browser => browser)
       server_error_detection = lambda { |browser|
         false
       }
-      configuration.stub!(:server_error_detection => server_error_detection)
+      configuration.stub(:server_error_detection => server_error_detection)
       def component.component_locator
         '#my_component'
       end
@@ -35,12 +35,12 @@ describe Kookaburra::UIDriver::UIComponent do
     end
 
     it 'raises UnexpectedResponse if the component_locator is not found and a server error is detected' do
-      browser = stub('Browser Driver', :has_css? => false)
-      configuration.stub!(:browser => browser)
+      browser = double('Browser Driver', :has_css? => false)
+      configuration.stub(:browser => browser)
       server_error_detection = lambda { |browser|
         true
       }
-      configuration.stub!(:server_error_detection => server_error_detection)
+      configuration.stub(:server_error_detection => server_error_detection)
       def component.component_locator
         '#my_component'
       end
@@ -51,7 +51,7 @@ describe Kookaburra::UIDriver::UIComponent do
 
   describe '#url' do
     it 'returns the app_host + #component_path' do
-      configuration.stub!(:app_host => 'http://my.example.com')
+      configuration.stub(:app_host => 'http://my.example.com')
       def component.component_path
         '/foo/bar'
       end

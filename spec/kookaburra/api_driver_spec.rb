@@ -5,18 +5,18 @@ describe Kookaburra::APIDriver do
     URI.join('http://example.com', uri).to_s
   end
 
-  let(:configuration) { stub('Configuration', :app_host => 'http://example.com') }
+  let(:configuration) { double('Configuration', :app_host => 'http://example.com') }
 
   let(:api) { Kookaburra::APIDriver.new(configuration, client) }
 
-  let(:response) { stub('RestClient::Response', body: 'foo', code: 200) }
+  let(:response) { double('RestClient::Response', body: 'foo', code: 200) }
 
-  let(:client) { stub('RestClient') }
+  let(:client) { double('RestClient') }
 
   shared_examples_for 'any type of HTTP request' do |http_verb|
     context "(#{http_verb})" do
       before(:each) do
-        client.stub!(http_verb => response)
+        client.stub(http_verb => response)
       end
 
       it 'returns the response body' do
@@ -24,8 +24,8 @@ describe Kookaburra::APIDriver do
       end
 
       it 'raises an UnexpectedResponse if the request is not successful' do
-        response.stub!(code: 500)
-        client.stub!(http_verb).and_raise(RestClient::Exception.new(response))
+        response.stub(code: 500)
+        client.stub(http_verb).and_raise(RestClient::Exception.new(response))
         lambda { api.send(http_verb, '/foo') } \
           .should raise_error(Kookaburra::UnexpectedResponse)
       end
@@ -116,7 +116,7 @@ describe Kookaburra::APIDriver do
   shared_examples_for 'it encodes request data' do |http_verb|
     context "(#{http_verb})" do
       before(:each) do
-        client.stub!(http_verb => response)
+        client.stub(http_verb => response)
       end
 
       context 'when a custom encoder is specified' do
