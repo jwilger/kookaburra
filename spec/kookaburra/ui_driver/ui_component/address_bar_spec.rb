@@ -3,13 +3,13 @@ require 'kookaburra/ui_driver/ui_component/address_bar'
 describe Kookaburra::UIDriver::UIComponent::AddressBar do
   describe '#go_to' do
     let(:browser) {
-      mock('Capybara::Session').tap do |b|
+      double('Capybara::Session').tap do |b|
         b.should_receive(:visit).with('http://site.example.com')
       end
     }
 
     let(:configuration) {
-      stub('Configuration', :browser => browser, :app_host => nil, :server_error_detection => nil)
+      double('Configuration', :browser => browser, :app_host => nil, :server_error_detection => nil)
     }
 
     let(:address_bar) {
@@ -24,7 +24,7 @@ describe Kookaburra::UIDriver::UIComponent::AddressBar do
 
     context 'when given a string' do
       it 'causes the browser to navigate to the (presumably URL) string' do
-        addressable = stub('addressable', :url => 'http://site.example.com')
+        addressable = double('addressable', :url => 'http://site.example.com')
         address_bar.go_to addressable
       end
     end

@@ -106,14 +106,15 @@ describe "testing a Rack application with Kookaburra" do
           widget_data[:id] = UUID.new.generate
           @@widgets << widget_data
           @@last_widget_created = widget_data
-          if request.accept? 'text/html'
-            redirect to('/widgets')
-          elsif request.accept? 'application/json'
-            status 201
-            headers 'Content-Type' => 'application/json'
-            body widget_data.to_json
-          else
-            redirect to('/widgets')
+          request.accept.each do |type|
+            case type.to_s
+            when 'application/json'
+              status 201
+              headers 'Content-Type' => 'application/json'
+              halt widget_data.to_json
+            else
+              halt redirect to('/widgets')
+            end
           end
         end
 

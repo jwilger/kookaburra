@@ -8,7 +8,7 @@ describe Kookaburra::UIDriver do
 
   describe '.ui_driver' do
     it 'adds an accessor method for the named driver that defaults to an instance of the specified class' do
-      foo_driver_class = mock(Class)
+      foo_driver_class = double(Class)
       foo_driver_class.should_receive(:new) \
         .with(:configuration) \
         .and_return(:a_foo_driver)
@@ -24,13 +24,13 @@ describe Kookaburra::UIDriver do
 
   describe '#url' do
     it 'returns the configured app_host' do
-      config = stub('Configuration', :app_host => 'http://my.example.com')
+      config = double('Configuration', :app_host => 'http://my.example.com')
       driver = Kookaburra::UIDriver.new(config)
       driver.url.should == 'http://my.example.com'
     end
   end
 
   it_behaves_like :it_can_make_assertions do
-    let(:subject) { Kookaburra::UIDriver.new(stub('Configuration')) }
+    let(:subject) { Kookaburra::UIDriver.new(double('Configuration')) }
   end
 end

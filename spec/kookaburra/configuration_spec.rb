@@ -27,7 +27,7 @@ describe Kookaburra::Configuration do
     end
 
     it 'changes if #app_host changes' do
-      URI.stub!(:parse) do |url|
+      URI.stub(:parse) do |url|
         url.to_sym
       end
       subject.app_host = 'http://example.com'

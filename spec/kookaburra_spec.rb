@@ -9,32 +9,32 @@ describe Kookaburra do
 
   describe '#given' do
     it 'returns an instance of the configured GivenDriver' do
-      my_given_driver_class = mock(Class)
+      my_given_driver_class = double(Class)
       my_given_driver_class.should_receive(:new) \
         .with(configuration) \
         .and_return(:a_given_driver)
-      configuration.stub!(:given_driver_class => my_given_driver_class)
+      configuration.stub(:given_driver_class => my_given_driver_class)
       k.given.should == :a_given_driver
     end
   end
 
   describe '#ui' do
     it 'returns an instance of the configured UIDriver' do
-      my_ui_driver_class = mock(Class)
+      my_ui_driver_class = double(Class)
       my_ui_driver_class.should_receive(:new) \
         .with(configuration) \
         .and_return(:a_ui_driver)
-      configuration.stub!(:ui_driver_class => my_ui_driver_class)
+      configuration.stub(:ui_driver_class => my_ui_driver_class)
       k.ui.should == :a_ui_driver
     end
   end
 
   describe '#get_data' do
     it 'returns a dup of the specified MentalModel::Collection' do
-      collection = stub('MentalModel::Collection')
+      collection = double('MentalModel::Collection')
       collection.should_receive(:dup) \
         .and_return(:mental_model_collection_dup)
-      configuration.stub!(:mental_model => stub(:foos => collection))
+      configuration.stub(:mental_model => double(:foos => collection))
       k.get_data(:foos).should == :mental_model_collection_dup
     end
   end
@@ -54,9 +54,9 @@ describe Kookaburra do
 
   describe '.configure' do
     it 'yields Kookaburra.configuration' do
-      configuration = mock('Kookaburra::Configuration')
+      configuration = double('Kookaburra::Configuration')
       configuration.should_receive(:foo=).with(:bar)
-      Kookaburra.stub!(:configuration => configuration)
+      Kookaburra.stub(:configuration => configuration)
       Kookaburra.configure do |c|
         c.foo = :bar
       end
