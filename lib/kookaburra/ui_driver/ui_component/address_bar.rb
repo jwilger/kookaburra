@@ -16,6 +16,7 @@ class Kookaburra
           else
             browser.visit(addressable.to_s)
           end
+          detect_server_error!
         end
       end
     end

@@ -9,6 +9,8 @@ require 'sinatra/base'
 require 'json'
 
 describe "testing a Rack application with Kookaburra" do
+  include Kookaburra::TestHelpers
+
   describe "with an HTML interface" do
     describe "with a JSON API" do
       # This is the fixture Rack application against which the integration
@@ -163,6 +165,20 @@ describe "testing a Rack application with Kookaburra" do
           body content
         end
 
+        get '/error_page' do
+          content = <<-EOF
+            <html>
+              <head>
+                <title>Internal Server Error</title>
+              </head>
+              <body>
+                <p>A Purposeful Error</p>
+              </body>
+            </html>
+          EOF
+          body content
+        end
+
         error do
           e = request.env['sinatra.error']
           body << <<-EOF
@@ -231,6 +247,12 @@ describe "testing a Rack application with Kookaburra" do
         end
       end
 
+      class ErrorPage < Kookaburra::UIDriver::UIComponent
+        def component_path
+          '/error_page'
+        end
+      end
+
       class WidgetDataContainer
         def initialize(element)
           @element = element
@@ -293,6 +315,7 @@ describe "testing a Rack application with Kookaburra" do
       end
 
       class MyUIDriver < Kookaburra::UIDriver
+        ui_component :error_page, ErrorPage
         ui_component :sign_in_screen, SignInScreen
         ui_component :widget_list, WidgetList
         ui_component :widget_form, WidgetForm
@@ -300,6 +323,10 @@ describe "testing a Rack application with Kookaburra" do
         def sign_in(name)
           address_bar.go_to sign_in_screen
           sign_in_screen.sign_in(mental_model.users[name])
+        end
+
+        def error_on_purpose
+          address_bar.go_to error_page
         end
 
         def view_widget_list
@@ -325,6 +352,16 @@ describe "testing a Rack application with Kookaburra" do
 
       before(:all) do
         app_server.boot
+
+        Kookaburra.configure do |c|
+          c.ui_driver_class = MyUIDriver
+          c.given_driver_class = MyGivenDriver
+          c.app_host = 'http://127.0.0.1:%d' % app_server.port
+          c.browser = Capybara::Session.new(:selenium)
+          c.server_error_detection do |browser|
+            browser.has_css?('head title', :text => 'Internal Server Error', :visible => false)
+          end
+        end
       end
 
       after(:all) do
@@ -332,18 +369,6 @@ describe "testing a Rack application with Kookaburra" do
       end
 
       it "runs the tests against the app" do
-        Kookaburra.configure do |c|
-          c.ui_driver_class = MyUIDriver
-          c.given_driver_class = MyGivenDriver
-          c.app_host = 'http://127.0.0.1:%d' % app_server.port
-          c.browser = Capybara::Session.new(:selenium)
-          c.server_error_detection do |browser|
-            browser.has_css?('head title', :text => 'Internal Server Error')
-          end
-        end
-
-        extend Kookaburra::TestHelpers
-
         given.a_user(:bob)
         given.a_widget(:widget_a)
         given.a_widget(:widget_b, :name => 'Foo')
@@ -369,6 +394,11 @@ describe "testing a Rack application with Kookaburra" do
         # As above, these are equivalent, but the second line is preferred.
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_c)
         ui.widget_list.widgets.should match_mental_model_of(:widgets)
+      end
+
+      it "catches errors based on the server error detection handler" do
+        expect { ui.error_on_purpose } \
+          .to raise_error(Kookaburra::UnexpectedResponse)
       end
     end
   end
