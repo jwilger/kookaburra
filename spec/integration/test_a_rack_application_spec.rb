@@ -2,6 +2,7 @@ require 'kookaburra/test_helpers'
 require 'kookaburra/api_driver'
 require 'kookaburra/rack_app_server'
 require 'capybara'
+require 'capybara/webkit'
 require 'uuid'
 
 # These are required for the Rack app used for testing
@@ -357,7 +358,7 @@ describe "testing a Rack application with Kookaburra" do
           c.ui_driver_class = MyUIDriver
           c.given_driver_class = MyGivenDriver
           c.app_host = 'http://127.0.0.1:%d' % app_server.port
-          c.browser = Capybara::Session.new(:selenium)
+          c.browser = Capybara::Session.new(:webkit)
           c.server_error_detection do |browser|
             browser.has_css?('head title', :text => 'Internal Server Error', :visible => false)
           end
