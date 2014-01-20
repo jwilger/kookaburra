@@ -171,6 +171,16 @@ class Kookaburra
           raise UnexpectedResponse, "Your server error detection function detected a server error. Looks like your applications is busted. :-("
         end
       end
+
+      private
+
+      # As of Ruby 2.1.0, 'SimpleDelegator' delegates the '#raise' method to the
+      # underlying object. Since our underlying object is probably a
+      # 'BasicObject' that doesn't define '#raise', things get confusing as we
+      # end up in a maze of '#method_missing' BS. This fixes it.
+      def raise(*args)
+        Kernel.raise(*args)
+      end
     end
   end
 end
