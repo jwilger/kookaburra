@@ -172,6 +172,18 @@ class Kookaburra
         end
       end
 
+      protected
+
+      # Provides a reference to the HTML element represented by this UIComponent
+      #
+      # This is useful for getting at attributes of the current element, because
+      # the normal find methods are scoped to run *inside* this element.
+      #
+      # @return Capybara::Element
+      def this_element
+        browser.find(component_locator)
+      end
+
       private
 
       # As of Ruby 2.1.0, 'SimpleDelegator' delegates the '#raise' method to the
