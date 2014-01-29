@@ -79,6 +79,21 @@ describe Kookaburra::UIDriver::UIComponent do
       end
     end
 
+    describe '#this_element' do
+      it 'returns the HTML element representing this component' do
+        browser = double('Browser Driver')
+        element = double('Element')
+
+        configuration.stub(browser: browser)
+        def component.component_locator
+          '#my_component'
+        end
+
+        expect(browser).to receive(:find).with('#my_component').and_return(element)
+        expect(component.send(:this_element)).to be(element)
+      end
+    end
+
     it_behaves_like :it_can_make_assertions do
       let(:subject) { component }
     end
