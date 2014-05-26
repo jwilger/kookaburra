@@ -21,31 +21,37 @@ describe Kookaburra::UIDriver::UIComponent do
       component.visible?.should == true
     end
 
-    it 'returns false if the component_locator id not found in the DOM' do
-      browser = double('Browser Driver', :has_css? => false)
-      configuration.stub(:browser => browser)
-      server_error_detection = lambda { |browser|
-        false
-      }
-      configuration.stub(:server_error_detection => server_error_detection)
-      def component.component_locator
-        '#my_component'
+    context 'when the component_locator is not found in the DOM' do
+      context 'and a server error is not detected' do
+        it 'returns false' do
+          browser = double('Browser Driver', :has_css? => false)
+          configuration.stub(:browser => browser)
+          server_error_detection = lambda { |browser|
+            false
+          }
+          configuration.stub(:server_error_detection => server_error_detection)
+          def component.component_locator
+            '#my_component'
+          end
+          component.visible?.should == false
+        end
       end
-      component.visible?.should == false
-    end
 
-    it 'raises UnexpectedResponse if the component_locator is not found and a server error is detected' do
-      browser = double('Browser Driver', :has_css? => false)
-      configuration.stub(:browser => browser)
-      server_error_detection = lambda { |browser|
-        true
-      }
-      configuration.stub(:server_error_detection => server_error_detection)
-      def component.component_locator
-        '#my_component'
+      context 'and a server error is detected' do
+        it 'raises UnexpectedResponse' do
+          browser = double('Browser Driver', :has_css? => false)
+          configuration.stub(:browser => browser)
+          server_error_detection = lambda { |browser|
+            true
+          }
+          configuration.stub(:server_error_detection => server_error_detection)
+          def component.component_locator
+            '#my_component'
+          end
+          lambda { component.visible? } \
+            .should raise_error(Kookaburra::UnexpectedResponse)
+        end
       end
-      lambda { component.visible? } \
-        .should raise_error(Kookaburra::UnexpectedResponse)
     end
   end
 
