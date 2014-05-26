@@ -31,7 +31,7 @@ describe Kookaburra::UIDriver::UIComponent do
     end
 
     context 'when the component_locator is not found in the DOM' do
-      let(:browser) { double('Browser Driver', has_css?: false) }
+      let(:browser) { double('Browser Driver', has_css?: false, text: '') }
 
       context 'and a server error is not detected' do
         it 'returns false' do
@@ -45,6 +45,14 @@ describe Kookaburra::UIDriver::UIComponent do
         it 'raises UnexpectedResponse' do
           lambda { component.visible? } \
             .should raise_error(Kookaburra::UnexpectedResponse)
+        end
+
+        it 'adds the text of the HTTP response to the exception message' do
+          browser.stub(text: 'This is text from the HTTP response')
+          lambda { component.visible? } \
+            .should raise_error(Kookaburra::UnexpectedResponse,
+                                "Server Error Detected:\n" \
+                                + "This is text from the HTTP response")
         end
       end
     end
