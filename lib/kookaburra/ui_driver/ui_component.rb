@@ -168,7 +168,7 @@ class Kookaburra
       def detect_server_error!
         return if @server_error_detection.nil?
         if @server_error_detection.call(browser)
-          raise UnexpectedResponse, "Your server error detection function detected a server error. Looks like your applications is busted. :-("
+          raise UnexpectedResponse, "Server Error Detected:\n#{browser.text}"
         end
       end
 
