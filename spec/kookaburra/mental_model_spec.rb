@@ -121,6 +121,17 @@ describe Kookaburra::MentalModel do
         new_collection[:foo][:bar].should == 'baz'
         new_collection[:foo][:bar].__id__.should_not === collection[:foo][:bar].__id__
       end
+
+      context 'when there are deleted items present' do
+        it 'also dupes the deleted items' do
+          collection[:foo] = 'foo'
+          collection[:bar] = 'bar'
+          deleted = collection.delete(:bar)
+          new_collection = collection.dup
+          expect(new_collection.deleted[:bar]).to eq deleted
+          expect(new_collection.deleted[:bar]).to_not equal deleted
+        end
+      end
     end
   end
 end

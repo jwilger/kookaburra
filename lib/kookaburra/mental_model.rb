@@ -137,8 +137,14 @@ class Kookaburra
       def dup
         new_data = {}.merge(self)
         new_data = Marshal.load(Marshal.dump(new_data))
-        self.class.new(@name, new_data)
+        self.class.new(@name, new_data).tap do |mm|
+          mm.deleted = deleted.dup unless deleted.empty?
+        end
       end
+
+      protected
+
+      attr_writer :deleted
     end
   end
 end
