@@ -369,11 +369,13 @@ describe "testing a Rack application with Kookaburra" do
         app_server.shutdown
       end
 
-      it "runs the tests against the app" do
+      before(:each) do
         given.a_user(:bob)
         given.a_widget(:widget_a)
         given.a_widget(:widget_b, :name => 'Foo')
+      end
 
+      it "runs the tests against the application's UI" do
         ui.sign_in(:bob)
         ui.view_widget_list
 
@@ -395,6 +397,21 @@ describe "testing a Rack application with Kookaburra" do
         # As above, these are equivalent, but the second line is preferred.
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_c)
         ui.widget_list.widgets.should match_mental_model_of(:widgets)
+      end
+
+      it "runs the tests agains the applications's API" do
+        pending "Requires Implementation of API client driver" do
+          api_client.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b)
+          api_client.widgets.should match_mental_model_of(:widgets)
+
+          api_client.create_new_widget(:widget_c, :name => 'Bar')
+          api_client.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b, :widget_c)
+          api_client.widgets.should match_mental_model_of(:widgets)
+
+          api_client.delete_widget(:widget_b)
+          api_client.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_c)
+          api_client.widgets.should match_mental_model_of(:widgets)
+        end
       end
 
       it "catches errors based on the server error detection handler" do
