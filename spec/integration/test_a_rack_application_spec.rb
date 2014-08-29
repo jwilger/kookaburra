@@ -377,40 +377,26 @@ describe "testing a Rack application with Kookaburra" do
 
       it "runs the tests against the application's UI" do
         ui.sign_in(:bob)
-        ui.view_widget_list
 
-        # The following two lines are two different ways to shave the yak, but
-        # the second one does more to match against the full state of the mental
-        # model, provides better failure messages, and is shorter.
+        ui.view_widget_list
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b)
-        ui.widget_list.widgets.should match_mental_model_of(:widgets)
 
         ui.create_new_widget(:widget_c, :name => 'Bar')
-
-
-        # As above, these are equivalent, but the second line is preferred.
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b, :widget_c)
-        ui.widget_list.widgets.should match_mental_model_of(:widgets)
 
         ui.delete_widget(:widget_b)
-
-        # As above, these are equivalent, but the second line is preferred.
         ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_c)
-        ui.widget_list.widgets.should match_mental_model_of(:widgets)
       end
 
       it "runs the tests against the applications's API" do
         pending "Requires Implementation of API client driver" do
           api_client.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b)
-          api_client.widgets.should match_mental_model_of(:widgets)
 
           api_client.create_new_widget(:widget_c, :name => 'Bar')
           api_client.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b, :widget_c)
-          api_client.widgets.should match_mental_model_of(:widgets)
 
           api_client.delete_widget(:widget_b)
           api_client.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_c)
-          api_client.widgets.should match_mental_model_of(:widgets)
         end
       end
 

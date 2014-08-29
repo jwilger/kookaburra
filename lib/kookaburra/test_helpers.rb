@@ -1,6 +1,5 @@
 require 'forwardable'
 require 'kookaburra'
-require 'kookaburra/mental_model_matcher'
 
 class Kookaburra
   # This module is intended to be mixed in to your testing context to provide
@@ -13,7 +12,7 @@ class Kookaburra
   #   require 'kookaburra/test_helpers'
   #   require 'my_app/kookaburra/given_driver'
   #   require 'my_app/kookaburra/ui_driver'
-  #   
+  #
   #   Kookaburra.configure do |c|
   #     c.given_driver_class = myapp::kookaburra::givendriver,
   #     c.ui_driver_class = myapp::kookaburra::uidriver,
@@ -50,7 +49,7 @@ class Kookaburra
   #   require 'kookaburra/test_helpers'
   #   require 'my_app/kookaburra/given_driver'
   #   require 'my_app/kookaburra/ui_driver'
-  #   
+  #
   #   Kookaburra.configure do |c|
   #     c.given_driver_class = myapp::kookaburra::givendriver,
   #     c.ui_driver_class = myapp::kookaburra::uidriver,
@@ -99,26 +98,5 @@ class Kookaburra
     # @method ui
     # Delegates to {#k}
     def_delegator :k, :ui
-
-    # RSpec-style custom matcher that compares a given array with
-    # the current state of one named collection in the mental model
-    #
-    # @see Kookaburra::MentalModel::Matcher
-    def match_mental_model_of(collection_key)
-      MentalModel::Matcher.new(k.send(:__mental_model__), collection_key)
-    end
-
-    # Custom assertion for Test::Unit-style tests
-    # (really, anything that uses #assert(predicate, message = nil))
-    #
-    # @see Kookaburra::MentalModel::Matcher
-    def assert_mental_model_matches(collection_key, actual, message = nil)
-      matcher = match_mental_model_of(collection_key)
-      result = matcher.matches?(actual)
-      return if !!result  # don't even bother
-
-      message ||= matcher.failure_message_for_should
-      assert result, message
-    end
   end
 end
