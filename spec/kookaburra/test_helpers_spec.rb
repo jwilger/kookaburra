@@ -39,43 +39,4 @@ describe Kookaburra::TestHelpers do
       ui
     end
   end
-
-  describe "methods related to the mental model" do
-    before(:each) do
-      mm = k.send(:__mental_model__)
-      mm.widgets[:foo] = 'FOO'
-    end
-
-    describe "#match_mental_model_of" do
-      it "does a positive match" do
-        ['FOO'].should match_mental_model_of(:widgets)
-      end
-
-      it "does a negative match" do
-        ['BAR'].should_not match_mental_model_of(:widgets)
-      end
-    end
-
-    describe "#assert_mental_model_matches" do
-      it "does a positive assertion" do
-        actual = ['FOO']
-        actual.should match_mental_model_of(:widgets) # Sanity check
-        self.should_receive(:assert).never
-        self.assert_mental_model_matches(:widgets, actual)
-      end
-
-      it "does a negative assertion" do
-        actual = ['BAR']
-        self.should_receive(:assert).with(false, kind_of(String))
-        self.assert_mental_model_matches(:widgets, actual)
-      end
-
-      it "does a negative assertion with a custom message" do
-        actual = ['YAK']
-        psa = 'Put the razor down and step away!'
-        self.should_receive(:assert).with(false, psa)
-        self.assert_mental_model_matches(:widgets, actual, psa)
-      end
-    end
-  end
 end
