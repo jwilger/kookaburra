@@ -7,6 +7,13 @@ class Kookaburra
   class Configuration
     extend DependencyAccessor
 
+    # The class to use as your APIClientDriver
+    #
+    # @attribute [rw] api_client_driver_class
+    # @raise [Kookaburra::ConfigurationError] if you try to read this attribute
+    #   without it having been set
+    dependency_accessor :api_client_driver_class
+
     # The class to use as your GivenDriver
     #
     # @attribute [rw] given_driver_class
