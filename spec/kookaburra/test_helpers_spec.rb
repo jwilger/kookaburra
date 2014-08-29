@@ -6,16 +6,14 @@ describe Kookaburra::TestHelpers do
   before(:all) do
     Kookaburra.configure do |c|
       c.given_driver_class = Kookaburra::GivenDriver
-      c.ui_driver_class = Kookaburra::UIDriver
-      c.api_client_driver_class = Kookaburra::APIClientDriver
+      c.ui_driver_class    = Kookaburra::UIDriver
     end
   end
 
   after(:all) do
     Kookaburra.configure do |c|
       c.given_driver_class = nil
-      c.ui_driver_class = nil
-      c.api_client_driver_class = nil
+      c.ui_driver_class    = nil
     end
   end
 
@@ -39,11 +37,6 @@ describe Kookaburra::TestHelpers do
     it "includes #ui" do
       k.should_receive(:ui)
       ui
-    end
-
-    it "includes #api_client" do
-      k.should_receive(:api_client)
-      api_client
     end
   end
 
