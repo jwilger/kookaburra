@@ -2,7 +2,6 @@ require 'kookaburra/configuration'
 require 'support/shared_examples/it_has_a_dependency_accessor'
 
 describe Kookaburra::Configuration do
-  it_behaves_like :it_has_a_dependency_accessor, :api_client_driver_class
   it_behaves_like :it_has_a_dependency_accessor, :given_driver_class
   it_behaves_like :it_has_a_dependency_accessor, :ui_driver_class
   it_behaves_like :it_has_a_dependency_accessor, :browser
