@@ -5,20 +5,20 @@ require 'kookaburra/exceptions'
 class Kookaburra
   # Communicate with a Web Services API
   #
-  # You will create a subclass of {APIDriver} in your testing
+  # You will create a subclass of {APIClient} in your testing
   # implementation to be used with you subclass of
   # {Kookaburra::GivenDriver}. While the {GivenDriver} implements the
   # "business domain" DSL for setting up your application state, the
-  # {APIDriver} maps discreet operations to your application's web
+  # {APIClient} maps discreet operations to your application's web
   # service API and can (optionally) handle encoding input data and
   # decoding response bodies to and from your preferred serialization
   # format.
-  class APIDriver
+  class APIClient
     class << self
       # Serializes input data
       #
-      # If specified, any input data provided to {APIDriver#post},
-      # {APIDriver#put} or {APIDriver#request} will be processed through
+      # If specified, any input data provided to {APIClient#post},
+      # {APIClient#put} or {APIClient#request} will be processed through
       # this function prior to being sent to the HTTP server.
       #
       # @yieldparam data [Object] The data parameter that was passed to
@@ -26,7 +26,7 @@ class Kookaburra
       # @yieldreturn [String] The text to be used as the request body
       #
       # @example
-      #   class MyAPIDriver < Kookaburra::APIDriver
+      #   class MyAPIClient < Kookaburra::APIClient
       #     encode_with { |data| JSON.dump(data) }
       #     # ...
       #   end
@@ -40,7 +40,7 @@ class Kookaburra
       # Deserialize response body
       #
       # If specified, the response bodies of all requests made using
-      # this {APIDriver} will be processed through this function prior
+      # this {APIClient} will be processed through this function prior
       # to being returned.
       #
       # @yieldparam data [String] The response body sent by the HTTP
@@ -50,7 +50,7 @@ class Kookaburra
       #              through this function
       #
       # @example
-      #   class MyAPIDriver < Kookaburra::APIDriver
+      #   class MyAPIClient < Kookaburra::APIClient
       #     decode_with { |data| JSON.parse(data) }
       #     # ...
       #   end
@@ -63,13 +63,13 @@ class Kookaburra
       # Set custom HTTP headers
       #
       # Can be called multiple times to set HTTP headers that will be
-      # provided with every request made by the {APIDriver}.
+      # provided with every request made by the {APIClient}.
       #
       # @param [String] name The name of the header, e.g. 'Content-Type'
       # @param [String] value The value to which the header is set
       #
       # @example
-      #   class MyAPIDriver < Kookaburra::APIDriver
+      #   class MyAPIClient < Kookaburra::APIClient
       #     header 'Content-Type', 'application/json'
       #     header 'Accept', 'application/json'
       #     # ...
@@ -87,7 +87,7 @@ class Kookaburra
       end
     end
 
-    # Create a new {APIDriver} instance
+    # Create a new {APIClient} instance
     #
     # @param [Kookaburra::Configuration] configuration
     # @param [RestClient] http_client (optional) Generally only
@@ -99,21 +99,21 @@ class Kookaburra
 
     # Convenience method to make a POST request
     #
-    # @see APIDriver#request
+    # @see APIClient#request
     def post(path, data = nil, headers = {})
       request(:post, path, data, headers)
     end
 
     # Convenience method to make a PUT request
     #
-    # @see APIDriver#request
+    # @see APIClient#request
     def put(path, data = nil, headers = {})
       request(:put, path, data, headers)
     end
 
     # Convenience method to make a GET request
     #
-    # @see APIDriver#request
+    # @see APIClient#request
     def get(path, data = nil, headers = {})
       path = add_querystring_to_path(path, data)
       request(:get, path, nil, headers)
@@ -121,7 +121,7 @@ class Kookaburra
 
     # Convenience method to make a DELETE request
     #
-    # @see APIDriver#request
+    # @see APIClient#request
     def delete(path, data = nil, headers = {})
       path = add_querystring_to_path(path, data)
       request(:delete, path, nil, headers)
@@ -136,13 +136,13 @@ class Kookaburra
     # the 3XX range. If the response is a 303, the request will be
     # transformed into a GET request.
     #
-    # @see APIDriver.encode_with
-    # @see APIDriver.decode_with
-    # @see APIDriver.header
-    # @see APIDriver#get
-    # @see APIDriver#post
-    # @see APIDriver#put
-    # @see APIDriver#delete
+    # @see APIClient.encode_with
+    # @see APIClient.decode_with
+    # @see APIClient.header
+    # @see APIClient#get
+    # @see APIClient#post
+    # @see APIClient#put
+    # @see APIClient#delete
     #
     # @param [Symbol] method The HTTP verb to use with the request
     # @param [String] path The path to request. Will be joined with the
