@@ -200,7 +200,7 @@ class JsonApiApp < Sinatra::Base
   end
 end
 
-class MyAPIDriver < Kookaburra::APIDriver
+class MyAPIClient < Kookaburra::APIClient
   encode_with { |data| JSON.dump(data) }
   decode_with { |data| JSON.parse(data) }
   header 'Content-Type', 'application/json'
@@ -225,7 +225,7 @@ end
 
 class MyGivenDriver < Kookaburra::GivenDriver
   def api
-    MyAPIDriver.new(configuration)
+    MyAPIClient.new(configuration)
   end
 
   def a_user(name)

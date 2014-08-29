@@ -1,13 +1,13 @@
-require 'kookaburra/api_driver'
+require 'kookaburra/api_client'
 
-describe Kookaburra::APIDriver do
+describe Kookaburra::APIClient do
   def url_for(uri)
     URI.join('http://example.com', uri).to_s
   end
 
   let(:configuration) { double('Configuration', :app_host => 'http://example.com') }
 
-  let(:api) { Kookaburra::APIDriver.new(configuration, client) }
+  let(:api) { Kookaburra::APIClient.new(configuration, client) }
 
   let(:response) { double('RestClient::Response', body: 'foo', code: 200) }
 
@@ -42,7 +42,7 @@ describe Kookaburra::APIDriver do
 
       context 'when custom global headers are specified' do
         let(:api) {
-          klass = Class.new(Kookaburra::APIDriver) do
+          klass = Class.new(Kookaburra::APIClient) do
             header 'Header-Foo', 'Baz'
             header 'Header-Bar', 'Bam'
           end
@@ -100,7 +100,7 @@ describe Kookaburra::APIDriver do
 
       context 'when a custom decoder is specified' do
         let(:api) {
-          klass = Class.new(Kookaburra::APIDriver) do
+          klass = Class.new(Kookaburra::APIClient) do
           decode_with { |data| :some_decoded_data }
           end
         klass.new(configuration, client)
@@ -121,7 +121,7 @@ describe Kookaburra::APIDriver do
 
       context 'when a custom encoder is specified' do
         let(:api) {
-          klass = Class.new(Kookaburra::APIDriver) do
+          klass = Class.new(Kookaburra::APIClient) do
             encode_with { |data|
               data.should == :some_ruby_data
               :some_encoded_data

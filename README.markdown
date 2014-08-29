@@ -53,19 +53,19 @@ stopping your server for you. Examples of how to do so with a Rack application
 are presented below, but you should be able to take the same basic approach with
 other types of application servers.
 
-Although Capybara is capable of starting a Rack application server on its own,
-the default setup only starts the server up on-demand when you call a method
-that requires the browser to interact with the web application. Because the
-APIDriver layer does not use Capybara, it is necessary to manage the server
-process on your own. Otherwise the server would not be guaranteed to be running
-when you call the APIDriver methods (particularly as these often appear in
-"Given" statements that are run before you start interacting with the web
-browser.)
+Although Capybara is capable of starting a Rack application server on 
+its own, the default setup only starts the server up on-demand when you 
+call a method that requires the browser to interact with the web 
+application. Because the APIClient layer does not use Capybara, it is 
+necessary to manage the server process on your own. Otherwise the server 
+would not be guaranteed to be running when you call the APIClient 
+methods (particularly as these often appear in "Given" statements that 
+are run before you start interacting with the web browser.)
 
 Keep in mind that, even if your server is capable of being started up in another
 thread within the same Ruby process that is executing your test suite, you will
 want to avoid doing so unless you are using a Ruby interpreter that supports
-native threads. Otherwise, when the APIDriver makes an HTTP call to your
+native threads. Otherwise, when the APIClient makes an HTTP call to your
 application's API, it will block while waiting for a response, thus preventing
 your application from being able to respond to that request and resulting in a
 timeout error in your tests.
@@ -245,7 +245,7 @@ the following layers:
    etc.)
 3. The **Domain Driver** (Kookaburra::GivenDriver and Kookaburra::UIDriver)
 4. The **Window Driver** (Kookaburra::UIDriver::UIComponent)
-5. The **Application Driver** (Capybara and Kookaburra::APIDriver)
+5. The **Application Driver** (Capybara and Kookaburra::APIClient)
 
 ### The Business Specification Language ###
 
@@ -470,9 +470,9 @@ for your application:
     # lib/my_app/kookaburra/given_driver.rb
 
     class MyApp::Kookaburra::GivenDriver < Kookaburra::GivenDriver
-      # Specify the APIDriver to use
+      # Specify the APIClient to use
       def api
-        @api ||= MyApp::Kookaburra::APIDriver.new(configuration)
+        @api ||= MyApp::Kookaburra::APIClient.new(configuration)
       end
 
       def existing_account(nickname)
@@ -496,17 +496,17 @@ tested. Although this state may be the result of a previous user interaction,
 your tests will be much, much faster if you create this state via API calls
 rather than driving a web browser.
 
-#### API Driver ####
+#### API Client ####
 
-The `Kookaburra::APIDriver` is used to interact with an application's
+The `Kookaburra::APIClient` is used to interact with an application's
 external web services API. You tell Kookaburra about your API by
-creating a subclass of `Kookaburra::APIDriver` for your application,
+creating a subclass of `Kookaburra::APIClient` for your application,
 specifying how requests should be encoded and decoded, and specifying
 any headers that should be present on every request.
 
     # lib/my_app/kookaburra/api_driver.rb
 
-    class MyApp::Kookaburra::APIDriver < Kookaburra::APIDriver
+    class MyApp::Kookaburra::APIClient < Kookaburra::APIClient
       encode_with { |data| JSON.dump(data) }
       decode_with { |data| JSON.parse(data) }
       header 'Content-Type', 'application/json'
@@ -521,7 +521,7 @@ any headers that should be present on every request.
       end
     end
 
-The content of your application's APIDriver should consist mainly of
+The content of your application's APIClient should consist mainly of
 mappings between discrete actions and HTTP requests to the specified URL
 paths.
 
@@ -601,9 +601,9 @@ You describe the various user interface components by sub-classing
 
 ### The Application Driver Layer ###
 
-`Kookaburra::APIDriver`, `Kookaburra::UIDriver` and
+`Kookaburra::APIClient`, `Kookaburra::UIDriver` and
 `Kookaburra::UIDriver::UIComponent` rely on the Application Driver layer
-to interact with your application. In the case of the `APIDriver`,
+to interact with your application. In the case of the `APIClient`,
 Kookaburra uses the [RestClient] [RestClient] library to send HTTP
 requests to your application. The `UIDriver` and `UIComponent` rely on
 whatever is passed to `Kookaburra.new` as the `:browser` option.
