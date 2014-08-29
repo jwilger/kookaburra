@@ -5,7 +5,7 @@ require 'kookaburra/ui_driver'
 require 'kookaburra/configuration'
 
 # Kookaburra provides the top-level API that you will access in your test
-# implementation, namely the {#given}, {#ui}, and the {#get_data} methods.
+# implementation, namely the {#api}, {#ui}, and the {#get_data} methods.
 #
 # The Kookaburra object ensures that your GivenDriver and UIDriver share the
 # same state with regard to any {Kookaburra::MentalModel} data that is created
@@ -41,7 +41,7 @@ class Kookaburra
   def initialize(configuration = Kookaburra.configuration)
     @configuration = configuration
     @configuration.mental_model = MentalModel.new
-    @given_driver_class = configuration.given_driver_class
+    @api_driver_class = configuration.api_driver_class
     @ui_driver_class = configuration.ui_driver_class
   end
 
@@ -49,8 +49,8 @@ class Kookaburra
   # fixture data with the UIDriver
   #
   # @return [Kookaburra::GivenDriver]
-  def given
-    @given ||= @given_driver_class.new(@configuration)
+  def api
+    @api ||= @api_driver_class.new(@configuration)
   end
 
   # Returns an instance of your UIDriver class configured to share test fixture
@@ -69,7 +69,7 @@ class Kookaburra
   # of your application's interface.
   #
   # @example
-  #   given.a_widget(:foo)
+  #   api.create_widget(:foo)
   #   ui.create_a_new_widget(:bar)
   #   ui.widget_list.widgets.should == k.get_data(:widgets).values_at(:foo, :bar)
   #
