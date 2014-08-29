@@ -399,7 +399,7 @@ describe "testing a Rack application with Kookaburra" do
         ui.widget_list.widgets.should match_mental_model_of(:widgets)
       end
 
-      it "runs the tests agains the applications's API" do
+      it "runs the tests against the applications's API" do
         pending "Requires Implementation of API client driver" do
           api_client.widgets.should == k.get_data(:widgets).values_at(:widget_a, :widget_b)
           api_client.widgets.should match_mental_model_of(:widgets)
