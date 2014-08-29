@@ -77,10 +77,4 @@ class Kookaburra
   def get_data(collection_name)
     @configuration.mental_model.send(collection_name).dup
   end
-
-  private
-
-  def __mental_model__
-    @configuration.mental_model
-  end
 end
