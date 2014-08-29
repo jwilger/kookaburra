@@ -10,12 +10,12 @@ class Kookaburra
   # @example RSpec setup
   #   # in 'spec/support/kookaburra_setup.rb'
   #   require 'kookaburra/test_helpers'
-  #   require 'my_app/kookaburra/given_driver'
+  #   require 'my_app/kookaburra/api_driver'
   #   require 'my_app/kookaburra/ui_driver'
   #
   #   Kookaburra.configure do |c|
-  #     c.given_driver_class = myapp::kookaburra::givendriver,
-  #     c.ui_driver_class = myapp::kookaburra::uidriver,
+  #     c.api_driver_class = MyApp::Kookaburra::APIDriver,
+  #     c.ui_driver_class = MyApp::Kookaburra::UIDriver,
   #     c.app_host = 'http://my_app.example.com:12345',
   #     c.browser = capybara,
   #     c.server_error_detection { |browser|
@@ -30,9 +30,9 @@ class Kookaburra
   #   # in 'spec/request/some_feature_spec.rb'
   #   describe "Some Feature" do
   #     example "some test script" do
-  #       given.a_widget(:foo)
-  #       given.a_widget(:bar, :hidden => true)
-  #       given.a_widget(:baz)
+  #       api.create_widget(:foo)
+  #       api.create_widget(:bar, :hidden => true)
+  #       api.create_widget(:baz)
   #
   #       ui.view_list_of_widgets
   #
@@ -47,12 +47,12 @@ class Kookaburra
   # @example Cucumber setup
   #   # in 'features/support/kookaburra_setup.rb'
   #   require 'kookaburra/test_helpers'
-  #   require 'my_app/kookaburra/given_driver'
+  #   require 'my_app/kookaburra/api_driver'
   #   require 'my_app/kookaburra/ui_driver'
   #
   #   Kookaburra.configure do |c|
-  #     c.given_driver_class = myapp::kookaburra::givendriver,
-  #     c.ui_driver_class = myapp::kookaburra::uidriver,
+  #     c.api_driver_class = MyApp::Kookaburra::APIDriver,
+  #     c.ui_driver_class = MyApp::Kookaburra::UIDriver,
   #     c.app_host = 'http://my_app.example.com:12345',
   #     c.browser = capybara,
   #     c.server_error_detection { |browser|
@@ -64,11 +64,11 @@ class Kookaburra
   #
   #   # in 'features/step_definitions/some_steps.rb
   #   Given /^there is a widget, "(\w+)"/ do |name|
-  #     given.a_widget(name.to_sym)
+  #     api.create_widget(name.to_sym)
   #   end
   #
   #   Given /^there is a hidden widget, "(\w+)"/ do |name|
-  #     given.a_widget(name.to_sym, :hidden => true)
+  #     api.create_widget(name.to_sym, :hidden => true)
   #   end
   #
   #   When /^I view the widget list/ do
@@ -91,9 +91,9 @@ class Kookaburra
       @k ||= Kookaburra.new
     end
 
-    # @method given
+    # @method api
     # Delegates to {#k}
-    def_delegator :k, :given
+    def_delegator :k, :api
 
     # @method ui
     # Delegates to {#k}

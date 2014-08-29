@@ -7,14 +7,14 @@ describe Kookaburra do
 
   let(:k) { Kookaburra.new(configuration) }
 
-  describe '#given' do
+  describe '#api' do
     it 'returns an instance of the configured GivenDriver' do
-      my_given_driver_class = double(Class)
-      my_given_driver_class.should_receive(:new) \
+      my_api_driver_class = double(Class)
+      my_api_driver_class.should_receive(:new) \
         .with(configuration) \
-        .and_return(:a_given_driver)
-      configuration.stub(:given_driver_class => my_given_driver_class)
-      k.given.should == :a_given_driver
+        .and_return(:an_api_driver)
+      configuration.stub(:api_driver_class => my_api_driver_class)
+      k.api.should == :an_api_driver
     end
   end
 

@@ -21,7 +21,7 @@ describe "testing a Rack application with Kookaburra" do
 
         Kookaburra.configure do |c|
           c.ui_driver_class = MyUIDriver
-          c.given_driver_class = MyGivenDriver
+          c.api_driver_class = MyGivenDriver
           c.app_host = 'http://127.0.0.1:%d' % app_server.port
           c.browser = Capybara::Session.new(:webkit)
           c.server_error_detection do |browser|
@@ -35,9 +35,9 @@ describe "testing a Rack application with Kookaburra" do
       end
 
       before(:each) do
-        given.a_user(:bob)
-        given.a_widget(:widget_a)
-        given.a_widget(:widget_b, :name => 'Foo')
+        api.create_user(:bob)
+        api.create_widget(:widget_a)
+        api.create_widget(:widget_b, :name => 'Widget B')
       end
 
       define_method(:widgets) { k.get_data(:widgets) }
@@ -49,7 +49,7 @@ describe "testing a Rack application with Kookaburra" do
         expect(ui.widget_list.widgets).to include widgets[:widget_a]
         expect(ui.widget_list.widgets).to include widgets[:widget_b]
 
-        ui.create_new_widget(:widget_c, :name => 'Bar')
+        ui.create_widget(:widget_c, :name => 'Bar')
         expect(ui.widget_list.widgets).to include widgets[:widget_a]
         expect(ui.widget_list.widgets).to include widgets[:widget_b]
         expect(ui.widget_list.widgets).to include widgets[:widget_c]
@@ -61,18 +61,18 @@ describe "testing a Rack application with Kookaburra" do
       end
 
       it "runs the tests against the applications's API" do
-        expect(given.widgets).to include widgets[:widget_a]
-        expect(given.widgets).to include widgets[:widget_b]
+        expect(api.widgets).to include widgets[:widget_a]
+        expect(api.widgets).to include widgets[:widget_b]
 
-        given.create_new_widget(:widget_c, :name => 'Bar')
-        expect(given.widgets).to include widgets[:widget_a]
-        expect(given.widgets).to include widgets[:widget_b]
-        expect(given.widgets).to include widgets[:widget_c]
+        api.create_widget(:widget_c, :name => 'Bar')
+        expect(api.widgets).to include widgets[:widget_a]
+        expect(api.widgets).to include widgets[:widget_b]
+        expect(api.widgets).to include widgets[:widget_c]
 
-        given.delete_widget(:widget_b)
-        expect(given.widgets).to include widgets[:widget_a]
-        expect(given.widgets).to include widgets[:widget_c]
-        expect(given.widgets).to_not include widgets.deleted[:widget_b]
+        api.delete_widget(:widget_b)
+        expect(api.widgets).to include widgets[:widget_a]
+        expect(api.widgets).to include widgets[:widget_c]
+        expect(api.widgets).to_not include widgets.deleted[:widget_b]
       end
 
       it "catches errors based on the server error detection handler" do

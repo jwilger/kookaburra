@@ -228,7 +228,7 @@ class MyGivenDriver < Kookaburra::GivenDriver
     MyAPIClient.new(configuration)
   end
 
-  def a_user(name)
+  def create_user(name)
     mental_model.users.fetch(name) { |name|
       user = {'email' => 'bob@example.com', 'password' => '12345'}
       result = api.create_user(user)
@@ -236,14 +236,13 @@ class MyGivenDriver < Kookaburra::GivenDriver
     }
   end
 
-  def a_widget(name, attributes = {})
+  def create_widget(name, attributes = {})
     mental_model.widgets.fetch(name) { |name|
       widget = {'name' => name}.merge(attributes)
       result = api.create_widget(widget)
       mental_model.widgets[name] = result
     }
   end
-  alias :create_new_widget :a_widget
 
   def delete_widget(name)
     widget = mental_model.widgets.delete(name)
@@ -359,7 +358,7 @@ class MyUIDriver < Kookaburra::UIDriver
     address_bar.go_to widget_list
   end
 
-  def create_new_widget(name, attributes = {})
+  def create_widget(name, attributes = {})
     assert widget_list.visible?, "Widget list is not visible!"
     widget_list.choose_to_create_new_widget
     widget_form.submit('name' => 'My Widget')

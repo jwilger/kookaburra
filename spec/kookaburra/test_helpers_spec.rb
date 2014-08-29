@@ -5,14 +5,14 @@ describe Kookaburra::TestHelpers do
 
   before(:all) do
     Kookaburra.configure do |c|
-      c.given_driver_class = Kookaburra::GivenDriver
+      c.api_driver_class = Kookaburra::GivenDriver
       c.ui_driver_class    = Kookaburra::UIDriver
     end
   end
 
   after(:all) do
     Kookaburra.configure do |c|
-      c.given_driver_class = nil
+      c.api_driver_class = nil
       c.ui_driver_class    = nil
     end
   end
@@ -29,9 +29,9 @@ describe Kookaburra::TestHelpers do
   end
 
   describe "methods delegated to #k" do
-    it "includes #given" do
-      k.should_receive(:given)
-      given
+    it "includes #api" do
+      k.should_receive(:api)
+      api
     end
 
     it "includes #ui" do
