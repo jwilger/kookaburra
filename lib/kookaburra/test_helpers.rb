@@ -100,6 +100,10 @@ class Kookaburra
     # Delegates to {#k}
     def_delegator :k, :ui
 
+    # #method api_client
+    # Delegates to {#k}
+    def_delegator :k, :api_client
+
     # RSpec-style custom matcher that compares a given array with
     # the current state of one named collection in the mental model
     #
