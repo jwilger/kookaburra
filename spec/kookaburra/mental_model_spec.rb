@@ -86,7 +86,8 @@ describe Kookaburra::MentalModel do
     describe '#deleted' do
       it 'generates a new subcollection if none exists' do
         initialized_collection = collection
-        Kookaburra::MentalModel::Collection.should_receive(:new).with("deleted")
+        Kookaburra::MentalModel::Collection.should_receive(:new) \
+          .with("#{initialized_collection.name}.deleted")
         initialized_collection.deleted
       end
 

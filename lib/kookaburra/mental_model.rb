@@ -48,11 +48,13 @@ class Kookaburra
     #   # Raises an UnknownKeyError
     #   mental_model.widgets[:bar]
     class Collection < SimpleDelegator
+      attr_reader :name
+
       # @param [String] name The name of the collection. Used to provide
       #   helpful error messages when unknown keys are accessed.
       # @param [Hash] init_data Preloads specific data into the collection
       def initialize(name, init_data = nil)
-        @name = name
+        self.name = name
         data = Hash.new do |hash, key|
           raise UnknownKeyError, "Can't find mental_model.#{@name}[#{key.inspect}]. Did you forget to set it?"
         end
@@ -119,7 +121,7 @@ class Kookaburra
       #
       # @return [Kookaburra::MentalModel::Collection] the deleted items subcollection
       def deleted
-        @deleted ||= self.class.new("deleted")
+        @deleted ||= self.class.new("#{name}.deleted")
       end
 
       # Deletes key/value pairs from the collection for which the given block evaluates
@@ -145,6 +147,10 @@ class Kookaburra
       protected
 
       attr_writer :deleted
+
+      private
+
+      attr_writer :name
     end
   end
 end
