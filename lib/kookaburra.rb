@@ -1,5 +1,6 @@
 require 'kookaburra/exceptions'
 require 'kookaburra/mental_model'
+require 'kookaburra/api_client_driver'
 require 'kookaburra/given_driver'
 require 'kookaburra/ui_driver'
 require 'kookaburra/configuration'
@@ -41,8 +42,13 @@ class Kookaburra
   def initialize(configuration = Kookaburra.configuration)
     @configuration = configuration
     @configuration.mental_model = MentalModel.new
+    @api_client_driver_class = configuration.api_client_driver_class
     @given_driver_class = configuration.given_driver_class
     @ui_driver_class = configuration.ui_driver_class
+  end
+
+  def api_client
+    @api_client ||= @api_client_driver_class.new(@configuration)
   end
 
   # Returns an instance of your GivenDriver class configured to share test
