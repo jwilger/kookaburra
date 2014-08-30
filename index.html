@@ -35,6 +35,12 @@
 order to keep acceptance tests maintainable.</p>
 
 <h2>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<p>Requires Ruby 1.9.3 or greater. Tested with both MRI and JRuby (note 
+that you must run JRuby in 1.9 compatability mode.)</p>
+
+<h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
 <p>Kookaburra is available as a Rubygem and <a href="https://rubygems.org/gems/kookaburra" title="kookaburra | RubyGems.org | your community gem host">published on Rubygems.org</a>,
@@ -67,7 +73,7 @@ running. </p>
 
 <p>The fact that Kookaburra runs against a remote server means that <em>it is not
 limited to testing only Ruby web applications</em>. As long as your application
-exposes a web-service API for use by the GivenDriver and an HTML user interface
+exposes a web-service API for use by the APIDriver and an HTML user interface
 for use by the UIDriver, you can use Kookaburra to test it. Also, as long as
 you're careful with both your application and test designs, you're not limited
 to running your tests only in an isolated testing environment; you could run
@@ -84,19 +90,19 @@ stopping your server for you. Examples of how to do so with a Rack application
 are presented below, but you should be able to take the same basic approach with
 other types of application servers.</p>
 
-<p>Although Capybara is capable of starting a Rack application server on its own,
-the default setup only starts the server up on-demand when you call a method
-that requires the browser to interact with the web application. Because the
-APIDriver layer does not use Capybara, it is necessary to manage the server
-process on your own. Otherwise the server would not be guaranteed to be running
-when you call the APIDriver methods (particularly as these often appear in
-"Given" statements that are run before you start interacting with the web
-browser.)</p>
+<p>Although Capybara is capable of starting a Rack application server on 
+its own, the default setup only starts the server up on-demand when you 
+call a method that requires the browser to interact with the web 
+application. Because the APIClient layer does not use Capybara, it is 
+necessary to manage the server process on your own. Otherwise the server 
+would not be guaranteed to be running when you call the APIClient 
+methods (particularly as these often appear in "Given" statements that 
+are run before you start interacting with the web browser.)</p>
 
 <p>Keep in mind that, even if your server is capable of being started up in another
 thread within the same Ruby process that is executing your test suite, you will
 want to avoid doing so unless you are using a Ruby interpreter that supports
-native threads. Otherwise, when the APIDriver makes an HTTP call to your
+native threads. Otherwise, when the APIClient makes an HTTP call to your
 application's API, it will block while waiting for a response, thus preventing
 your application from being able to respond to that request and resulting in a
 timeout error in your tests.</p>
@@ -116,15 +122,15 @@ add the following to <code>spec/support/kookaburra_setup.rb</code>:</p>
 
 <pre><code>require 'kookaburra/test_helpers'
 
-# Change these to the files that define your custom GivenDriver and UIDriver
+# Change these to the files that define your custom APIDriver and UIDriver
 # implementations.
-require 'my_app/kookaburra/given_driver'
+require 'my_app/kookaburra/api_driver'
 require 'my_app/kookaburra/ui_driver'
 
 # c.app_host below should be set to whatever the root URL of your running
 # application is.
 Kookaburra.configure do |c|
-  c.given_driver_class = MyApp::Kookaburra::GivenDriver
+  c.api_driver_class = MyApp::Kookaburra::APIDriver
   c.ui_driver_class = MyApp::Kookaburra::UIDriver
   c.app_host = 'http://my_app.example.com:1234'
   c.browser = Capybara::Session.new(:selenium)
@@ -134,7 +140,7 @@ Kookaburra.configure do |c|
 end
 
 RSpec.configure do |c|
-  # Makes the #k, #given and #ui methods available to your specs
+  # Makes the #k, #api and #ui methods available to your specs
   # (See section on test implementation below)
   c.include(Kookaburra::TestHelpers, :type =&gt; :request)
 end
@@ -150,21 +156,28 @@ and shut down a Rack application server. Just add the following to
 <code>spec/support/kookaburra_setup.rb</code>:</p>
 
 <pre><code>require 'kookaburra/test_helpers'
-require 'thwait'
+require 'kookaburra/rack_app_server'
 
-# Change these to the files that define your custom GivenDriver and UIDriver
+# Change these to the files that define your custom APIDriver and UIDriver
 # implementations.
-require 'my_app/kookaburra/given_driver'
+require 'my_app/kookaburra/api_driver'
 require 'my_app/kookaburra/ui_driver'
 
-APP_PORT = ENV['APP_PORT'] || 3009
+# `MyApplication` below should be replaced with the object that
+# implements the Rack `#call` interface for your application. For a
+# Rails app, this would be along the lines of
+# `MyAppName::Application`.
+app_server = Kookaburra::RackAppServer.new do
+  require 'path/to/my_application'
+  MyApplication
+end
 
-# c.app_host below should be set to whatever the root URL of your running
-# application is.
+# c.app_host below should be set to whatever the root URL of your
+# running application is.
 Kookaburra.configure do |c|
-  c.given_driver_class = MyApp::Kookaburra::GivenDriver
+  c.api_driver_class = MyApp::Kookaburra::APIDriver
   c.ui_driver_class = MyApp::Kookaburra::UIDriver
-  c.app_host = 'http://localhost:%d' % APP_PORT
+  c.app_host = 'http://localhost:%d' % app_server.port
   c.browser = Capybara::Session.new(:selenium)
   c.server_error_detection { |browser|
     browser.has_css?('head title', :text =&gt; 'Internal Server Error')
@@ -174,32 +187,12 @@ end
 RSpec.configure do |c|
   c.include(Kookaburra::TestHelpers, :type =&gt; :request)
 
-  # Start the application server prior to running a group of integration
-  # specs. `MyApplication` below should be replaced with the object that
-  # implements the Rack `#call` interface for your application. For a Rails
-  # app, this would be along the lines of `MyAppName::Application`.
   c.before(:all, :type =&gt; :request) do
-    # Run the server process in a forked process, and get a handle on that
-    # process, so that it can be shut down after the tests run.
-    @rack_server_pid = fork do
-      Capybara.server_port = APP_PORT
-      Capybara::Server.new(MyApplication).boot
-
-      # This ensures that this forked process keeps running, because the
-      # actual server is started in a thread by Capybara.
-      ThreadsWait.all_waits(Thread.list)
-    end
-
-    # Give the server a chance to start up in the forked process. You may
-    # need to adjust this depending on how long your application takes to
-    # start up.
-    sleep 1
+    app_server.boot
   end
 
-  # After the tests run, kill the server process. 
   c.after(:all, :type =&gt; :request) do
-    Process.kill(9, @rack_server_pid)
-    Process.wait
+    app_server.shutdown
   end
 end
 </code></pre>
@@ -219,15 +212,15 @@ add the following to <code>features/support/kookaburra_setup.rb</code>:</p>
 
 <pre><code>require 'kookaburra/test_helpers'
 
-# Change these to the files that define your custom GivenDriver and UIDriver
+# Change these to the files that define your custom APIDriver and UIDriver
 # implementations.
-require 'my_app/kookaburra/given_driver'
+require 'my_app/kookaburra/api_driver'
 require 'my_app/kookaburra/ui_driver'
 
 # c.app_host below should be set to whatever the root URL of your running
 # application is.
 Kookaburra.configure do |c|
-  c.given_driver_class = MyApp::Kookaburra::GivenDriver
+  c.api_driver_class = MyApp::Kookaburra::APIDriver
   c.ui_driver_class = MyApp::Kookaburra::UIDriver
   c.app_host = 'http://my_app.example.com:1234'
   c.browser = Capybara::Session.new(:selenium)
@@ -249,21 +242,28 @@ and shut down a Rack application server. Just add the following to
 <code>features/support/kookaburra_setup.rb</code>:</p>
 
 <pre><code>require 'kookaburra/test_helpers'
-require 'thwait'
+require 'kookaburra/rack_app_server'
 
-# Change these to the files that define your custom GivenDriver and UIDriver
+# Change these to the files that define your custom APIDriver and UIDriver
 # implementations.
-require 'my_app/kookaburra/given_driver'
+require 'my_app/kookaburra/api_driver'
 require 'my_app/kookaburra/ui_driver'
 
-APP_PORT = ENV['APP_PORT'] || 3009
+# `MyApplication` below should be replaced with the object that
+# implements the Rack `#call` interface for your application. For a
+# Rails app, this would be along the lines of
+# `MyAppName::Application`.
+app_server = Kookaburra::RackAppServer.new do
+  require 'path/to/my_application'
+  MyApplication
+end
 
-# c.app_host below should be set to whatever the root URL of your running
-# application is.
+# c.app_host below should be set to whatever the root URL of your
+# running application is.
 Kookaburra.configure do |c|
-  c.given_driver_class = MyApp::Kookaburra::GivenDriver
+  c.api_driver_class = MyApp::Kookaburra::APIDriver
   c.ui_driver_class = MyApp::Kookaburra::UIDriver
-  c.app_host = 'http://localhost:%d' % APP_PORT
+  c.app_host = 'http://localhost:%d' % app_server.port
   c.browser = Capybara::Session.new(:selenium)
   c.server_error_detection { |browser|
     browser.has_css?('head title', :text =&gt; 'Internal Server Error')
@@ -272,30 +272,10 @@ end
 
 World(Kookaburra::TestHelpers)
 
-# Start the application server prior to running a group of integration
-# specs. `MyApplication` below should be replaced with the object that
-# implements the Rack `#call` interface for your application. For a Rails
-# app, this would be along the lines of `MyAppName::Application`.
-# Runs the server process in a forked process, and get a handle on that
-# process, so that it can be shut down after the tests run.
-@rack_server_pid = fork do
-  Capybara.server_port = APP_PORT
-  Capybara::Server.new(MyApplication).boot
+app_server.boot
 
-  # This ensures that this forked process keeps running, because the
-  # actual server is started in a thread by Capybara.
-  ThreadsWait.all_waits(Thread.list)
-end
-
-# Give the server a chance to start up in the forked process. You may
-# need to adjust this depending on how long your application takes to
-# start up.
-sleep 1
-
-# After the tests run, kill the server process. 
 at_exit do
-  Process.kill(9, @rack_server_pid)
-  Process.wait
+  app_server.shutdown
 end
 </code></pre>
 
@@ -312,9 +292,9 @@ the following layers:</p>
 spcification documents)</li>
 <li>The <strong>Test Implementation</strong> (Cucumber step definitions, RSpec example blocks,
 etc.)</li>
-<li>The <strong>Domain Driver</strong> (Kookaburra::GivenDriver and Kookaburra::UIDriver)</li>
+<li>The <strong>Domain Driver</strong> (Kookaburra::APIDriver and Kookaburra::UIDriver)</li>
 <li>The <strong>Window Driver</strong> (Kookaburra::UIDriver::UIComponent)</li>
-<li>The <strong>Application Driver</strong> (Capybara and Kookaburra::APIDriver)</li>
+<li>The <strong>Application Driver</strong> (Capybara and Kookaburra::APIClient)</li>
 </ol><h3>
 <a name="the-business-specification-language" class="anchor" href="#the-business-specification-language"><span class="octicon octicon-link"></span></a>The Business Specification Language</h3>
 
@@ -386,19 +366,19 @@ might look:</p>
 <pre><code># step_definitions/various_steps.rb
 
 Given "I have an existing account" do
-  given.existing_account
+  api.existing_account
 end
 
 Given "I have previously specified default payment options" do
-  given.default_payment_options_specified
+  api.default_payment_options_specified
 end
 
 Given "I have previously specified default shipping options" do
-  given.default_shipping_options_specified
+  api.default_shipping_options_specified
 end
 
 Given "I have an item in my shopping cart" do
-  given.an_item_in_my_shopping_cart
+  api.an_item_in_my_shopping_cart
 end
 
 When "I sign in to my account" do
@@ -462,10 +442,10 @@ development team needs to add in.</p>
 
 describe "Purchase Items in Cart" do
   example "Using Existing Billing and Shipping Information" do
-    given.existing_account(:my_account)
-    given.default_payment_options_specified_for(:my_account)
-    given.default_shipping_options_specified_for(:my_account)
-    given.an_item_in_my_shopping_cart(:my_account)
+    api.existing_account(:my_account)
+    api.default_payment_options_specified_for(:my_account)
+    api.default_shipping_options_specified_for(:my_account)
+    api.an_item_in_my_shopping_cart(:my_account)
 
     ui.sign_in(:my_account)
     ui.choose_to_check_out
@@ -482,22 +462,22 @@ end
 
 <p>The Domain Driver layer is where you build up an internal DSL that describes the
 business concepts of your application at a fairly high level. It consists of two
-top-level drivers: the <code>GivenDriver</code> (available via <code>#given</code>) used to set up
+top-level drivers: the <code>APIDriver</code> (available via <code>#api</code>) used to set up
 state for your tests and the UIDriver (available via <code>#ui</code>) for describing the
 tasks that a user can accomplish with the application.</p>
 
 <h4>
 <a name="mental-model" class="anchor" href="#mental-model"><span class="octicon octicon-link"></span></a>Mental Model</h4>
 
-<p><code>Kookaburra::MentalModel</code> is the component via which the <code>GivenDriver</code> and the
+<p><code>Kookaburra::MentalModel</code> is the component via which the <code>APIDriver</code> and the
 <code>UIDriver</code> share information, and it is intended to represent your application
 user's mental picture of the data they are working with. For instance, if you
-create a user account via the <code>GivenDriver</code>, you would store the login
+create a user account via the <code>APIDriver</code>, you would store the login
 credentials for that account in the <code>MentalModel</code> instance, so the <code>UIDriver</code>
 knows what to use when you tell it to <code>#sign_in</code>. This is what allows the
 Cucumber step definitions to remain free from explicitly shared state.</p>
 
-<p>Kookaburra automatically configures your <code>GivenDriver</code> and your <code>UIDriver</code> to
+<p>Kookaburra automatically configures your <code>APIDriver</code> and your <code>UIDriver</code> to
 share a <code>MentalModel</code> instance, which is available to both of them via their
 <code>#mental_model</code> method.</p>
 
@@ -537,20 +517,20 @@ mental_model.widgets.deleted[:widget_a]
 </code></pre>
 
 <h4>
-<a name="given-driver" class="anchor" href="#given-driver"><span class="octicon octicon-link"></span></a>Given Driver</h4>
+<a name="api-driver" class="anchor" href="#api-driver"><span class="octicon octicon-link"></span></a>API Driver</h4>
 
-<p>The <code>Kookaburra::GivenDriver</code> is used to create a particular "preexisting" state
+<p>The <code>Kookaburra::APIDriver</code> is used to create a particular "preexisting" state
 within your application's data and ensure you have a handle to that data (when
 needed) prior to interacting with the UI. You will create a subclass of
-<code>Kookaburra::GivenDriver</code> in which you will create part of the Domain Driver DSL
+<code>Kookaburra::APIDriver</code> in which you will create part of the Domain Driver DSL
 for your application:</p>
 
-<pre><code># lib/my_app/kookaburra/given_driver.rb
+<pre><code># lib/my_app/kookaburra/api_driver.rb
 
-class MyApp::Kookaburra::GivenDriver &lt; Kookaburra::GivenDriver
-  # Specify the APIDriver to use
+class MyApp::Kookaburra::APIDriver &lt; Kookaburra::APIDriver
+  # Specify the APIClient to use
   def api
-    @api ||= MyApp::Kookaburra::APIDriver.new(configuration)
+    @api ||= MyApp::Kookaburra::APIClient.new(configuration)
   end
 
   def existing_account(nickname)
@@ -568,43 +548,36 @@ class MyApp::Kookaburra::GivenDriver &lt; Kookaburra::GivenDriver
 end
 </code></pre>
 
-<p>Although there is nothing that actually <em>prevents</em> you from interacting with the
-UI in the <code>GivenDriver</code>, you should avoid doing so. The <code>GivenDriver</code>'s purpose
-is to describe state that exists <em>before</em> the user interaction that is being
-tested. Although this state may be the result of a previous user interaction,
-your tests will be much, much faster if you create this state via API calls
-rather than driving a web browser.</p>
-
 <h4>
-<a name="api-driver" class="anchor" href="#api-driver"><span class="octicon octicon-link"></span></a>API Driver</h4>
+<a name="api-client" class="anchor" href="#api-client"><span class="octicon octicon-link"></span></a>API Client</h4>
 
-<p>The <code>Kookaburra::APIDriver</code> is used to interact with an application's external
-web services API. You tell Kookaburra about your API by creating a subclass of
-<code>Kookaburra::APIDriver</code> for your application. Because different applications may
-implement different types of APIs, Kookaburra will provide more than one base
-APIDriver class. At the moment, only a JSON API is supported via
-<code>Kookaburra::JsonApiDriver</code>:</p>
+<p>The <code>Kookaburra::APIClient</code> is used to interact with an application's
+external web services API. You tell Kookaburra about your API by
+creating a subclass of <code>Kookaburra::APIClient</code> for your application,
+specifying how requests should be encoded and decoded, and specifying
+any headers that should be present on every request.</p>
 
 <pre><code># lib/my_app/kookaburra/api_driver.rb
 
-class MyApp::Kookaburra::APIDriver &lt; Kookaburra::JsonApiDriver
+class MyApp::Kookaburra::APIClient &lt; Kookaburra::APIClient
+  encode_with { |data| JSON.dump(data) }
+  decode_with { |data| JSON.parse(data) }
+  header 'Content-Type', 'application/json'
+  header 'Accept', 'application/json'
+
   def create_account(account_data)
-    post '/api/v1/accounts', account_data
+    post '/api/accounts', account_data
   end
 
   def get_account(id)
-    get '/api/v1/accounts/%d' % id
+    get '/api/accounts/%d' % id
   end
 end
 </code></pre>
 
-<p>Regardless of the type of APIDriver, the content of your application's APIDriver
-should consist mainly of mappings between discrete actions and HTTP requests to
-the specified URL paths. Each driver will implement <code>#post</code>, <code>#get</code>, <code>#put</code> and
-<code>#delete</code> in such a way that any Ruby data structure provided as parameters will
-be appropriately translated to the API's required data format, and any response
-body from the API request will be translated into a Ruby data structure and
-returned.</p>
+<p>The content of your application's APIClient should consist mainly of
+mappings between discrete actions and HTTP requests to the specified URL
+paths.</p>
 
 <h4>
 <a name="ui-driver" class="anchor" href="#ui-driver"><span class="octicon octicon-link"></span></a>UI Driver</h4>
@@ -632,7 +605,7 @@ end
 <h3>
 <a name="the-window-driver-layer" class="anchor" href="#the-window-driver-layer"><span class="octicon octicon-link"></span></a>The Window Driver Layer</h3>
 
-<p>While your <code>GivenDriver</code> and <code>UIDriver</code> provide a DSL that represents actions
+<p>While your <code>APIDriver</code> and <code>UIDriver</code> provide a DSL that represents actions
 your users can perform in your application, the <a href="http://martinfowler.com/eaaDev/WindowDriver.html" title="Window Driver - Martin Fowler">Window Driver</a>
 layer describes the individual user interface components that the user interacts
 with to perform these tasks. By describing each interface component using an OOP
@@ -687,13 +660,14 @@ end
 <h3>
 <a name="the-application-driver-layer" class="anchor" href="#the-application-driver-layer"><span class="octicon octicon-link"></span></a>The Application Driver Layer</h3>
 
-<p><code>Kookaburra::APIDriver</code>, <code>Kookaburra::UIDriver</code> and
-<code>Kookaburra::UIDriver::UIComponent</code> rely on the Application Driver layer to
-interact with your application. In the case of the <code>APIDriver</code>, Kookaburra uses
-the <a href="https://github.com/toland/patron" title="toland/patron">Patron</a> library to send HTTP requests to your application. The
-<code>UIDriver</code> and <code>UIComponent</code> rely on whatever is passed to <code>Kookaburra.new</code> as
-the <code>:browser</code> option. Presently, we have only used Capybara as the application
-driver for Kookaburra.</p>
+<p><code>Kookaburra::APIClient</code>, <code>Kookaburra::UIDriver</code> and
+<code>Kookaburra::UIDriver::UIComponent</code> rely on the Application Driver layer
+to interact with your application. In the case of the <code>APIClient</code>,
+Kookaburra uses the <a href="https://github.com/archiloque/rest-client" title="archiloque/rest-client -GitHub">RestClient</a> library to send HTTP
+requests to your application. The <code>UIDriver</code> and <code>UIComponent</code> rely on
+whatever is passed to <code>Kookaburra.new</code> as the <code>:browser</code> option.
+Presently, we have only used Capybara as the application driver for
+Kookaburra.</p>
 
 <p>It's possible that something other than Capybara could be passed in, as long as
 that something presented the same API. In reality, using something other than
@@ -722,7 +696,7 @@ isolate to its own commit so I can cherry-pick around it.</li>
 </ul><h2>
 <a name="copyright" class="anchor" href="#copyright"><span class="octicon octicon-link"></span></a>Copyright</h2>
 
-<p>Copyright © 2011 John Wilger. See <a href="https://github.com/jwilger/kookaburra/blob/master/LICENSE.txt">LICENSE.txt</a> for
+<p>Copyright © 2011 John Wilger. See LICENSE.txt for
 further details.</p>
         </section>
 
