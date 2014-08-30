@@ -1,10 +1,11 @@
+require 'spec_helper'
 require 'kookaburra/ui_driver/ui_component/address_bar'
 
 describe Kookaburra::UIDriver::UIComponent::AddressBar do
   describe '#go_to' do
     let(:browser) {
       double('Capybara::Session', text: '').tap do |b|
-        b.should_receive(:visit).with('http://site.example.com')
+        allow(b).to receive(:visit).with('http://site.example.com')
       end
     }
 

@@ -3,7 +3,7 @@ shared_examples_for :it_can_have_ui_components do |subject_class|
     it 'adds an accessor method for the named component that defaults to an instance of the specified class' do
       configuration = double('Kookaburra::Configuration').as_null_object
       foo_component_class = double(Class)
-      foo_component_class.should_receive(:new) \
+      allow(foo_component_class).to receive(:new) \
         .with(configuration, :option => :value) \
         .and_return(:a_foo_component)
 
@@ -12,7 +12,7 @@ shared_examples_for :it_can_have_ui_components do |subject_class|
       end
 
       component_container = component_container_class.new(configuration)
-      component_container.foo.should == :a_foo_component
+      expect(component_container.foo).to eq :a_foo_component
     end
   end
 end

@@ -1,8 +1,11 @@
+require 'spec_helper'
 require 'kookaburra'
 
 describe Kookaburra do
   let(:configuration) {
-    OpenStruct.new
+    double('configuration', :mental_model= => nil,
+           ui_driver_class: nil,
+           api_driver_class: nil)
   }
 
   let(:k) { Kookaburra.new(configuration) }
@@ -10,32 +13,34 @@ describe Kookaburra do
   describe '#api' do
     it 'returns an instance of the configured APIDriver' do
       my_api_driver_class = double(Class)
-      my_api_driver_class.should_receive(:new) \
+      expect(my_api_driver_class).to receive(:new) \
         .with(configuration) \
         .and_return(:an_api_driver)
-      configuration.stub(:api_driver_class => my_api_driver_class)
-      k.api.should == :an_api_driver
+      allow(configuration).to receive(:api_driver_class) { my_api_driver_class }
+      expect(k.api).to eq :an_api_driver
     end
   end
 
   describe '#ui' do
     it 'returns an instance of the configured UIDriver' do
       my_ui_driver_class = double(Class)
-      my_ui_driver_class.should_receive(:new) \
+      expect(my_ui_driver_class).to receive(:new) \
         .with(configuration) \
         .and_return(:a_ui_driver)
-      configuration.stub(:ui_driver_class => my_ui_driver_class)
-      k.ui.should == :a_ui_driver
+      allow(configuration).to receive(:ui_driver_class) { my_ui_driver_class }
+      expect(k.ui).to eq :a_ui_driver
     end
   end
 
   describe '#get_data' do
     it 'returns a dup of the specified MentalModel::Collection' do
       collection = double('MentalModel::Collection')
-      collection.should_receive(:dup) \
+      expect(collection).to receive(:dup) \
         .and_return(:mental_model_collection_dup)
-      configuration.stub(:mental_model => double(:foos => collection))
-      k.get_data(:foos).should == :mental_model_collection_dup
+      allow(configuration).to receive(:mental_model) {
+        double(:foos => collection)
+      }
+      expect(k.get_data(:foos)).to eq :mental_model_collection_dup
     end
   end
 
@@ -55,8 +60,8 @@ describe Kookaburra do
   describe '.configure' do
     it 'yields Kookaburra.configuration' do
       configuration = double('Kookaburra::Configuration')
-      configuration.should_receive(:foo=).with(:bar)
-      Kookaburra.stub(:configuration => configuration)
+      expect(configuration).to receive(:foo=).with(:bar)
+      allow(Kookaburra).to receive(:configuration) { configuration }
       Kookaburra.configure do |c|
         c.foo = :bar
       end

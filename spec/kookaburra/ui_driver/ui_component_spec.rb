@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'kookaburra/ui_driver/ui_component'
 require 'support/shared_examples/it_can_make_assertions'
 require 'support/shared_examples/it_can_have_ui_components'
@@ -24,10 +25,10 @@ describe Kookaburra::UIDriver::UIComponent do
     end
 
     it 'returns true if the component_locator is found in the DOM and is visible' do
-      browser.should_receive(:has_css?) \
+      expect(browser).to receive(:has_css?) \
         .with('#my_component', :visible) \
         .and_return(true)
-      component.visible?.should == true
+      expect(component).to be_visible
     end
 
     context 'when the component_locator is not found in the DOM' do
@@ -35,7 +36,7 @@ describe Kookaburra::UIDriver::UIComponent do
 
       context 'and a server error is not detected' do
         it 'returns false' do
-          component.visible?.should == false
+          expect(component).to_not be_visible
         end
       end
 
@@ -43,16 +44,19 @@ describe Kookaburra::UIDriver::UIComponent do
         let(:server_error_detection) { ->(browser) { true } }
 
         it 'raises UnexpectedResponse' do
-          lambda { component.visible? } \
-            .should raise_error(Kookaburra::UnexpectedResponse)
+          expect{ component.visible? }.to \
+            raise_error(Kookaburra::UnexpectedResponse)
         end
 
         it 'adds the text of the HTTP response to the exception message' do
-          browser.stub(text: 'This is text from the HTTP response')
-          lambda { component.visible? } \
-            .should raise_error(Kookaburra::UnexpectedResponse,
-                                "Server Error Detected:\n" \
-                                + "This is text from the HTTP response")
+          allow(browser).to receive(:text) {
+            'This is text from the HTTP response'
+          }
+
+          expect{ component.visible? }.to \
+            raise_error(Kookaburra::UnexpectedResponse,
+                        "Server Error Detected:\n" \
+                        + "This is text from the HTTP response")
         end
       end
     end
@@ -63,15 +67,15 @@ describe Kookaburra::UIDriver::UIComponent do
       def component.component_path
         '/foo/bar'
       end
-      component.url.should == 'http://my.example.com/foo/bar'
+      expect(component.url).to eq 'http://my.example.com/foo/bar'
     end
   end
 
   describe 'protected methods (for use by subclasses)' do
     describe '#component_path' do
       it 'must be defined by subclasses' do
-        lambda { component.send(:component_path) } \
-          .should raise_error(Kookaburra::ConfigurationError)
+        expect{ component.send(:component_path) }.to \
+          raise_error(Kookaburra::ConfigurationError)
       end
     end
 
