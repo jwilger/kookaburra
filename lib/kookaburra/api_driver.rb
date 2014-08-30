@@ -1,18 +1,18 @@
 require 'forwardable'
 
 class Kookaburra
-  # Your GivenDriver subclass is used to define your testing DSL for setting up
+  # Your APIDriver subclass is used to define your testing DSL for setting up
   # test preconditions. Unlike {Kookaburra::APIClient}, which is meant to be a
-  # simple mapping to your application's API, a method in the GivenDriver may be
+  # simple mapping to your application's API, a method in the APIDriver may be
   # comprised of several distinct API calls as well as access to Kookaburra's
   # test data store via {#mental_model}.
   #
   # @abstract Subclass and implement your Given DSL.
   #
-  # @example GivenDriver subclass
+  # @example APIDriver subclass
   #   module MyApp
   #     module Kookaburra
-  #       class GivenDriver < ::Kookaburra::GivenDriver
+  #       class APIDriver < ::Kookaburra::APIDriver
   #         def api
   #           @api ||= APIClient.new(configuration)
   #         end
@@ -32,10 +32,10 @@ class Kookaburra
   #       end
   #     end
   #   end
-  class GivenDriver
+  class APIDriver
     extend Forwardable
 
-    # It is unlikely that you would call #initialize yourself; your GivenDriver
+    # It is unlikely that you would call #initialize yourself; your APIDriver
     # object is instantiated for you by {Kookaburra#given}.
     #
     # @param [Kookaburra::Configuration] configuration
@@ -52,7 +52,7 @@ class Kookaburra
     # @attribute [rw] mental_model
     def_delegator :configuration, :mental_model
 
-    # Used to access your APIClient in your own GivenDriver implementation
+    # Used to access your APIClient in your own APIDriver implementation
     #
     # @abstract
     # @return [Kookaburra::APIClient]

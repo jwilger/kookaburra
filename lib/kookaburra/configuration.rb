@@ -39,7 +39,7 @@ class Kookaburra
     dependency_accessor :app_host
 
     # This is the {Kookaburra::MentalModel} that is shared between your
-    # GivenDriver and your UIDriver. This attribute is managed by {Kookaburra},
+    # APIDriver and your UIDriver. This attribute is managed by {Kookaburra},
     # so you shouldn't need to change it yourself.
     #
     # @attribute [rw] mental_model

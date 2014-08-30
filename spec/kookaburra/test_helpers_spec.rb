@@ -5,7 +5,7 @@ describe Kookaburra::TestHelpers do
 
   before(:all) do
     Kookaburra.configure do |c|
-      c.api_driver_class = Kookaburra::GivenDriver
+      c.api_driver_class = Kookaburra::APIDriver
       c.ui_driver_class    = Kookaburra::UIDriver
     end
   end

@@ -223,7 +223,7 @@ class MyAPIClient < Kookaburra::APIClient
   end
 end
 
-class MyGivenDriver < Kookaburra::GivenDriver
+class MyAPIDriver < Kookaburra::APIDriver
   def api
     MyAPIClient.new(configuration)
   end

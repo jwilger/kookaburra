@@ -37,7 +37,7 @@ running.
 
 The fact that Kookaburra runs against a remote server means that *it is not
 limited to testing only Ruby web applications*. As long as your application
-exposes a web-service API for use by the GivenDriver and an HTML user interface
+exposes a web-service API for use by the APIDriver and an HTML user interface
 for use by the UIDriver, you can use Kookaburra to test it. Also, as long as
 you're careful with both your application and test designs, you're not limited
 to running your tests only in an isolated testing environment; you could run
@@ -83,15 +83,15 @@ add the following to `spec/support/kookaburra_setup.rb`:
 
     require 'kookaburra/test_helpers'
 
-    # Change these to the files that define your custom GivenDriver and UIDriver
+    # Change these to the files that define your custom APIDriver and UIDriver
     # implementations.
-    require 'my_app/kookaburra/given_driver'
+    require 'my_app/kookaburra/api_driver'
     require 'my_app/kookaburra/ui_driver'
 
     # c.app_host below should be set to whatever the root URL of your running
     # application is.
     Kookaburra.configure do |c|
-      c.given_driver_class = MyApp::Kookaburra::GivenDriver
+      c.api_driver_class = MyApp::Kookaburra::APIDriver
       c.ui_driver_class = MyApp::Kookaburra::UIDriver
       c.app_host = 'http://my_app.example.com:1234'
       c.browser = Capybara::Session.new(:selenium)
@@ -101,7 +101,7 @@ add the following to `spec/support/kookaburra_setup.rb`:
     end
 
     RSpec.configure do |c|
-      # Makes the #k, #given and #ui methods available to your specs
+      # Makes the #k, #api and #ui methods available to your specs
       # (See section on test implementation below)
       c.include(Kookaburra::TestHelpers, :type => :request)
     end
@@ -117,9 +117,9 @@ and shut down a Rack application server. Just add the following to
     require 'kookaburra/test_helpers'
     require 'kookaburra/rack_app_server'
 
-    # Change these to the files that define your custom GivenDriver and UIDriver
+    # Change these to the files that define your custom APIDriver and UIDriver
     # implementations.
-    require 'my_app/kookaburra/given_driver'
+    require 'my_app/kookaburra/api_driver'
     require 'my_app/kookaburra/ui_driver'
 
     # `MyApplication` below should be replaced with the object that
@@ -134,7 +134,7 @@ and shut down a Rack application server. Just add the following to
     # c.app_host below should be set to whatever the root URL of your
     # running application is.
     Kookaburra.configure do |c|
-      c.given_driver_class = MyApp::Kookaburra::GivenDriver
+      c.api_driver_class = MyApp::Kookaburra::APIDriver
       c.ui_driver_class = MyApp::Kookaburra::UIDriver
       c.app_host = 'http://localhost:%d' % app_server.port
       c.browser = Capybara::Session.new(:selenium)
@@ -168,15 +168,15 @@ add the following to `features/support/kookaburra_setup.rb`:
 
     require 'kookaburra/test_helpers'
 
-    # Change these to the files that define your custom GivenDriver and UIDriver
+    # Change these to the files that define your custom APIDriver and UIDriver
     # implementations.
-    require 'my_app/kookaburra/given_driver'
+    require 'my_app/kookaburra/api_driver'
     require 'my_app/kookaburra/ui_driver'
 
     # c.app_host below should be set to whatever the root URL of your running
     # application is.
     Kookaburra.configure do |c|
-      c.given_driver_class = MyApp::Kookaburra::GivenDriver
+      c.api_driver_class = MyApp::Kookaburra::APIDriver
       c.ui_driver_class = MyApp::Kookaburra::UIDriver
       c.app_host = 'http://my_app.example.com:1234'
       c.browser = Capybara::Session.new(:selenium)
@@ -198,9 +198,9 @@ and shut down a Rack application server. Just add the following to
     require 'kookaburra/test_helpers'
     require 'kookaburra/rack_app_server'
 
-    # Change these to the files that define your custom GivenDriver and UIDriver
+    # Change these to the files that define your custom APIDriver and UIDriver
     # implementations.
-    require 'my_app/kookaburra/given_driver'
+    require 'my_app/kookaburra/api_driver'
     require 'my_app/kookaburra/ui_driver'
 
     # `MyApplication` below should be replaced with the object that
@@ -215,7 +215,7 @@ and shut down a Rack application server. Just add the following to
     # c.app_host below should be set to whatever the root URL of your
     # running application is.
     Kookaburra.configure do |c|
-      c.given_driver_class = MyApp::Kookaburra::GivenDriver
+      c.api_driver_class = MyApp::Kookaburra::APIDriver
       c.ui_driver_class = MyApp::Kookaburra::UIDriver
       c.app_host = 'http://localhost:%d' % app_server.port
       c.browser = Capybara::Session.new(:selenium)
@@ -243,7 +243,7 @@ the following layers:
    spcification documents)
 2. The **Test Implementation** (Cucumber step definitions, RSpec example blocks,
    etc.)
-3. The **Domain Driver** (Kookaburra::GivenDriver and Kookaburra::UIDriver)
+3. The **Domain Driver** (Kookaburra::APIDriver and Kookaburra::UIDriver)
 4. The **Window Driver** (Kookaburra::UIDriver::UIComponent)
 5. The **Application Driver** (Capybara and Kookaburra::APIClient)
 
@@ -315,19 +315,19 @@ might look:
     # step_definitions/various_steps.rb
 
     Given "I have an existing account" do
-      given.existing_account
+      api.existing_account
     end
 
     Given "I have previously specified default payment options" do
-      given.default_payment_options_specified
+      api.default_payment_options_specified
     end
 
     Given "I have previously specified default shipping options" do
-      given.default_shipping_options_specified
+      api.default_shipping_options_specified
     end
 
     Given "I have an item in my shopping cart" do
-      given.an_item_in_my_shopping_cart
+      api.an_item_in_my_shopping_cart
     end
 
     When "I sign in to my account" do
@@ -389,10 +389,10 @@ Using RSpec, the test implementation would be as follows:
     
     describe "Purchase Items in Cart" do
       example "Using Existing Billing and Shipping Information" do
-        given.existing_account(:my_account)
-        given.default_payment_options_specified_for(:my_account)
-        given.default_shipping_options_specified_for(:my_account)
-        given.an_item_in_my_shopping_cart(:my_account)
+        api.existing_account(:my_account)
+        api.default_payment_options_specified_for(:my_account)
+        api.default_shipping_options_specified_for(:my_account)
+        api.an_item_in_my_shopping_cart(:my_account)
 
         ui.sign_in(:my_account)
         ui.choose_to_check_out
@@ -407,21 +407,21 @@ Using RSpec, the test implementation would be as follows:
 
 The Domain Driver layer is where you build up an internal DSL that describes the
 business concepts of your application at a fairly high level. It consists of two
-top-level drivers: the `GivenDriver` (available via `#given`) used to set up
+top-level drivers: the `APIDriver` (available via `#api`) used to set up
 state for your tests and the UIDriver (available via `#ui`) for describing the
 tasks that a user can accomplish with the application.
 
 #### Mental Model ####
 
-`Kookaburra::MentalModel` is the component via which the `GivenDriver` and the
+`Kookaburra::MentalModel` is the component via which the `APIDriver` and the
 `UIDriver` share information, and it is intended to represent your application
 user's mental picture of the data they are working with. For instance, if you
-create a user account via the `GivenDriver`, you would store the login
+create a user account via the `APIDriver`, you would store the login
 credentials for that account in the `MentalModel` instance, so the `UIDriver`
 knows what to use when you tell it to `#sign_in`. This is what allows the
 Cucumber step definitions to remain free from explicitly shared state.
 
-Kookaburra automatically configures your `GivenDriver` and your `UIDriver` to
+Kookaburra automatically configures your `APIDriver` and your `UIDriver` to
 share a `MentalModel` instance, which is available to both of them via their
 `#mental_model` method.
 
@@ -459,17 +459,17 @@ Here's an example of MentalModel behavior:
     mental_model.widgets.deleted[:widget_a]
     #=> {'name' => 'Widget A'}
 
-#### Given Driver ####
+#### API Driver ####
 
-The `Kookaburra::GivenDriver` is used to create a particular "preexisting" state
+The `Kookaburra::APIDriver` is used to create a particular "preexisting" state
 within your application's data and ensure you have a handle to that data (when
 needed) prior to interacting with the UI. You will create a subclass of
-`Kookaburra::GivenDriver` in which you will create part of the Domain Driver DSL
+`Kookaburra::APIDriver` in which you will create part of the Domain Driver DSL
 for your application:
 
-    # lib/my_app/kookaburra/given_driver.rb
+    # lib/my_app/kookaburra/api_driver.rb
 
-    class MyApp::Kookaburra::GivenDriver < Kookaburra::GivenDriver
+    class MyApp::Kookaburra::APIDriver < Kookaburra::APIDriver
       # Specify the APIClient to use
       def api
         @api ||= MyApp::Kookaburra::APIClient.new(configuration)
@@ -488,13 +488,6 @@ for your application:
         mental_model.accounts[nickname] = account_details
       end
     end
-
-Although there is nothing that actually *prevents* you from interacting with the
-UI in the `GivenDriver`, you should avoid doing so. The `GivenDriver`'s purpose
-is to describe state that exists *before* the user interaction that is being
-tested. Although this state may be the result of a previous user interaction,
-your tests will be much, much faster if you create this state via API calls
-rather than driving a web browser.
 
 #### API Client ####
 
@@ -548,7 +541,7 @@ within your subclass:
 
 ### The Window Driver Layer ###
 
-While your `GivenDriver` and `UIDriver` provide a DSL that represents actions
+While your `APIDriver` and `UIDriver` provide a DSL that represents actions
 your users can perform in your application, the [Window Driver] [Window Driver]
 layer describes the individual user interface components that the user interacts
 with to perform these tasks. By describing each interface component using an OOP
