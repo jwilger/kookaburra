@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'kookaburra/test_helpers'
 
 describe Kookaburra::TestHelpers do
@@ -19,23 +20,23 @@ describe Kookaburra::TestHelpers do
 
   describe "#k" do
     it "returns an instance of Kookaburra" do
-      k.should be_kind_of(Kookaburra)
+      expect(k).to be_kind_of(Kookaburra)
     end
 
     it "memoizes" do
       a = k; b = k
-      a.should equal(b)
+      expect(a).to equal(b)
     end
   end
 
   describe "methods delegated to #k" do
     it "includes #api" do
-      k.should_receive(:api)
+      expect(k).to receive(:api)
       api
     end
 
     it "includes #ui" do
-      k.should_receive(:ui)
+      expect(k).to receive(:ui)
       ui
     end
   end

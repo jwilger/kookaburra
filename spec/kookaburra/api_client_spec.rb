@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'kookaburra/api_client'
 
 describe Kookaburra::APIClient do
@@ -16,7 +17,7 @@ describe Kookaburra::APIClient do
   shared_examples_for 'any type of HTTP request' do |http_verb|
     context "(#{http_verb})" do
       before(:each) do
-        client.stub(http_verb => response)
+        allow(client).to receive(http_verb).and_return(response)
       end
 
       it 'returns the response body' do
@@ -24,8 +25,8 @@ describe Kookaburra::APIClient do
       end
 
       it 'raises an UnexpectedResponse if the request is not successful' do
-        response.stub(code: 500)
-        client.stub(http_verb).and_raise(RestClient::Exception.new(response))
+        allow(response).to receive(:code) { 500 }
+        allow(client).to receive(http_verb).and_raise(RestClient::Exception.new(response))
         expect{ api.send(http_verb, '/foo') } \
           .to raise_error(Kookaburra::UnexpectedResponse)
       end
@@ -116,7 +117,7 @@ describe Kookaburra::APIClient do
   shared_examples_for 'it encodes request data' do |http_verb|
     context "(#{http_verb})" do
       before(:each) do
-        client.stub(http_verb => response)
+        allow(client).to receive(http_verb) { response }
       end
 
       context 'when a custom encoder is specified' do
@@ -132,7 +133,7 @@ describe Kookaburra::APIClient do
 
         it "encodes input to requests" do
           expect(client).to receive(http_verb) do |_, data, _|
-            data.should == :some_encoded_data
+            expect(data).to eq :some_encoded_data
             response
           end
 

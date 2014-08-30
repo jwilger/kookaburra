@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'kookaburra/test_helpers'
 require 'kookaburra/api_client'
 require 'kookaburra/rack_app_server'

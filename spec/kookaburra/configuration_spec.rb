@@ -1,3 +1,4 @@
+require 'spec_helper'
 require 'kookaburra/configuration'
 require 'support/shared_examples/it_has_a_dependency_accessor'
 

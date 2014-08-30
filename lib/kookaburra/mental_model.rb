@@ -28,7 +28,7 @@ class Kookaburra
     # MentalModel instances respond to everything.
     #
     # @see #method_missing
-    def respond_to?
+    def respond_to?(_)
       true
     end
 
