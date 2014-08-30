@@ -13,13 +13,13 @@ describe Kookaburra::Configuration do
     it 'returns the block that it was last given' do
       block = lambda { 'foo' }
       subject.server_error_detection(&block)
-      subject.server_error_detection.should == block
+      expect(subject.server_error_detection).to eq block
     end
   end
 
   describe '#app_host_uri' do
     it 'returns a URI version of the #app_host attribute via URI.parse' do
-      URI.should_receive(:parse) \
+      expect(URI).to receive(:parse) \
         .with('http://example.com') \
         .and_return(:a_parsed_uri)
       subject.app_host = 'http://example.com'
@@ -27,13 +27,13 @@ describe Kookaburra::Configuration do
     end
 
     it 'changes if #app_host changes' do
-      URI.stub(:parse) do |url|
+      allow(URI).to receive(:parse) do |url|
         url.to_sym
       end
       subject.app_host = 'http://example.com'
-      subject.app_host_uri.should == 'http://example.com'.to_sym
+      expect(subject.app_host_uri).to eq 'http://example.com'.to_sym
       subject.app_host = 'http://foo.example.com'
-      subject.app_host_uri.should == 'http://foo.example.com'.to_sym
+      expect(subject.app_host_uri).to eq 'http://foo.example.com'.to_sym
     end
   end
 end

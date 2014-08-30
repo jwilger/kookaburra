@@ -20,20 +20,20 @@ describe Kookaburra::APIClient do
       end
 
       it 'returns the response body' do
-        api.send(http_verb, '/foo').should == 'foo'
+        expect(api.send(http_verb, '/foo')).to eq 'foo'
       end
 
       it 'raises an UnexpectedResponse if the request is not successful' do
         response.stub(code: 500)
         client.stub(http_verb).and_raise(RestClient::Exception.new(response))
-        lambda { api.send(http_verb, '/foo') } \
-          .should raise_error(Kookaburra::UnexpectedResponse)
+        expect{ api.send(http_verb, '/foo') } \
+          .to raise_error(Kookaburra::UnexpectedResponse)
       end
 
       let(:expect_client_to_receive_headers) { ->(expected_headers) {
         # Some HTTP verb methods pass data, some don't, and their arity
         # is different
-        client.should_receive(http_verb) do |path, data_or_headers, headers|
+        allow(client).to receive(http_verb) do |path, data_or_headers, headers|
           headers ||= data_or_headers
           expect(headers).to eq(expected_headers)
           response
@@ -107,7 +107,7 @@ describe Kookaburra::APIClient do
         }
 
         it "decodes response bodies from requests" do
-          api.send(http_verb, '/foo').should == :some_decoded_data
+          expect(api.send(http_verb, '/foo')).to eq :some_decoded_data
         end
       end
     end
@@ -123,7 +123,7 @@ describe Kookaburra::APIClient do
         let(:api) {
           klass = Class.new(Kookaburra::APIClient) do
             encode_with { |data|
-              data.should == :some_ruby_data
+              raise "Wrong data!" unless data == :some_ruby_data
               :some_encoded_data
             }
           end
@@ -131,7 +131,7 @@ describe Kookaburra::APIClient do
         }
 
         it "encodes input to requests" do
-          client.should_receive(http_verb) do |_, data, _|
+          expect(client).to receive(http_verb) do |_, data, _|
             data.should == :some_encoded_data
             response
           end
@@ -145,7 +145,7 @@ describe Kookaburra::APIClient do
   shared_examples_for 'it encodes data as a querystring' do |http_verb|
     context "(#{http_verb})" do
       it 'adds data as querystirng params' do
-        client.should_receive(http_verb).with(url_for('/foo?bar=baz&yak=shaved'), {}) \
+        expect(client).to receive(http_verb).with(url_for('/foo?bar=baz&yak=shaved'), {}) \
           .and_return(response)
         api.send(http_verb, '/foo', bar: 'baz', yak: 'shaved')
       end
