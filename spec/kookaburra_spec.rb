@@ -8,7 +8,7 @@ describe Kookaburra do
   let(:k) { Kookaburra.new(configuration) }
 
   describe '#api' do
-    it 'returns an instance of the configured GivenDriver' do
+    it 'returns an instance of the configured APIDriver' do
       my_api_driver_class = double(Class)
       my_api_driver_class.should_receive(:new) \
         .with(configuration) \

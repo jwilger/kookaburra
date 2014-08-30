@@ -1,13 +1,13 @@
 require 'kookaburra/exceptions'
 require 'kookaburra/mental_model'
-require 'kookaburra/given_driver'
+require 'kookaburra/api_driver'
 require 'kookaburra/ui_driver'
 require 'kookaburra/configuration'
 
 # Kookaburra provides the top-level API that you will access in your test
 # implementation, namely the {#api}, {#ui}, and the {#get_data} methods.
 #
-# The Kookaburra object ensures that your GivenDriver and UIDriver share the
+# The Kookaburra object ensures that your APIDriver and UIDriver share the
 # same state with regard to any {Kookaburra::MentalModel} data that is created
 # during your test run. As such, it is important to ensure that a new instance
 # of Kookaburra is created for each individual test, otherwise you may wind up
@@ -35,7 +35,7 @@ class Kookaburra
   end
 
   # Returns a new Kookaburra instance that wires together your application's
-  # GivenDriver and UIDriver with a shared {Kookaburra::MentalModel}.
+  # APIDriver and UIDriver with a shared {Kookaburra::MentalModel}.
   #
   # @param [Kookaburra::Configuration] configuration (Kookaburra.configuration)
   def initialize(configuration = Kookaburra.configuration)
@@ -45,16 +45,16 @@ class Kookaburra
     @ui_driver_class = configuration.ui_driver_class
   end
 
-  # Returns an instance of your GivenDriver class configured to share test
+  # Returns an instance of your APIDriver class configured to share test
   # fixture data with the UIDriver
   #
-  # @return [Kookaburra::GivenDriver]
+  # @return [Kookaburra::APIDriver]
   def api
     @api ||= @api_driver_class.new(@configuration)
   end
 
   # Returns an instance of your UIDriver class configured to share test fixture
-  # data with the GivenDriver and to use the browser driver you specified in
+  # data with the APIDriver and to use the browser driver you specified in
   # {#initialize}
   #
   # @return [Kookaburra::UIDriver]

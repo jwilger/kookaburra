@@ -4,7 +4,7 @@ require 'kookaburra/exceptions'
 class Kookaburra
   # Each instance of {Kookaburra} has its own instance of MentalModel. This object
   # is used to maintain a shared understanding of the application state between
-  # your {GivenDriver} and your {UIDriver}. You can access the various test data
+  # your {APIDriver} and your {UIDriver}. You can access the various test data
   # collections in your test implementations via {Kookaburra#get_data}.
   #
   # The mental model is not intended to represent a copy of all of the data

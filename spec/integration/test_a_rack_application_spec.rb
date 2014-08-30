@@ -21,7 +21,7 @@ describe "testing a Rack application with Kookaburra" do
 
         Kookaburra.configure do |c|
           c.ui_driver_class = MyUIDriver
-          c.api_driver_class = MyGivenDriver
+          c.api_driver_class = MyAPIDriver
           c.app_host = 'http://127.0.0.1:%d' % app_server.port
           c.browser = Capybara::Session.new(:webkit)
           c.server_error_detection do |browser|
