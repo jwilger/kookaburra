@@ -1,38 +1,41 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Kookaburra by jwilger</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
     <!--[if lt IE 9]>
     <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+
+    <title>Kookaburra by jwilger</title>
   </head>
+
   <body>
-    <div class="wrapper">
-      <header>
+    <header>
+      <div class="inner">
         <h1>Kookaburra</h1>
-<p>A Ruby framework for implementing the Window Driver testing pattern</p>
-        <p class="view"><a href="https://github.com/jwilger/kookaburra">View the Project on GitHub <small>jwilger/kookaburra</small></a></p>
-        <ul>
-          <li><a href="https://github.com/jwilger/kookaburra/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/jwilger/kookaburra/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/jwilger/kookaburra">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <h1>Kookaburra</h1>
+        <h2>A Ruby framework for implementing the Window Driver testing pattern</h2>
+        <a href="https://github.com/jwilger/kookaburra" class="button"><small>View project on</small>GitHub</a>
+      </div>
+    </header>
+
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <h1>
+<a name="kookaburra" class="anchor" href="#kookaburra"><span class="octicon octicon-link"></span></a>Kookaburra</h1>
 
 <p>Kookaburra is a framework for implementing the <a href="http://martinfowler.com/eaaDev/WindowDriver.html" title="Window Driver - Martin Fowler">Window Driver</a> pattern in
 order to keep acceptance tests maintainable.</p>
 
-<h2>Installation</h2>
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
 <p>Kookaburra is available as a Rubygem and <a href="https://rubygems.org/gems/kookaburra" title="kookaburra | RubyGems.org | your community gem host">published on Rubygems.org</a>,
 so installation is trivial:</p>
@@ -48,7 +51,8 @@ following:</p>
 end
 </code></pre>
 
-<h2>Setup</h2>
+<h2>
+<a name="setup" class="anchor" href="#setup"><span class="octicon octicon-link"></span></a>Setup</h2>
 
 <p>Kookaburra abstracts some common patterns for implementing the Window Driver
 testing pattern for web applications. You will need to tell Kookaburra which
@@ -70,7 +74,8 @@ to running your tests only in an isolated testing environment; you could run
 the same test suite you use for development against your staging or production
 systems.</p>
 
-<h3>Testing an Application Running Locally</h3>
+<h3>
+<a name="testing-an-application-running-locally" class="anchor" href="#testing-an-application-running-locally"><span class="octicon octicon-link"></span></a>Testing an Application Running Locally</h3>
 
 <p>The fact that Kookaburra is designed to support running tests against a remote
 server does not, of course, mean that the application cannot be running locally.
@@ -96,13 +101,15 @@ application's API, it will block while waiting for a response, thus preventing
 your application from being able to respond to that request and resulting in a
 timeout error in your tests.</p>
 
-<h3>RSpec</h3>
+<h3>
+<a name="rspec" class="anchor" href="#rspec"><span class="octicon octicon-link"></span></a>RSpec</h3>
 
 <p>The following examples depict how you might configure RSpec to run tests against
 an already running application server (e.g. a remote staging site) and a Rack
 application server that is managed by the test suite.</p>
 
-<h4>Testing an already running server</h4>
+<h4>
+<a name="testing-an-already-running-server" class="anchor" href="#testing-an-already-running-server"><span class="octicon octicon-link"></span></a>Testing an already running server</h4>
 
 <p>If you are running your tests against an already running server, you can simply
 add the following to <code>spec/support/kookaburra_setup.rb</code>:</p>
@@ -133,7 +140,8 @@ RSpec.configure do |c|
 end
 </code></pre>
 
-<h4>Managing startup and shutdown of a Rack application server</h4>
+<h4>
+<a name="managing-startup-and-shutdown-of-a-rack-application-server" class="anchor" href="#managing-startup-and-shutdown-of-a-rack-application-server"><span class="octicon octicon-link"></span></a>Managing startup and shutdown of a Rack application server</h4>
 
 <p>While developing, it can be helpful to run your integration specs against a
 locally-running server that is managed by your test suite. The setup is similar
@@ -196,13 +204,15 @@ RSpec.configure do |c|
 end
 </code></pre>
 
-<h3>Cucumber</h3>
+<h3>
+<a name="cucumber" class="anchor" href="#cucumber"><span class="octicon octicon-link"></span></a>Cucumber</h3>
 
 <p>The following examples depict how you might configure <a href="http://cukes.info/" title="Cucumber - Making BDD fun">Cucumber</a> to
 run tests against an already running application server (e.g. a remote staging
 site) and a Rack application server that is managed by the test suite.</p>
 
-<h4>Testing an already running server</h4>
+<h4>
+<a name="testing-an-already-running-server-1" class="anchor" href="#testing-an-already-running-server-1"><span class="octicon octicon-link"></span></a>Testing an already running server</h4>
 
 <p>If you are running your tests against an already running server, you can simply
 add the following to <code>features/support/kookaburra_setup.rb</code>:</p>
@@ -229,7 +239,8 @@ end
 World(Kookaburra::TestHelpers)
 </code></pre>
 
-<h4>Managing startup and shutdown of a Rack application server</h4>
+<h4>
+<a name="managing-startup-and-shutdown-of-a-rack-application-server-1" class="anchor" href="#managing-startup-and-shutdown-of-a-rack-application-server-1"><span class="octicon octicon-link"></span></a>Managing startup and shutdown of a Rack application server</h4>
 
 <p>While developing, it can be helpful to run your acceptance tests against a
 locally-running server that is managed by your test suite. The setup is similar
@@ -288,7 +299,8 @@ at_exit do
 end
 </code></pre>
 
-<h2>Defining Your Testing DSL</h2>
+<h2>
+<a name="defining-your-testing-dsl" class="anchor" href="#defining-your-testing-dsl"><span class="octicon octicon-link"></span></a>Defining Your Testing DSL</h2>
 
 <p>Kookaburra extracts some common patterns that make it easier to use the Window
 Driver pattern along with various Ruby testing frameworks, but you still need to
@@ -303,7 +315,8 @@ etc.)</li>
 <li>The <strong>Domain Driver</strong> (Kookaburra::GivenDriver and Kookaburra::UIDriver)</li>
 <li>The <strong>Window Driver</strong> (Kookaburra::UIDriver::UIComponent)</li>
 <li>The <strong>Application Driver</strong> (Capybara and Kookaburra::APIDriver)</li>
-</ol><h3>The Business Specification Language</h3>
+</ol><h3>
+<a name="the-business-specification-language" class="anchor" href="#the-business-specification-language"><span class="octicon octicon-link"></span></a>The Business Specification Language</h3>
 
 <p>The business specification language consists of the highest-level descriptions
 of a feature that are suitable for sharing with the non/less-technical
@@ -339,7 +352,8 @@ all, because the actual business concepts described would not change (and
 although Kookaburra's focus is on testing web applications, it could likely be
 adapted to other environments.)</p>
 
-<h3>The Test Implementation</h3>
+<h3>
+<a name="the-test-implementation" class="anchor" href="#the-test-implementation"><span class="octicon octicon-link"></span></a>The Test Implementation</h3>
 
 <p>The Test Implementation layer exists as the line in between the Business
 Specification Language and the Domain Driver, and it includes Cucumber step
@@ -463,7 +477,8 @@ describe "Purchase Items in Cart" do
 end
 </code></pre>
 
-<h3>The Domain Driver</h3>
+<h3>
+<a name="the-domain-driver" class="anchor" href="#the-domain-driver"><span class="octicon octicon-link"></span></a>The Domain Driver</h3>
 
 <p>The Domain Driver layer is where you build up an internal DSL that describes the
 business concepts of your application at a fairly high level. It consists of two
@@ -471,7 +486,8 @@ top-level drivers: the <code>GivenDriver</code> (available via <code>#given</cod
 state for your tests and the UIDriver (available via <code>#ui</code>) for describing the
 tasks that a user can accomplish with the application.</p>
 
-<h4>Mental Model</h4>
+<h4>
+<a name="mental-model" class="anchor" href="#mental-model"><span class="octicon octicon-link"></span></a>Mental Model</h4>
 
 <p><code>Kookaburra::MentalModel</code> is the component via which the <code>GivenDriver</code> and the
 <code>UIDriver</code> share information, and it is intended to represent your application
@@ -520,7 +536,8 @@ mental_model.widgets.deleted[:widget_a]
 #=&gt; {'name' =&gt; 'Widget A'}
 </code></pre>
 
-<h4>Given Driver</h4>
+<h4>
+<a name="given-driver" class="anchor" href="#given-driver"><span class="octicon octicon-link"></span></a>Given Driver</h4>
 
 <p>The <code>Kookaburra::GivenDriver</code> is used to create a particular "preexisting" state
 within your application's data and ensure you have a handle to that data (when
@@ -558,7 +575,8 @@ tested. Although this state may be the result of a previous user interaction,
 your tests will be much, much faster if you create this state via API calls
 rather than driving a web browser.</p>
 
-<h4>API Driver</h4>
+<h4>
+<a name="api-driver" class="anchor" href="#api-driver"><span class="octicon octicon-link"></span></a>API Driver</h4>
 
 <p>The <code>Kookaburra::APIDriver</code> is used to interact with an application's external
 web services API. You tell Kookaburra about your API by creating a subclass of
@@ -588,7 +606,8 @@ be appropriately translated to the API's required data format, and any response
 body from the API request will be translated into a Ruby data structure and
 returned.</p>
 
-<h4>UI Driver</h4>
+<h4>
+<a name="ui-driver" class="anchor" href="#ui-driver"><span class="octicon octicon-link"></span></a>UI Driver</h4>
 
 <p><code>Kookaburra::UIDriver</code> provides the necessary tools for driving your
 application's user interface with the Window Driver pattern. You will subclass
@@ -610,7 +629,8 @@ class MyApp::Kookaburra::UIDriver &lt; Kookaburra::UIDriver
 end
 </code></pre>
 
-<h3>The Window Driver Layer</h3>
+<h3>
+<a name="the-window-driver-layer" class="anchor" href="#the-window-driver-layer"><span class="octicon octicon-link"></span></a>The Window Driver Layer</h3>
 
 <p>While your <code>GivenDriver</code> and <code>UIDriver</code> provide a DSL that represents actions
 your users can perform in your application, the <a href="http://martinfowler.com/eaaDev/WindowDriver.html" title="Window Driver - Martin Fowler">Window Driver</a>
@@ -664,7 +684,8 @@ class MyApp::Kookaburra::UIDriver::SignInScreen &lt; Kookaburra::UIDriver::UICom
 end
 </code></pre>
 
-<h3>The Application Driver Layer</h3>
+<h3>
+<a name="the-application-driver-layer" class="anchor" href="#the-application-driver-layer"><span class="octicon octicon-link"></span></a>The Application Driver Layer</h3>
 
 <p><code>Kookaburra::APIDriver</code>, <code>Kookaburra::UIDriver</code> and
 <code>Kookaburra::UIDriver::UIComponent</code> rely on the Application Driver layer to
@@ -680,7 +701,8 @@ Capybara is likely to require some changes to Kookaburra itself. If you have a
 particular interest in making this work, please feel free to fork the project
 and send us a <a href="https://github.com/projectdx/kookaburra/pull/new/master" title="Send a pull request - GitHub">GitHub pull request</a> with your changes.</p>
 
-<h2>Contributing to kookaburra</h2>
+<h2>
+<a name="contributing-to-kookaburra" class="anchor" href="#contributing-to-kookaburra"><span class="octicon octicon-link"></span></a>Contributing to kookaburra</h2>
 
 <ul>
 <li>Check out the latest master to make sure the feature hasn't been implemented
@@ -697,16 +719,30 @@ have your own version, or is otherwise necessary, that is fine, but please
 isolate to its own commit so I can cherry-pick around it.</li>
 <li>Send us a <a href="https://github.com/projectdx/kookaburra/pull/new/master" title="Send a pull request - GitHub">pull request</a>
 </li>
-</ul><h2>Copyright</h2>
+</ul><h2>
+<a name="copyright" class="anchor" href="#copyright"><span class="octicon octicon-link"></span></a>Copyright</h2>
 
 <p>Copyright © 2011 John Wilger. See <a href="https://github.com/jwilger/kookaburra/blob/master/LICENSE.txt">LICENSE.txt</a> for
 further details.</p>
-      </section>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/jwilger/kookaburra/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/jwilger/kookaburra/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/jwilger/kookaburra"></a> is maintained by <a href="https://github.com/jwilger">jwilger</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
     </div>
-    <footer>
-      <p>Project maintained by <a href="https://github.com/jwilger">jwilger</a></p>
-      <p>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></p>
-    </footer>
-    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+
+  
   </body>
 </html>
