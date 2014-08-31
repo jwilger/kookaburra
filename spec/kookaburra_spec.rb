@@ -46,14 +46,14 @@ describe Kookaburra do
 
   describe '.configuration' do
     it 'returns a Kookaburra::Configuration instance' do
-      Kookaburra.configuration.should be_kind_of(Kookaburra::Configuration)
+      expect(Kookaburra.configuration).to be_kind_of(Kookaburra::Configuration)
     end
 
     it 'always returns the same configuration' do
       x = Kookaburra.configuration
       y = Kookaburra.configuration
       x.app_host = 'http://example.com'
-      y.app_host.should == 'http://example.com'
+      expect(y.app_host).to eq 'http://example.com'
     end
   end
 

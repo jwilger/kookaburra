@@ -24,7 +24,7 @@ describe Kookaburra::Configuration do
         .with('http://example.com') \
         .and_return(:a_parsed_uri)
       subject.app_host = 'http://example.com'
-      subject.app_host_uri.should == :a_parsed_uri
+      expect(subject.app_host_uri).to eq :a_parsed_uri
     end
 
     it 'changes if #app_host changes' do
