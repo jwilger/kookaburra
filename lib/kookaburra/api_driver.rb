@@ -1,4 +1,5 @@
 require 'forwardable'
+require 'kookaburra/api_client'
 
 class Kookaburra
   # Your APIDriver subclass is used to define your testing DSL for setting up
@@ -13,10 +14,6 @@ class Kookaburra
   #   module MyApp
   #     module Kookaburra
   #       class APIDriver < ::Kookaburra::APIDriver
-  #         def api
-  #           @api ||= APIClient.new(configuration)
-  #         end
-  #
   #         def a_widget(name, attributes = {})
   #           # Set up the data that will be passed to the API by merging any
   #           # passed attributes into the default data.
@@ -54,12 +51,9 @@ class Kookaburra
 
     # Used to access your APIClient in your own APIDriver implementation
     #
-    # @abstract
     # @return [Kookaburra::APIClient]
-    # @raise [Kookaburra::ConfigurationError] raised if you do not provide an
-    #   implementation.
     def api
-      raise ConfigurationError, "You must implement #api in your subclass."
+      @api ||= APIClient.new(configuration)
     end
   end
 end
