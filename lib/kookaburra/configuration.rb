@@ -55,7 +55,7 @@ class Kookaburra
     dependency_accessor :logger
 
     def application(app_name, &block)
-      test_helpers.instance_eval do
+      TestHelpers.module_eval do
         define_method(app_name) {
           @applications ||= Hash.new do |h,k|
             h[k] = Kookaburra.new
@@ -64,13 +64,6 @@ class Kookaburra
         }
       end
       block.call(self)
-    end
-
-    def test_helpers
-      @test_helpers ||=
-        Module.new do
-          include TestHelpers
-        end
     end
 
     # Specify a function that can be used to determine if a server error has

@@ -39,10 +39,6 @@ class Kookaburra
     def forget_configuration!
       @configuration = nil
     end
-
-    def test_helpers
-      configuration.test_helpers
-    end
   end
 
   # Returns a new Kookaburra instance that wires together your application's
