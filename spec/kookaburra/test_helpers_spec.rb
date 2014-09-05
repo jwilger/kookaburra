@@ -57,7 +57,7 @@ describe 'Kookaburra.test_helpers', :focus do
       Kookaburra.forget_configuration!
     end
 
-    it 'returns a seperate Kookaburra instance for each defined application' do
+    it 'returns a separate Kookaburra instance for each defined application' do
       expect(app_1).to be_kind_of(Kookaburra)
       expect(app_2).to be_kind_of(Kookaburra)
       expect(app_1).to_not equal app_2
