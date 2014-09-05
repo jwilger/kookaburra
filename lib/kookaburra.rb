@@ -32,6 +32,17 @@ class Kookaburra
     def configure(&blk)
       blk.call(configuration)
     end
+
+    # Unsets *all* configuration values.
+    #
+    # Probably only really useful in testing Kookaburra itself, but hey.
+    def forget_configuration!
+      @configuration = nil
+    end
+
+    def test_helpers
+      configuration.test_helpers
+    end
   end
 
   # Returns a new Kookaburra instance that wires together your application's
