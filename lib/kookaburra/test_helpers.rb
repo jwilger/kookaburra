@@ -88,7 +88,10 @@ class Kookaburra
     #
     # @return [Kookaburra]
     def k
-      @k ||= Kookaburra.new
+      unless Kookaburra.configuration.applications.empty?
+        raise AmbiguousDriverError
+      end
+      kookaburra_instance
     end
 
     # @method api
@@ -98,5 +101,25 @@ class Kookaburra
     # @method ui
     # Delegates to {#k}
     def_delegator :k, :ui
+
+    # @method get_data
+    # Delegates to {Kookaburra} instance
+    def_delegator :kookaburra_instance, :get_data
+
+    def method_missing(method_name, *args, &block)
+      Kookaburra.configuration.applications[method_name.to_sym] \
+        || super
+    end
+
+    def respond_to?(method_name)
+      Kookaburra.configuration.applications.has_key?(method_name) \
+        || super
+    end
+
+    private
+
+    def kookaburra_instance
+      @kookaburra_instance ||= Kookaburra.new
+    end
   end
 end

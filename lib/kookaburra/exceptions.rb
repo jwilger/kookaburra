@@ -11,4 +11,6 @@ class Kookaburra
   class ComponentNotFound < RuntimeError; end
   # @private
   class NullBrowserError < ConfigurationError; end
+  # @private
+  class AmbiguousDriverError < StandardError; end
 end
