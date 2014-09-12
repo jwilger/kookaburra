@@ -7,7 +7,7 @@ require 'uuid'
 
 require 'support/json_api_app_and_kookaburra_drivers'
 
-describe 'testing multiple applications', :pending do
+describe 'testing multiple applications' do
   include Kookaburra::TestHelpers
 
   OtherJsonApiApp = Class.new(JsonApiApp)
@@ -22,7 +22,7 @@ describe 'testing multiple applications', :pending do
     OtherJsonApiApp.new
   end
 
-  before(:each) do
+  before(:all) do
     app_server_1.boot
     app_server_2.boot
 
@@ -44,18 +44,20 @@ describe 'testing multiple applications', :pending do
     end
   end
 
-  after(:each) do
+  after(:all) do
     app_server_1.shutdown
     app_server_2.shutdown
   end
 
-  specify 'once you have defined multiple apps, the top-level #api and #ui methods asplode' do
+  specify 'once you have defined multiple apps, the top-level #api and #ui methods raise errors' do
+    pending "need to disable top-level api and ui methods in test helpers"
     expect { api } .to raise_error( Kookaburra::AmbiguousDriverError )
     expect { ui }  .to raise_error( Kookaburra::AmbiguousDriverError )
   end
 
   context "with different data in each app" do
     before(:each) do
+      pending "need to create test helper methods for app names"
       app_1.api.create_widget(:widget_a)
       app_2.api.create_widget(:widget_b)
     end
