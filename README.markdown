@@ -3,6 +3,9 @@
 Kookaburra is a framework for implementing the [Window Driver] [Window Driver] pattern in
 order to keep acceptance tests maintainable.
 
+[![Code Climate](https://codeclimate.com/github/jwilger/kookaburra/badges/gpa.svg)](https://codeclimate.com/github/jwilger/kookaburra)
+[![Test Coverage](https://codeclimate.com/github/jwilger/kookaburra/badges/coverage.svg)](https://codeclimate.com/github/jwilger/kookaburra)
+
 ## Requirements ##
 
 Requires Ruby 1.9.3 or greater. Tested with both MRI and JRuby (note 
