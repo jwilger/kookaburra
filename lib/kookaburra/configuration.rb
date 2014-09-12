@@ -96,5 +96,9 @@ class Kookaburra
     def applications
       @applications ||= {}
     end
+
+    def has_named_applications?
+      !applications.empty?
+    end
   end
 end

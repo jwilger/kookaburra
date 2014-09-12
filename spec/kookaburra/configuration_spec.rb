@@ -77,4 +77,15 @@ describe Kookaburra::Configuration do
       expect(subject.applications[:foo]).to equal app_kookaburra
     end
   end
+
+  describe '#has_named_applications?' do
+    it 'is true when a named application is configured' do
+      subject.application(:foo)
+      expect(subject).to have_named_applications
+    end
+
+    it 'is false when no named applications are configured' do
+      expect(subject).to_not have_named_applications
+    end
+  end
 end

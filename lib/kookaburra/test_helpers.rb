@@ -82,35 +82,46 @@ class Kookaburra
   module TestHelpers
     extend Forwardable
 
-    # The {Kookaburra} instance to be used by your tests. It gets configured
-    # using the options set in {Kookaburra.configuration}, and the result is
-    # memoized.
-    #
-    # @return [Kookaburra]
-    def k
-      unless Kookaburra.configuration.applications.empty?
-        raise AmbiguousDriverError
-      end
-      kookaburra_instance
-    end
-
     # @method api
-    # Delegates to {#k}
-    def_delegator :k, :api
+    # Delegates to main {Kookaburra} instance
+    #
+    # @note This method will only be available when no named applications have
+    #   been defined. (See {Koookaburra::Configuration#application}.)
+    #
+    # @raise [Kookaburra::AmbiguousDriverError] if named applications have been
+    #   configured.
+    def_delegator :kookaburra, :api
 
     # @method ui
-    # Delegates to {#k}
-    def_delegator :k, :ui
+    # Delegates to main {Kookaburra} instance
+    #
+    # @note This method will only be available when no named applications have
+    #   been defined. (See {Koookaburra::Configuration#application}.)
+    #
+    # @raise [Kookaburra::AmbiguousDriverError] if named applications have been
+    #   configured.
+    def_delegator :kookaburra, :ui
 
-    # @method get_data
-    # Delegates to {Kookaburra} instance
-    def_delegator :kookaburra_instance, :get_data
+    # Delegates to main {Kookaburra} instance
+    def get_data(*args)
+      kookaburra(validate: false).get_data(*args)
+    end
 
+    # Will return the {Kookaburra} instance for any configured applications
+    #
+    # After an application is configured via
+    # {Kookaburra::Configuration#application}, the TestHelpers will respond to
+    # the name of that application by returning the associated Kookaburra
+    # instance. (Messages that do not match the name of a configured application
+    # will be handled with the usual #method_missing semantics.)
+    #
+    # @see [Kookaburra::Configuration#application]
     def method_missing(method_name, *args, &block)
       Kookaburra.configuration.applications[method_name.to_sym] \
         || super
     end
 
+    # @see [Kookaburra::TestHelpers#method_missing]
     def respond_to?(method_name)
       Kookaburra.configuration.applications.has_key?(method_name) \
         || super
@@ -118,8 +129,11 @@ class Kookaburra
 
     private
 
-    def kookaburra_instance
-      @kookaburra_instance ||= Kookaburra.new
+    def kookaburra(validate: true)
+      if validate && Kookaburra.configuration.has_named_applications?
+        raise AmbiguousDriverError
+      end
+      @kookaburra ||= Kookaburra.new
     end
   end
 end
