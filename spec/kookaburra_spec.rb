@@ -67,14 +67,4 @@ describe Kookaburra do
       end
     end
   end
-
-  describe '.reset_configuration!' do
-    it 'forgets the existing configuration' do
-      x = Kookaburra.configuration
-      x.app_host = 'http://example.com'
-      Kookaburra.reset_configuration!
-      y = Kookaburra.configuration
-      expect(x).to_not equal y
-    end
-  end
 end

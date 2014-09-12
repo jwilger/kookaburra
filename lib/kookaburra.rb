@@ -23,22 +23,22 @@ class Kookaburra
   class << self
     # Stores the configuration object that is used by default when creating new
     # instances of Kookaburra
-    #
-    # @return [Kookaburra::Configuration] return value is memoized
-    def configuration
-      @configuration ||= Configuration.new
-    end
+    attr_reader :configuration
 
-    # Yields the current configuration so that it can be modified
+    # Yields a new configuration so that it can be modified
+    #
+    # The new configuration object will now be used by default when creating
+    # instances of Kookaburra.
     #
     # @yield [Kookaburra::Configuration]
     def configure(&blk)
+      self.configuration = Configuration.new
       blk.call(configuration)
     end
 
-    def reset_configuration!
-      @configuration = Configuration.new
-    end
+    private
+
+    attr_writer :configuration
   end
 
   # Returns a new Kookaburra instance that wires together your application's
