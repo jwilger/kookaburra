@@ -23,7 +23,11 @@ class Kookaburra
   class << self
     # Stores the configuration object that is used by default when creating new
     # instances of Kookaburra
-    attr_reader :configuration
+    #
+    # @return [Kookaburra::Configuration]
+    def configuration
+      @configuration ||= Configuration.new
+    end
 
     # Yields a new configuration so that it can be modified
     #

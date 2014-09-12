@@ -50,17 +50,19 @@ describe 'testing multiple applications' do
   end
 
   specify 'once you have defined multiple apps, the top-level #api and #ui methods raise errors' do
-    pending "need to disable top-level api and ui methods in test helpers"
     expect { api } .to raise_error( Kookaburra::AmbiguousDriverError )
     expect { ui }  .to raise_error( Kookaburra::AmbiguousDriverError )
   end
 
   context "with different data in each app" do
     before(:each) do
-      pending "need to create test helper methods for app names"
+      app_1.api.create_user(:bob)
+      app_2.api.create_user(:sue)
       app_1.api.create_widget(:widget_a)
       app_2.api.create_widget(:widget_b)
     end
+
+    let(:widgets) { get_data(:widgets) }
 
     it 'can speak to both application APIs' do
       expect(app_1.api.widgets).to include widgets[:widget_a]
@@ -70,8 +72,25 @@ describe 'testing multiple applications' do
       expect(app_2.api.widgets).to include widgets[:widget_b]
     end
 
-    it 'can speak to both application UIs'
-    it 'shares a mental model between applications'
-    it 'shares a single browser session'
+    it 'can speak to both application UIs' do
+        app_1.ui.sign_in(:bob)
+        app_1.ui.view_widget_list
+        expect(app_1.ui.widget_list.widgets).to include widgets[:widget_a]
+        expect(app_1.ui.widget_list.widgets).to_not include widgets[:widget_b]
+
+        app_2.ui.sign_in(:sue)
+        app_2.ui.view_widget_list
+        expect(app_2.ui.widget_list.widgets).to_not include widgets[:widget_a]
+        expect(app_2.ui.widget_list.widgets).to include widgets[:widget_b]
+    end
+
+    it 'shares a single browser session' do
+      app_1.ui.sign_in(:bob)
+      app_1.ui.view_widget_list
+      app_2.ui.sign_in(:sue)
+      expect(app_1.ui.widget_list).to be_not_visible
+      app_1.ui.view_widget_list
+      expect(app_1.ui.widget_list).to be_visible
+    end
   end
 end

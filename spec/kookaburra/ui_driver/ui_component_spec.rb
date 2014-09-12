@@ -26,7 +26,7 @@ describe Kookaburra::UIDriver::UIComponent do
 
     it 'returns true if the component_locator is found in the DOM and is visible' do
       expect(browser).to receive(:has_css?) \
-        .with('#my_component', :visible) \
+        .with('#my_component', visible: true) \
         .and_return(true)
       expect(component).to be_visible
     end
