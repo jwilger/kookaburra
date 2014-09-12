@@ -1,6 +1,7 @@
 require 'ostruct'
 require 'delegate'
 require 'kookaburra/dependency_accessor'
+require 'kookaburra/mental_model'
 
 class Kookaburra
   # Provides access to the configuration data used throughout Kookaburra
@@ -37,15 +38,6 @@ class Kookaburra
     # @raise [Kookaburra::ConfigurationError] if you try to read this attribute
     #   without it having been set
     dependency_accessor :app_host
-
-    # This is the {Kookaburra::MentalModel} that is shared between your
-    # APIDriver and your UIDriver. This attribute is managed by {Kookaburra},
-    # so you shouldn't need to change it yourself.
-    #
-    # @attribute [rw] mental_model
-    # @raise [Kookaburra::ConfigurationError] if you try to read this attribute
-    #   without it having been set
-    dependency_accessor :mental_model
 
     # This is the logger to which Kookaburra will send various messages
     # about its operation. This would generally be used to allow
@@ -84,5 +76,14 @@ class Kookaburra
     def app_host_uri
       URI.parse(app_host)
     end
+
+    # This is the {Kookaburra::MentalModel} that is shared between your
+    # APIDriver and your UIDriver. This attribute is managed by {Kookaburra},
+    # so you shouldn't need to change it yourself.
+    def mental_model
+      @mental_model ||= MentalModel.new
+    end
+
+    attr_writer :mental_model
   end
 end

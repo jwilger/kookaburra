@@ -7,7 +7,6 @@ describe Kookaburra::Configuration do
   it_behaves_like :it_has_a_dependency_accessor, :ui_driver_class
   it_behaves_like :it_has_a_dependency_accessor, :browser
   it_behaves_like :it_has_a_dependency_accessor, :app_host
-  it_behaves_like :it_has_a_dependency_accessor, :mental_model
   it_behaves_like :it_has_a_dependency_accessor, :logger
 
   describe '#server_error_detection' do
@@ -35,6 +34,16 @@ describe Kookaburra::Configuration do
       expect(subject.app_host_uri).to eq 'http://example.com'.to_sym
       subject.app_host = 'http://foo.example.com'
       expect(subject.app_host_uri).to eq 'http://foo.example.com'.to_sym
+    end
+  end
+
+  describe '#mental_model' do
+    it 'returns an instance of MentalModel' do
+      expect(subject.mental_model).to be_kind_of Kookaburra::MentalModel
+    end
+
+    it 'always returns the same instance' do
+      expect(subject.mental_model.__id__).to eq subject.mental_model.__id__
     end
   end
 end

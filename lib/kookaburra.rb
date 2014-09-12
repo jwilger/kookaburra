@@ -43,7 +43,6 @@ class Kookaburra
   # @param [Kookaburra::Configuration] configuration (Kookaburra.configuration)
   def initialize(configuration = Kookaburra.configuration)
     self.configuration = configuration
-    configuration.mental_model = MentalModel.new
   end
 
   # Returns an instance of your APIDriver class configured to share test
