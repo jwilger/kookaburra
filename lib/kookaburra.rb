@@ -35,6 +35,10 @@ class Kookaburra
     def configure(&blk)
       blk.call(configuration)
     end
+
+    def reset_configuration!
+      @configuration = Configuration.new
+    end
   end
 
   # Returns a new Kookaburra instance that wires together your application's
