@@ -49,16 +49,11 @@ class Kookaburra::RackAppServer
   # will then monitor that port and only return once the app server is
   # responding (or after the timeout period specified on {#initialize}).
   def boot
-    if defined?(JRUBY_VERSION)
-      thread_app_server
-    else
-      fork_app_server
-    end
+    fork_app_server
     wait_for_app_to_respond
   end
 
   def shutdown
-    return if defined?(JRUBY_VERSION)
     Process.kill(9, rack_server_pid)
     Process.wait
   end
@@ -67,10 +62,6 @@ class Kookaburra::RackAppServer
 
   attr_accessor :rack_app_initializer, :rack_server_pid, :startup_timeout
   attr_writer :port
-
-  def thread_app_server
-    Thread.new { start_server }
-  end
 
   def fork_app_server
     self.rack_server_pid = fork do
