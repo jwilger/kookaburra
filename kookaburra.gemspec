@@ -32,4 +32,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "uuid"
   spec.add_development_dependency "find_a_port"
   spec.add_development_dependency "json"
+  spec.add_development_dependency "codeclimate-test-reporter"
 end

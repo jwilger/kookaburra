@@ -1,6 +1,7 @@
 before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
+  - "export CODECLIMATE_REPO_TOKEN=476ff0f469278c42a67f2682736e2522cda104a104e01ba6dbe532e9934de3b1"
 rvm:
   - "2.1.2"
   - "2.0.0"
