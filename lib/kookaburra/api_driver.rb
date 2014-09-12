@@ -36,7 +36,7 @@ class Kookaburra
     extend Forwardable
 
     # It is unlikely that you would call #initialize yourself; your APIDriver
-    # object is instantiated for you by {Kookaburra#given}.
+    # object is instantiated for you by {Kookaburra#api}.
     #
     # @param [Kookaburra::Configuration] configuration
     def initialize(configuration)
