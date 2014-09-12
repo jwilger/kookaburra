@@ -58,7 +58,7 @@ describe Kookaburra::Configuration do
 
     it 'builds a proxy configuration based on this one' do
       expect(Kookaburra::Configuration::Proxy).to receive(:new) \
-        .with(name: :foo, based_on: subject)
+        .with(name: :foo, basis: subject)
       subject.application(:foo)
     end
 

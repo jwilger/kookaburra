@@ -88,7 +88,7 @@ class Kookaburra
     attr_writer :mental_model
 
     def application(name, &block)
-      proxy = Proxy.new(name: name, based_on: self)
+      proxy = Proxy.new(name: name, basis: self)
       block.call(proxy) if block_given?
       applications[name] = Kookaburra.new(proxy)
     end
