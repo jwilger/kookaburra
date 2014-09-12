@@ -41,7 +41,7 @@ describe "testing a Rack application with Kookaburra", :slow do
         api.create_widget(:widget_b, :name => 'Widget B')
       end
 
-      define_method(:widgets) { k.get_data(:widgets) }
+      define_method(:widgets) { get_data(:widgets) }
 
       it "runs the tests against the application's UI" do
         ui.sign_in(:bob)
