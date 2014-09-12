@@ -8,7 +8,7 @@ require 'uuid'
 
 require 'support/json_api_app_and_kookaburra_drivers'
 
-describe "testing a Rack application with Kookaburra" do
+describe "testing a Rack application with Kookaburra", :slow do
   include Kookaburra::TestHelpers
 
   describe "with an HTML interface" do
