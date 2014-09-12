@@ -7,7 +7,7 @@ require 'uuid'
 
 require 'support/json_api_app_and_kookaburra_drivers'
 
-describe 'testing multiple applications' do
+describe 'testing multiple applications', :slow do
   include Kookaburra::TestHelpers
 
   OtherJsonApiApp = Class.new(JsonApiApp)
