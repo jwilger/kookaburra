@@ -1,3 +1,4 @@
+require 'forwardable'
 require 'kookaburra/exceptions'
 require 'kookaburra/mental_model'
 require 'kookaburra/api_driver'
@@ -17,6 +18,8 @@ require 'kookaburra/configuration'
 #
 # @see Kookaburra::TestHelpers
 class Kookaburra
+  extend Forwardable
+
   class << self
     # Stores the configuration object that is used by default when creating new
     # instances of Kookaburra
@@ -39,10 +42,8 @@ class Kookaburra
   #
   # @param [Kookaburra::Configuration] configuration (Kookaburra.configuration)
   def initialize(configuration = Kookaburra.configuration)
-    @configuration = configuration
-    @configuration.mental_model = MentalModel.new
-    @api_driver_class = configuration.api_driver_class
-    @ui_driver_class = configuration.ui_driver_class
+    self.configuration = configuration
+    configuration.mental_model = MentalModel.new
   end
 
   # Returns an instance of your APIDriver class configured to share test
@@ -50,7 +51,7 @@ class Kookaburra
   #
   # @return [Kookaburra::APIDriver]
   def api
-    @api ||= @api_driver_class.new(@configuration)
+    @api ||= api_driver_class.new(configuration)
   end
 
   # Returns an instance of your UIDriver class configured to share test fixture
@@ -59,7 +60,7 @@ class Kookaburra
   #
   # @return [Kookaburra::UIDriver]
   def ui
-    @ui ||= @ui_driver_class.new(@configuration)
+    @ui ||= ui_driver_class.new(configuration)
   end
 
   # Returns a deep-dup of the specified {MentalModel::Collection}.
@@ -75,6 +76,13 @@ class Kookaburra
   #
   # @return [Kookaburra::MentalModel::Collection]
   def get_data(collection_name)
-    @configuration.mental_model.send(collection_name).dup
+    mental_model.send(collection_name).dup
   end
+
+  private
+
+  attr_accessor :configuration
+
+  def_delegators :configuration, :api_driver_class, :ui_driver_class,
+    :mental_model
 end
