@@ -2,6 +2,7 @@ require 'ostruct'
 require 'delegate'
 require 'kookaburra/dependency_accessor'
 require 'kookaburra/mental_model'
+require 'kookaburra/configuration/proxy'
 
 class Kookaburra
   # Provides access to the configuration data used throughout Kookaburra
@@ -85,5 +86,15 @@ class Kookaburra
     end
 
     attr_writer :mental_model
+
+    def application(name, &block)
+      proxy = Proxy.new(name: name, based_on: self)
+      block.call(proxy) if block_given?
+      applications[name] = Kookaburra.new(proxy)
+    end
+
+    def applications
+      @applications ||= {}
+    end
   end
 end
