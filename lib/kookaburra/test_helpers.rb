@@ -104,7 +104,7 @@ class Kookaburra
 
     # Delegates to main {Kookaburra} instance
     def get_data(*args)
-      kookaburra(validate: false).get_data(*args)
+      main_kookaburra.get_data(*args)
     end
 
     # Will return the {Kookaburra} instance for any configured applications
@@ -129,10 +129,14 @@ class Kookaburra
 
     private
 
-    def kookaburra(validate: true)
-      if validate && Kookaburra.configuration.has_named_applications?
+    def kookaburra
+      if Kookaburra.configuration.has_named_applications?
         raise AmbiguousDriverError
       end
+      main_kookaburra
+    end
+
+    def main_kookaburra
       @kookaburra ||= Kookaburra.new
     end
   end
