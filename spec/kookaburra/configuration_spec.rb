@@ -46,4 +46,35 @@ describe Kookaburra::Configuration do
       expect(subject.mental_model.__id__).to eq subject.mental_model.__id__
     end
   end
+
+  describe '#application' do
+    let(:proxy) { double(:proxy) }
+    let(:app_kookaburra) { double(:app_kookaburra) }
+
+    before(:each) do
+      allow(Kookaburra::Configuration::Proxy).to receive(:new) { proxy }
+      allow(Kookaburra).to receive(:new) { app_kookaburra }
+    end
+
+    it 'builds a proxy configuration based on this one' do
+      expect(Kookaburra::Configuration::Proxy).to receive(:new) \
+        .with(name: :foo, based_on: subject)
+      subject.application(:foo)
+    end
+
+    it 'yields the proxy configuration' do
+      expect{ |b| subject.application(:foo, &b) }.to yield_with_args(proxy)
+    end
+
+    it 'builds a new Kookaburra instance with the proxy configuration' do
+      expect(Kookaburra).to receive(:new).with(proxy)
+      subject.application(:foo)
+    end
+
+    it 'stores the new Kookaburra instance by name' do
+      expect(subject.applications.keys).to_not include(:foo)
+      subject.application(:foo)
+      expect(subject.applications[:foo]).to equal app_kookaburra
+    end
+  end
 end
