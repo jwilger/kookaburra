@@ -132,8 +132,8 @@ class Kookaburra
       #
       # @return [Hash] the key/value pairs still remaining after the deletion
       def delete_if(&block)
-        move = lambda { |k,v| deleted[k] = v; true }
-        super { |k,v| block.call(k,v) && move.call(k,v) }
+        move = ->(key, value) { deleted[key] = value; true }
+        super { |key, value| block.call(key, value) && move.call(key, value) }
       end
 
       def dup
