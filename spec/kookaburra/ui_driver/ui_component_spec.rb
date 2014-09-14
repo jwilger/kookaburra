@@ -62,6 +62,36 @@ describe Kookaburra::UIDriver::UIComponent do
     end
   end
 
+  describe '#not_visible?' do
+    before(:each) do
+      def component.component_locator
+        '#my_component'
+      end
+    end
+
+    it 'returns true if the component_locator is not found in the DOM or is not visible' do
+      expect(browser).to receive(:has_no_css?) \
+        .with('#my_component', visible: true) \
+        .and_return(true)
+      expect(component).to be_not_visible
+    end
+
+    it 'returns false if the component_locator is found in the DOM and is visible' do
+      expect(browser).to receive(:has_no_css?) \
+        .with('#my_component', visible: true) \
+        .and_return(false)
+      expect(component).to_not be_not_visible
+    end
+
+    context 'when the component_locator is found in the DOM' do
+      let(:browser) { double('Browser Driver', has_css?: false, text: '') }
+
+      it 'returns false' do
+        expect(component).to_not be_visible
+      end
+    end
+  end
+
   describe '#url' do
     it 'returns the app_host + #component_path' do
       def component.component_path
