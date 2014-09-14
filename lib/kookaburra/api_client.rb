@@ -100,31 +100,29 @@ class Kookaburra
     # Convenience method to make a POST request
     #
     # @see APIClient#request
-    def post(path, data = nil, headers = {})
-      request(:post, path, data, headers)
+    def post(*args)
+      request(:post, *args)
     end
 
     # Convenience method to make a PUT request
     #
     # @see APIClient#request
-    def put(path, data = nil, headers = {})
-      request(:put, path, data, headers)
+    def put(*args)
+      request(:put, *args)
     end
 
     # Convenience method to make a GET request
     #
     # @see APIClient#request
-    def get(path, data = nil, headers = {})
-      path = add_querystring_to_path(path, data)
-      request(:get, path, nil, headers)
+    def get(*args)
+      request(:get, *args)
     end
 
     # Convenience method to make a DELETE request
     #
     # @see APIClient#request
-    def delete(path, data = nil, headers = {})
-      path = add_querystring_to_path(path, data)
-      request(:delete, path, nil, headers)
+    def delete(*args)
+      request(:delete, *args)
     end
 
     # Make an HTTP request
@@ -164,8 +162,16 @@ class Kookaburra
     #
     # @raise [Kookaburra::UnexpectedResponse] Raised if the HTTP
     #        response received is not in the 2XX-3XX range.
-    def request(method, path, data, headers)
-      data = encode(data)
+    def request(method, path, data = {}, headers = {})
+      case method
+      when :get, :delete
+        path = URI(path).tap do |uri|
+          uri.query = data.to_query
+        end
+        data = nil
+      when :post, :put
+        data = encode(data)
+      end
       headers = global_headers.merge(headers)
       response = @http_client.send(method, url_for(path), *[data, headers].compact)
       decode(response.body)
@@ -174,11 +180,6 @@ class Kookaburra
     end
 
     private
-
-    def add_querystring_to_path(path, data)
-      return path if data.nil? || data == {}
-      "#{path}?#{data.to_query}"
-    end
 
     def global_headers
       self.class.headers
