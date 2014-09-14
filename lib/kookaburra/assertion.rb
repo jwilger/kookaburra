@@ -18,7 +18,7 @@ class Kookaburra
     #
     # @raise [Kookaburra::AssertionFailed] raised if test evaluates to false
     def assert(test, message = "You might want to provide a better message, eh?")
-      test or raise AssertionFailed, message
+      (!!test == true) or raise AssertionFailed, message
     end
   end
 end
