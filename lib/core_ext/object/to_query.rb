@@ -50,4 +50,10 @@ rescue LoadError
   class Hash
     alias_method :to_query, :to_param
   end
+
+  class NilClass
+    def to_query
+      ''
+    end
+  end
 end
