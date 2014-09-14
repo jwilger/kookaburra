@@ -89,8 +89,8 @@ class Kookaburra::RackAppServer
   end
 
   def running?
-    res = Net::HTTP.start('localhost', port) { |http| http.get('/__identify__') }
-    if res.is_a?(Net::HTTPSuccess) or res.is_a?(Net::HTTPRedirection)
+    case (Net::HTTP.start('localhost', port) { |http| http.get('/__identify__') })
+    when Net::HTTPSuccess, Net::HTTPRedirection
       true
     else
       false
