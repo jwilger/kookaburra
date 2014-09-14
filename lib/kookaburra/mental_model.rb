@@ -53,12 +53,12 @@ class Kookaburra
       # @param [String] name The name of the collection. Used to provide
       #   helpful error messages when unknown keys are accessed.
       # @param [Hash] init_data Preloads specific data into the collection
-      def initialize(name, init_data = nil)
+      def initialize(name, init_data = {})
         self.name = name
         data = Hash.new do |hash, key|
           raise UnknownKeyError, "Can't find mental_model.#{@name}[#{key.inspect}]. Did you forget to set it?"
         end
-        data.merge!(init_data) unless init_data.nil?
+        data.merge!(init_data)
         super(data)
       end
 
