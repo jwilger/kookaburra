@@ -106,7 +106,7 @@ class Kookaburra
       end
 
       # Is the component's element found on the page and is it considered
-      # "visible" by the browser driver.
+      # "visible" by the browser driver?
       def visible?
         visible = browser.has_css?(component_locator, visible: true)
         unless visible
@@ -115,6 +115,9 @@ class Kookaburra
         visible
       end
 
+      # The opposite of {#visible?}
+      #
+      # @note This does not check for a server error.
       def not_visible?
         browser.has_no_css?(component_locator, visible: true)
       end
