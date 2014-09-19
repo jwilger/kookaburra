@@ -86,7 +86,7 @@ class Kookaburra
     # Delegates to main {Kookaburra} instance
     #
     # @note This method will only be available when no named applications have
-    #   been defined. (See {Koookaburra::Configuration#application}.)
+    #   been defined. (See {Kookaburra::Configuration#application}.)
     #
     # @raise [Kookaburra::AmbiguousDriverError] if named applications have been
     #   configured.
@@ -96,7 +96,7 @@ class Kookaburra
     # Delegates to main {Kookaburra} instance
     #
     # @note This method will only be available when no named applications have
-    #   been defined. (See {Koookaburra::Configuration#application}.)
+    #   been defined. (See {Kookaburra::Configuration#application}.)
     #
     # @raise [Kookaburra::AmbiguousDriverError] if named applications have been
     #   configured.
