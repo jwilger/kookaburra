@@ -2,9 +2,21 @@ require 'delegate'
 
 class Kookaburra
   class Configuration
+    # Used to manage configuration for a named application
+    #
+    # `Configuration::Proxy` objects delegate to their basis object to retrieve
+    # default values. This allows a base configuration to be specified and
+    # inherited by each application configuration.
+    #
+    # @see Kookaburra::Configuration#application
+    # @private
     class Proxy < DelegateClass(Configuration)
       attr_reader :name
 
+      # Builds a new Proxy
+      #
+      # @param [String] name An (arbitrary) identifier for this configuration
+      # @param [Kookaburra::Configuration] The object that will be used as the source for default values
       def initialize(name:, basis:)
         self.name = name
         self.basis = basis

@@ -7,7 +7,7 @@ class Kookaburra
   #
   # You will create a subclass of {APIClient} in your testing
   # implementation to be used with you subclass of
-  # {Kookaburra::APIDriver}. While the {GivenDriver} implements the
+  # {Kookaburra::APIDriver}. While the {APIDriver} implements the
   # "business domain" DSL for setting up your application state, the
   # {APIClient} maps discreet operations to your application's web
   # service API and can (optionally) handle encoding input data and
