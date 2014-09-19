@@ -31,20 +31,22 @@
           <h1>
 <a name="kookaburra" class="anchor" href="#kookaburra"><span class="octicon octicon-link"></span></a>Kookaburra</h1>
 
-<p>Kookaburra is a framework for implementing the <a href="http://martinfowler.com/eaaDev/WindowDriver.html" title="Window Driver - Martin Fowler">Window Driver</a> pattern in
-order to keep acceptance tests maintainable.</p>
+<p>Kookaburra is a framework for implementing the <a href="http://martinfowler.com/eaaDev/WindowDriver.html" title="Window Driver - Martin Fowler">Window Driver</a>
+pattern in order to keep acceptance tests maintainable.</p>
+
+<p><a href="https://codeclimate.com/github/jwilger/kookaburra"><img src="https://codeclimate.com/github/jwilger/kookaburra/badges/gpa.svg" alt="Code Climate"></a>
+<a href="https://codeclimate.com/github/jwilger/kookaburra"><img src="https://codeclimate.com/github/jwilger/kookaburra/badges/coverage.svg" alt="Test Coverage"></a></p>
 
 <h2>
 <a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
 
-<p>Requires Ruby 1.9.3 or greater. Tested with both MRI and JRuby (note 
-that you must run JRuby in 1.9 compatability mode.)</p>
+<p>Requires Ruby 2.1.0 or greater.</p>
 
 <h2>
 <a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
 
-<p>Kookaburra is available as a Rubygem and <a href="https://rubygems.org/gems/kookaburra" title="kookaburra | RubyGems.org | your community gem host">published on Rubygems.org</a>,
-so installation is trivial:</p>
+<p>Kookaburra is available as a Rubygem and
+<a href="https://rubygems.org/gems/kookaburra" title="kookaburra | RubyGems.org | your community gem host">published on Rubygems.org</a>, so installation is trivial:</p>
 
 <pre><code>gem install kookaburra
 </code></pre>
@@ -60,52 +62,54 @@ end
 <h2>
 <a name="setup" class="anchor" href="#setup"><span class="octicon octicon-link"></span></a>Setup</h2>
 
-<p>Kookaburra abstracts some common patterns for implementing the Window Driver
-testing pattern for web applications. You will need to tell Kookaburra which
-classes contain the specific Domain Driver implementations for your application
-as well as which driver to use for running the tests (currently only tested with
-<a href="https://github.com/jnicklas/capybara" title="jnicklas/capybara - GitHub">Capybara</a>).</p>
+<p>Kookaburra abstracts some common patterns for implementing the Window
+Driver testing pattern for web applications. You will need to tell
+Kookaburra which classes contain the specific Domain Driver
+implementations for your application as well as which driver to use for
+running the tests (currently only tested with <a href="https://github.com/jnicklas/capybara" title="jnicklas/capybara - GitHub">Capybara</a>).</p>
 
-<p>Kookaburra is designed to run tests agains a remote web server (although that
-server could be running on the same machine, it doesn't need to be), and it is
-the responsibility of the test implementation to ensure that the server is
-running. </p>
+<p>Kookaburra is designed to run tests against one or more remote web
+servers (although the server(s) could be running on the same machine, it
+doesn't need to be), and it is the responsibility of the test
+implementation to ensure that the server is running. </p>
 
-<p>The fact that Kookaburra runs against a remote server means that <em>it is not
-limited to testing only Ruby web applications</em>. As long as your application
-exposes a web-service API for use by the APIDriver and an HTML user interface
-for use by the UIDriver, you can use Kookaburra to test it. Also, as long as
-you're careful with both your application and test designs, you're not limited
-to running your tests only in an isolated testing environment; you could run
-the same test suite you use for development against your staging or production
-systems.</p>
+<p>The fact that Kookaburra runs against a remote server means that <em>it is
+not limited to testing only Ruby web applications</em>. As long as your
+application exposes a web-service API for use by the APIDriver and an
+HTML user interface for use by the UIDriver, you can use Kookaburra to
+test it. Also, as long as you're careful with both your application and
+test designs, you're not limited to running your tests only in an
+isolated testing environment; you could run the same test suite you use
+for development against your staging or production systems.</p>
 
 <h3>
 <a name="testing-an-application-running-locally" class="anchor" href="#testing-an-application-running-locally"><span class="octicon octicon-link"></span></a>Testing an Application Running Locally</h3>
 
-<p>The fact that Kookaburra is designed to support running tests against a remote
-server does not, of course, mean that the application cannot be running locally.
-It is possible to have your test suite manage the process of starting and
-stopping your server for you. Examples of how to do so with a Rack application
-are presented below, but you should be able to take the same basic approach with
-other types of application servers.</p>
+<p>The fact that Kookaburra is designed to support running tests against a
+remote server does not, of course, mean that the application cannot be
+running locally.  It is possible to have your test suite manage the
+process of starting and stopping your server(s) for you. Examples of how
+to do so with a Rack application are presented below, but you should be
+able to take the same basic approach with other types of application
+servers.</p>
 
-<p>Although Capybara is capable of starting a Rack application server on 
-its own, the default setup only starts the server up on-demand when you 
-call a method that requires the browser to interact with the web 
-application. Because the APIClient layer does not use Capybara, it is 
-necessary to manage the server process on your own. Otherwise the server 
-would not be guaranteed to be running when you call the APIClient 
-methods (particularly as these often appear in "Given" statements that 
+<p>Although Capybara is capable of starting a Rack application server on
+its own, the default setup only starts the server up on-demand when you
+call a method that requires the browser to interact with the web
+application. Because the APIClient layer does not use Capybara, it is
+necessary to manage the server process on your own. Otherwise the server
+would not be guaranteed to be running when you call the APIClient
+methods (particularly as these often appear in "Given" statements that
 are run before you start interacting with the web browser.)</p>
 
-<p>Keep in mind that, even if your server is capable of being started up in another
-thread within the same Ruby process that is executing your test suite, you will
-want to avoid doing so unless you are using a Ruby interpreter that supports
-native threads. Otherwise, when the APIClient makes an HTTP call to your
-application's API, it will block while waiting for a response, thus preventing
-your application from being able to respond to that request and resulting in a
-timeout error in your tests.</p>
+<p><strong>Keep in mind that, even if your server is capable of being started up in
+another thread within the same Ruby process that is executing your test
+suite, you will want to avoid doing so unless you are using a Ruby
+interpreter that supports native threads. Otherwise, when the APIClient
+makes an HTTP call to your application's API, it will block while
+waiting for a response, thus preventing your application from being able
+to respond to that request and resulting in a timeout error in your
+tests.</strong></p>
 
 <h3>
 <a name="rspec" class="anchor" href="#rspec"><span class="octicon octicon-link"></span></a>RSpec</h3>
@@ -147,13 +151,48 @@ end
 </code></pre>
 
 <h4>
+<a name="testing-multiple-applications" class="anchor" href="#testing-multiple-applications"><span class="octicon octicon-link"></span></a>Testing Multiple Applications</h4>
+
+<p>Sometimes you need to test a business process that spans multiple
+"applications" in your platform. Kookaburra can be configured to operate
+against multiple remote applications by defining them in the
+configuration block as follows:</p>
+
+<pre><code>Kookaburra.configure do |c|
+  c.application(:app_one) do |a|
+    a.api_driver_class = AppOne::APIDriver
+    a.ui_driver_class = AppOne::UIDriver
+    a.app_host = 'http://app_one.example.com:1234'
+  end
+
+  c.application(:app_two) do |a|
+    a.api_driver_class = AppTwo::APIDriver
+    a.ui_driver_class = AppTwo::UIDriver
+    a.app_host = 'http://app_two.example.com:1234'
+  end
+
+  c.browser = Capybara::Session.new(:selenium)
+  c.server_error_detection { |browser|
+    browser.has_css?('head title', :text =&gt; 'Internal Server Error')
+  }
+end
+</code></pre>
+
+<p>This changes the way you use the <code>#api</code> and <code>#ui</code> test helpers
+(explained below) so that you must qualify each one with the name of the
+application, i.e. <code>#app_one.api</code>, and <code>#app_two.ui</code>. Configuration
+parameters set on the base configuration (e.g. <code>c.browser = #...</code>) are
+shared between all named applications that do not specifically override
+them.</p>
+
+<h4>
 <a name="managing-startup-and-shutdown-of-a-rack-application-server" class="anchor" href="#managing-startup-and-shutdown-of-a-rack-application-server"><span class="octicon octicon-link"></span></a>Managing startup and shutdown of a Rack application server</h4>
 
-<p>While developing, it can be helpful to run your integration specs against a
-locally-running server that is managed by your test suite. The setup is similar
-to that in the previous section, but it adds before and after hooks to launch
-and shut down a Rack application server. Just add the following to
-<code>spec/support/kookaburra_setup.rb</code>:</p>
+<p>While developing, it can be helpful to run your integration specs
+against a locally-running server that is managed by your test suite. The
+setup is similar to that in the previous section, but it adds before and
+after hooks to launch and shut down a Rack application server. Just add
+the following to <code>spec/support/kookaburra_setup.rb</code>:</p>
 
 <pre><code>require 'kookaburra/test_helpers'
 require 'kookaburra/rack_app_server'
@@ -200,15 +239,15 @@ end
 <h3>
 <a name="cucumber" class="anchor" href="#cucumber"><span class="octicon octicon-link"></span></a>Cucumber</h3>
 
-<p>The following examples depict how you might configure <a href="http://cukes.info/" title="Cucumber - Making BDD fun">Cucumber</a> to
-run tests against an already running application server (e.g. a remote staging
-site) and a Rack application server that is managed by the test suite.</p>
+<p>The following examples depict how you might configure <a href="http://cukes.info/" title="Cucumber - Making BDD fun">Cucumber</a> to run tests against an already running application server
+(e.g. a remote staging site) and a Rack application server that is
+managed by the test suite.</p>
 
 <h4>
 <a name="testing-an-already-running-server-1" class="anchor" href="#testing-an-already-running-server-1"><span class="octicon octicon-link"></span></a>Testing an already running server</h4>
 
-<p>If you are running your tests against an already running server, you can simply
-add the following to <code>features/support/kookaburra_setup.rb</code>:</p>
+<p>If you are running your tests against an already running server, you can
+simply add the following to <code>features/support/kookaburra_setup.rb</code>:</p>
 
 <pre><code>require 'kookaburra/test_helpers'
 
@@ -233,13 +272,48 @@ World(Kookaburra::TestHelpers)
 </code></pre>
 
 <h4>
+<a name="testing-multiple-applications-1" class="anchor" href="#testing-multiple-applications-1"><span class="octicon octicon-link"></span></a>Testing Multiple Applications</h4>
+
+<p>Sometimes you need to test a business process that spans multiple
+"applications" in your platform. Kookaburra can be configured to operate
+against multiple remote applications by defining them in the
+configuration block as follows:</p>
+
+<pre><code>Kookaburra.configure do |c|
+  c.application(:app_one) do |a|
+    a.api_driver_class = AppOne::APIDriver
+    a.ui_driver_class = AppOne::UIDriver
+    a.app_host = 'http://app_one.example.com:1234'
+  end
+
+  c.application(:app_two) do |a|
+    a.api_driver_class = AppTwo::APIDriver
+    a.ui_driver_class = AppTwo::UIDriver
+    a.app_host = 'http://app_two.example.com:1234'
+  end
+
+  c.browser = Capybara::Session.new(:selenium)
+  c.server_error_detection { |browser|
+    browser.has_css?('head title', :text =&gt; 'Internal Server Error')
+  }
+end
+</code></pre>
+
+<p>This changes the way you use the <code>#api</code> and <code>#ui</code> test helpers
+(explained below) so that you must qualify each one with the name of the
+application, i.e. <code>#app_one.api</code>, and <code>#app_two.ui</code>. Configuration
+parameters set on the base configuration (e.g. <code>c.browser = #...</code>) are
+shared between all named applications that do not specifically override
+them.</p>
+
+<h4>
 <a name="managing-startup-and-shutdown-of-a-rack-application-server-1" class="anchor" href="#managing-startup-and-shutdown-of-a-rack-application-server-1"><span class="octicon octicon-link"></span></a>Managing startup and shutdown of a Rack application server</h4>
 
-<p>While developing, it can be helpful to run your acceptance tests against a
-locally-running server that is managed by your test suite. The setup is similar
-to that in the previous section, but it adds before and after hooks to launch
-and shut down a Rack application server. Just add the following to
-<code>features/support/kookaburra_setup.rb</code>:</p>
+<p>While developing, it can be helpful to run your acceptance tests against
+a locally-running server that is managed by your test suite. The setup
+is similar to that in the previous section, but it adds before and after
+hooks to launch and shut down a Rack application server. Just add the
+following to <code>features/support/kookaburra_setup.rb</code>:</p>
 
 <pre><code>require 'kookaburra/test_helpers'
 require 'kookaburra/rack_app_server'
@@ -282,10 +356,10 @@ end
 <h2>
 <a name="defining-your-testing-dsl" class="anchor" href="#defining-your-testing-dsl"><span class="octicon octicon-link"></span></a>Defining Your Testing DSL</h2>
 
-<p>Kookaburra extracts some common patterns that make it easier to use the Window
-Driver pattern along with various Ruby testing frameworks, but you still need to
-define your own testing DSL. An acceptance testing stack using Kookaburra has
-the following layers:</p>
+<p>Kookaburra extracts some common patterns that make it easier to use the
+Window Driver pattern along with various Ruby testing frameworks, but
+you still need to define your own testing DSL. An acceptance testing
+stack using Kookaburra has the following layers:</p>
 
 <ol>
 <li>The <strong>Business Specification Language</strong> (Cucumber scenarios or other
@@ -298,12 +372,12 @@ etc.)</li>
 </ol><h3>
 <a name="the-business-specification-language" class="anchor" href="#the-business-specification-language"><span class="octicon octicon-link"></span></a>The Business Specification Language</h3>
 
-<p>The business specification language consists of the highest-level descriptions
-of a feature that are suitable for sharing with the non/less-technical
-stakeholders on a project.</p>
+<p>The business specification language consists of the highest-level
+descriptions of a feature that are suitable for sharing with the
+non/less-technical stakeholders on a project.</p>
 
-<p>Gherkin is the external DSL used by Cucumber for this purpose, and you might
-have the following scenario defined for an e-commerce application:</p>
+<p>Gherkin is the external DSL used by Cucumber for this purpose, and you
+might have the following scenario defined for an e-commerce application:</p>
 
 <pre><code># purchase_items_in_cart.feature
 
@@ -324,41 +398,39 @@ Feature: Purchase Items in Cart
     And I see that my default shipping options will be used
 </code></pre>
 
-<p>Note that the scenario is focused on business concepts versus interface details,
-i.e. you "choose to check out" rather than "click on the checkout button". If
-for some reason your e-commerce system was going to be a terminal application
-rather than a web application, you would not need to change this scenario at
-all, because the actual business concepts described would not change (and
-although Kookaburra's focus is on testing web applications, it could likely be
-adapted to other environments.)</p>
+<p>Note that the scenario is focused on business concepts versus interface
+details, i.e. you "choose to check out" rather than "click on the
+checkout button". If for some reason your e-commerce system was going to
+be a terminal application rather than a web application, you would not
+need to change this scenario at all, because the actual business
+concepts described would not change (and although Kookaburra's focus is
+on testing web applications, it could likely be adapted to other
+environments.)</p>
 
 <h3>
 <a name="the-test-implementation" class="anchor" href="#the-test-implementation"><span class="octicon octicon-link"></span></a>The Test Implementation</h3>
 
 <p>The Test Implementation layer exists as the line in between the Business
-Specification Language and the Domain Driver, and it includes Cucumber step
-definitions, RSpec example blocks, Test::Unit tests, etc. At this layer, your
-code orchestrates calls into the Domain Driver to mimic user interactions under
-various conditions and make assertions about the results.</p>
+Specification Language and the Domain Driver, and it includes Cucumber
+step definitions, RSpec example blocks, Test::Unit tests, etc. At this
+layer, your code orchestrates calls into the Domain Driver to mimic user
+interactions under various conditions and make assertions about the
+results.</p>
 
-<p><strong>Test assertions always belong within the test implementation layer.</strong> Some
-testing frameworks such as RSpec add methods like <code>#should</code> to <code>Object</code>, which
-has the effect of poisoning the entire Ruby namespace with these methods---if
-you are using RSpec, you can call <code>#should</code> anywhere in your code and it will
-work when RSpec is loaded. Do not be tempted to call a testing library's Object
-decorators anywhere outside of your test implementation (such as within
-<code>UIDriver</code> or <code>UIComponent</code> subclasses.) Doing so will tightly couple your
-Domain Driver and/or Window Driver implementation to a specific testing library.</p>
+<p><strong>Test assertions always belong within the test implementation layer.</strong>
+Some testing frameworks such as RSpec add methods like <code>#should</code> to
+<code>Object</code>, which has the effect of poisoning the entire Ruby namespace
+with these methods---if you are using RSpec, you can call <code>#should</code>
+anywhere in your code and it will work when RSpec is loaded. Do not be
+tempted to call a testing library's Object decorators anywhere outside
+of your test implementation (such as within <code>UIDriver</code> or <code>UIComponent</code>
+subclasses.) Doing so will tightly couple your Domain Driver and/or
+Window Driver implementation to a specific testing library.</p>
 
-<p><code>Kookaburra::UIDriver::UIComponent</code> provides an <code>#assert</code> method for use inside
-your own UIComponents. This method exists to verify preconditions and provide
-more informative error messages; it is not intended to be used for test
-verifications.</p>
-
-<p><code>Kookaburra::TestHelpers</code> provides a convenient way to make assertions about the
-mental model.  If you are using Test::Unit, see
-<code>Kookaburra::TestHelpers#assert_mental_model_of</code>; for RSpec, see
-<code>Kookaburra::TestHelpers#match_mental_model_of</code>.</p>
+<p><code>Kookaburra::UIDriver::UIComponent</code> provides an <code>#assert</code> method for use
+inside your own UIComponents. This method exists to verify preconditions
+and provide more informative error messages; it is not intended to be
+used for test verifications.</p>
 
 <p>Given the Cucumber scenario above, here is how the test implementation layer
 might look:</p>
@@ -394,25 +466,27 @@ Then "I see my order summary" do
 end
 
 Then "I see that my default payment options will be used" do
-  ui.order_summary.payment_options.should match_mental_model_of(:default_payment_options)
-  # Or if you prefer Test::Unit style assertions...
-  # assert_mental_model_matches(:default_payment_options, ui.order_summary.payment_options)
+  expect(ui.order_summary.payment_options).to \
+    eq get_data(:payment_optons)[:default]
 end
 
 Then "I see that my default shipping options will be used" do
-  ui.order_summary.shipping_options.should match_mental_model_of(:default_shipping_options)
+  expect(ui.order_summary.shipping_options).to \
+    eq get_data(:shipping_options)[:default]
 end
 </code></pre>
 
 <p>The step definitions contain neither explicitly shared state (instance
-variables) nor any logic branches; they are simply wrappers around calls into
-the Domain Driver layer. There are a couple of advantages to this approach.</p>
+variables) nor any logic branches; they are simply wrappers around calls
+into the Domain Driver layer. There are a couple of advantages to this
+approach.</p>
 
-<p>First, because step definitions are so simple, it isn't necessary to force <em>Very
-Specific Wording</em> on the business analyst/product owner who is writing the
-specs. For instance, if she writes "I see a summary of my order" in another
-scenario, it's not a big deal to have the following in your step definitions (as
-long as the author of the spec confirms that they really mean the same thing):</p>
+<p>First, because step definitions are so simple, it isn't necessary to
+force <em>Very Specific Wording</em> on the business analyst/product owner who
+is writing the specs. For instance, if she writes "I see a summary of my
+order" in another scenario, it's not a big deal to have the following in
+your step definitions (as long as the author of the spec confirms that
+they really mean the same thing):</p>
 
 <pre><code>Then "I see my order summary" do
   ui.order_summary.should be_visible
@@ -423,18 +497,18 @@ Then "I see a summary of my order" do
 end
 </code></pre>
 
-<p>The step definitions are nothing more than a natural language reference to an
-action in the Domain Driver; there is no overwhelming maintenance cost to the
-slight duplication, and it opens up the capacity for more readable Gherkin
-specs. The fewer false road blocks you put between your product owner and a
-written specification, the easier it becomes to ensure her participation in this
-process.</p>
+<p>The step definitions are nothing more than a natural language reference
+to an action in the Domain Driver; there is no overwhelming maintenance
+cost to the slight duplication, and it opens up the capacity for more
+readable Gherkin specs. The fewer false road blocks you put between your
+product owner and a written specification, the easier it becomes to
+ensure her participation in this process.</p>
 
-<p>The second advantage is that by pushing all of the complexity down into the
-Domain Driver, it's now trivial to reuse the exact same code in
-developer-centric integration tests. This ensures you have parity between the
-way the automated acceptance tests run and any additional testing that the
-development team needs to add in.</p>
+<p>The second advantage is that by pushing all of the complexity down into
+the Domain Driver, it's now trivial to reuse the exact same code in
+developer-centric integration tests. This ensures you have parity
+between the way the automated acceptance tests run and any additional
+testing that the development team needs to add in.</p>
 
 <p>Using RSpec, the test implementation would be as follows:</p>
 
@@ -443,16 +517,19 @@ development team needs to add in.</p>
 describe "Purchase Items in Cart" do
   example "Using Existing Billing and Shipping Information" do
     api.existing_account(:my_account)
-    api.default_payment_options_specified_for(:my_account)
-    api.default_shipping_options_specified_for(:my_account)
-    api.an_item_in_my_shopping_cart(:my_account)
+    api.default_payment_options_specified
+    api.default_shipping_options_specified
+    api.an_item_in_my_shopping_cart
 
-    ui.sign_in(:my_account)
+    ui.sign_in
     ui.choose_to_check_out
 
-    ui.order_summary.should be_visible
-    ui.order_summary.payment_options.should == k.get_data(:default_payment_options)[:my_account]
-    ui.order_summary.shipping_options.should == k.get_data(:default_shipping_options)[:my_account]
+    expect(ui.order_summary).to be_visible
+    expect(ui.order_summary.payment_options).to \
+      eq get_data(:payment_optons)[:default]
+
+    expect(ui.order_summary.shipping_options).to \
+      eq get_data(:shipping_options)[:default]
   end
 end
 </code></pre>
@@ -460,38 +537,41 @@ end
 <h3>
 <a name="the-domain-driver" class="anchor" href="#the-domain-driver"><span class="octicon octicon-link"></span></a>The Domain Driver</h3>
 
-<p>The Domain Driver layer is where you build up an internal DSL that describes the
-business concepts of your application at a fairly high level. It consists of two
-top-level drivers: the <code>APIDriver</code> (available via <code>#api</code>) used to set up
-state for your tests and the UIDriver (available via <code>#ui</code>) for describing the
-tasks that a user can accomplish with the application.</p>
+<p>The Domain Driver layer is where you build up an internal DSL that
+describes the business concepts of your application at a fairly high
+level. It consists of two top-level drivers: the <code>APIDriver</code> (available
+via <code>#api</code>) used to set up state for your tests and the UIDriver
+(available via <code>#ui</code>) for describing the tasks that a user can
+accomplish with the application.</p>
 
 <h4>
 <a name="mental-model" class="anchor" href="#mental-model"><span class="octicon octicon-link"></span></a>Mental Model</h4>
 
-<p><code>Kookaburra::MentalModel</code> is the component via which the <code>APIDriver</code> and the
-<code>UIDriver</code> share information, and it is intended to represent your application
-user's mental picture of the data they are working with. For instance, if you
-create a user account via the <code>APIDriver</code>, you would store the login
-credentials for that account in the <code>MentalModel</code> instance, so the <code>UIDriver</code>
-knows what to use when you tell it to <code>#sign_in</code>. This is what allows the
-Cucumber step definitions to remain free from explicitly shared state.</p>
+<p><code>Kookaburra::MentalModel</code> is the component via which the <code>APIDriver</code> and
+the <code>UIDriver</code> share information, and it is intended to represent your
+application user's mental picture of the data they are working with. For
+instance, if you create a user account via the <code>APIDriver</code>, you would
+store the login credentials for that account in the <code>MentalModel</code>
+instance, so the <code>UIDriver</code> knows what to use when you tell it to
+<code>#sign_in</code>. This is what allows the Cucumber step definitions to remain
+free from explicitly shared state.</p>
 
-<p>Kookaburra automatically configures your <code>APIDriver</code> and your <code>UIDriver</code> to
-share a <code>MentalModel</code> instance, which is available to both of them via their
-<code>#mental_model</code> method.</p>
+<p>Kookaburra automatically configures your <code>APIDriver</code> and your <code>UIDriver</code>
+to share a <code>MentalModel</code> instance, which is available to both of them
+via their <code>#mental_model</code> method.</p>
 
-<p>The <code>MentalModel</code> instance will return a <code>MentalModel::Collection</code> for any method
-called on the object. The <code>MentalModel::Collection</code> object behaves like a <code>Hash</code>
-for the most part; however, it will raise a <code>Kookaburra::UnknownKeyError</code> if you
-try to access a key that has not yet been assigned a value.</p>
+<p>The <code>MentalModel</code> instance will return a <code>MentalModel::Collection</code> for
+any method called on the object. The <code>MentalModel::Collection</code> object
+behaves like a <code>Hash</code> for the most part; however, it will raise a
+<code>Kookaburra::UnknownKeyError</code> if you try to access a key that has not
+yet been assigned a value.</p>
 
-<p>Deletions (via <code>#delete</code> or <code>#delete_if</code>) will actually remove the key/value
-pair from the collection, but add it to a sub-collection (available at
-<code>MentalModel::Collection#deleted</code>). This reflects the fact that the user's
-mental model of the dataset would also include any intentional exceptions -
-the user will, for example, want to verify that an item they deleted does
-not appear to be available in the system.</p>
+<p>Deletions (via <code>#delete</code> or <code>#delete_if</code>) will actually remove the
+key/value pair from the collection, but add it to a sub-collection
+(available at <code>MentalModel::Collection#deleted</code>). This reflects the fact
+that the user's mental model of the dataset would also include any
+intentional exceptions - the user will, for example, want to verify that
+an item they deleted does not appear to be available in the system.</p>
 
 <p>Here's an example of MentalModel behavior:</p>
 
@@ -519,11 +599,11 @@ mental_model.widgets.deleted[:widget_a]
 <h4>
 <a name="api-driver" class="anchor" href="#api-driver"><span class="octicon octicon-link"></span></a>API Driver</h4>
 
-<p>The <code>Kookaburra::APIDriver</code> is used to create a particular "preexisting" state
-within your application's data and ensure you have a handle to that data (when
-needed) prior to interacting with the UI. You will create a subclass of
-<code>Kookaburra::APIDriver</code> in which you will create part of the Domain Driver DSL
-for your application:</p>
+<p>The <code>Kookaburra::APIDriver</code> is used to create a particular "preexisting"
+state within your application's data and ensure you have a handle to
+that data (when needed) prior to interacting with the UI. You will
+create a subclass of <code>Kookaburra::APIDriver</code> in which you will create
+part of the Domain Driver DSL for your application:</p>
 
 <pre><code># lib/my_app/kookaburra/api_driver.rb
 
@@ -583,9 +663,9 @@ paths.</p>
 <a name="ui-driver" class="anchor" href="#ui-driver"><span class="octicon octicon-link"></span></a>UI Driver</h4>
 
 <p><code>Kookaburra::UIDriver</code> provides the necessary tools for driving your
-application's user interface with the Window Driver pattern. You will subclass
-<code>Kookaburra::UIDriver</code> for your application and implement your testing DSL
-within your subclass:</p>
+application's user interface with the Window Driver pattern. You will
+subclass <code>Kookaburra::UIDriver</code> for your application and implement your
+testing DSL within your subclass:</p>
 
 <pre><code># lib/my_app/kookaburra/ui_driver.rb
 
@@ -605,15 +685,16 @@ end
 <h3>
 <a name="the-window-driver-layer" class="anchor" href="#the-window-driver-layer"><span class="octicon octicon-link"></span></a>The Window Driver Layer</h3>
 
-<p>While your <code>APIDriver</code> and <code>UIDriver</code> provide a DSL that represents actions
-your users can perform in your application, the <a href="http://martinfowler.com/eaaDev/WindowDriver.html" title="Window Driver - Martin Fowler">Window Driver</a>
-layer describes the individual user interface components that the user interacts
-with to perform these tasks. By describing each interface component using an OOP
-approach, it is much easier to maintain your acceptance/integration tests,
-because the implementation details of each component are captured in a single
-place. For example, if/when the implementation of your application's sign in
-screen changes, you can fix every single test that needs to log a user into the
-system just by updating the <code>SignInScreen</code> class.</p>
+<p>While your <code>APIDriver</code> and <code>UIDriver</code> provide a DSL that represents
+actions your users can perform in your application, the
+<a href="http://martinfowler.com/eaaDev/WindowDriver.html" title="Window Driver - Martin Fowler">Window Driver</a> layer describes the individual user
+interface components that the user interacts with to perform these
+tasks. By describing each interface component using an OOP approach, it
+is much easier to maintain your acceptance/integration tests, because
+the implementation details of each component are captured in a single
+place. For example, if/when the implementation of your application's
+sign in screen changes, you can fix every single test that needs to log
+a user into the system just by updating the <code>SignInScreen</code> class.</p>
 
 <p>You describe the various user interface components by sub-classing
 <code>Kookaburra::UIDriver::UIComponent</code>:</p>
@@ -669,11 +750,12 @@ whatever is passed to <code>Kookaburra.new</code> as the <code>:browser</code> o
 Presently, we have only used Capybara as the application driver for
 Kookaburra.</p>
 
-<p>It's possible that something other than Capybara could be passed in, as long as
-that something presented the same API. In reality, using something other than
-Capybara is likely to require some changes to Kookaburra itself. If you have a
-particular interest in making this work, please feel free to fork the project
-and send us a <a href="https://github.com/projectdx/kookaburra/pull/new/master" title="Send a pull request - GitHub">GitHub pull request</a> with your changes.</p>
+<p>It's possible that something other than Capybara could be passed in, as
+long as that something presented the same API. In reality, using
+something other than Capybara is likely to require some changes to
+Kookaburra itself. If you have a particular interest in making this
+work, please feel free to fork the project and send us a <a href="https://github.com/projectdx/kookaburra/pull/new/master" title="Send a pull request - GitHub">GitHub pull
+request</a> with your changes.</p>
 
 <h2>
 <a name="contributing-to-kookaburra" class="anchor" href="#contributing-to-kookaburra"><span class="octicon octicon-link"></span></a>Contributing to kookaburra</h2>
@@ -696,8 +778,7 @@ isolate to its own commit so I can cherry-pick around it.</li>
 </ul><h2>
 <a name="copyright" class="anchor" href="#copyright"><span class="octicon octicon-link"></span></a>Copyright</h2>
 
-<p>Copyright © 2011 John Wilger. See LICENSE.txt for
-further details.</p>
+<p>Copyright © 2011 John Wilger. See LICENSE.txt for further details.</p>
         </section>
 
         <aside id="sidebar">
