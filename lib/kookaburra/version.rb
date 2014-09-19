@@ -1,3 +1,3 @@
 class Kookaburra
-  VERSION = "3.0.0.pre.dev"
+  VERSION = "3.0.0"
 end
