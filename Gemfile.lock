@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    kookaburra (3.0.0.pre.dev)
+    kookaburra (3.0.0)
       rest-client
 
 GEM
