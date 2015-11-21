@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'kookaburra/test_helpers'
 require 'kookaburra/rack_app_server'
 require 'capybara'
-require 'capybara/webkit'
+require 'capybara/poltergeist'
 require 'uuid'
 
 require 'support/json_api_app_and_kookaburra_drivers'
@@ -37,7 +37,7 @@ describe 'testing multiple applications', :slow do
         a.api_driver_class = MyOtherAPIDriver
         a.app_host = 'http://127.0.0.1:%d' % app_server_2.port
       end
-      c.browser = Capybara::Session.new(:webkit)
+      c.browser = Capybara::Session.new(:poltergeist)
       c.server_error_detection do |browser|
         browser.has_css?('head title', :text => 'Internal Server Error', :visible => false)
       end
