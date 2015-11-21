@@ -89,7 +89,19 @@ class Kookaburra::RackAppServer
   end
 
   def running?
-    case (Net::HTTP.start('localhost', port) { |http| http.get('/__identify__') })
+    case (Net::HTTP.start('localhost', port) { |http|
+      attempts_remaining = 3
+      begin
+        http.get('/__identify__')
+      rescue Net::HTTPBadResponse => e
+        if attempts_remaining > 0
+          attempts_remaining -= 1
+          retry
+        else
+          raise e
+        end
+      end
+    })
     when Net::HTTPSuccess, Net::HTTPRedirection
       true
     else
