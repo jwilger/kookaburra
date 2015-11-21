@@ -3,7 +3,7 @@ require 'kookaburra/test_helpers'
 require 'kookaburra/api_client'
 require 'kookaburra/rack_app_server'
 require 'capybara'
-require 'capybara/webkit'
+require 'capybara/poltergeist'
 require 'uuid'
 
 require 'support/json_api_app_and_kookaburra_drivers'
@@ -24,7 +24,7 @@ describe "testing a Rack application with Kookaburra", :slow do
           c.ui_driver_class = MyUIDriver
           c.api_driver_class = MyAPIDriver
           c.app_host = 'http://127.0.0.1:%d' % app_server.port
-          c.browser = Capybara::Session.new(:webkit)
+          c.browser = Capybara::Session.new(:poltergeist)
           c.server_error_detection do |browser|
             browser.has_css?('head title', :text => 'Internal Server Error', :visible => false)
           end
