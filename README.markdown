@@ -1,5 +1,7 @@
 # Kookaburra #
 
+N.B. I (John Wilger) am no longer maintaining this library. If you find it useful and would like to take over maintenance, please reach out.
+
 Kookaburra is a framework for implementing the [Window Driver] [Window Driver]
 pattern in order to keep acceptance tests maintainable.
 
